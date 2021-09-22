@@ -16,4 +16,4 @@ WORKDIR /app/iglo
 
 EXPOSE 8000
 
-CMD uwsgi --http :8000 --module iglo.wsgi
+CMD /app/deploy/run.sh

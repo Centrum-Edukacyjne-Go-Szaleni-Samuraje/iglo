@@ -11,9 +11,9 @@ $ python iglo/manage.py migrate
 $ python iglo/manage.py runserver
 ```
 
-Docker image/container:
+Docker build & run:
 
 ```
-$ docker build -f deploy/Dockerfile -t iglo .
-$ docker run --name iglo -p 8000:8000 iglo
+$ ./deploy/build.sh
+$ ./deploy/start.sh
 ```

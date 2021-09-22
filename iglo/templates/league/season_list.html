@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Sezony</li>
+                </ol>
+            </nav>
+            <h2>Sezony</h2>
+            <ul>
+                {% for season in object_list %}
+                    <li>
+                        <a href="{% url "season-detail" season.id %}">
+                            Sezon {{ season.start_date }} - {{ season.end_date }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

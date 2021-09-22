@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Sezon {{ object.start_date }}- {{ object.end_date }}
+                    </li>
+                </ol>
+            </nav>
+            <h2>Sezon {{ object.start_date }} - {{ object.end_date }}</h2>
+            <ul>
+                {% for group in object.groups.all %}
+                    <li><a href="{% url "group-detail" group.id %}">Grupa {{ group.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

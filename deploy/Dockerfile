@@ -14,6 +14,6 @@ ADD . /app/
 
 WORKDIR /app/iglo
 
-EXPOSE 8000
+EXPOSE 9999
 
 CMD /app/deploy/run.sh

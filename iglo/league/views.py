@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView
 
-from league.models import Season, Group
+from league.models import Season, Group, Game
 
 
 class SeasonsListView(ListView):
@@ -13,3 +13,7 @@ class SeasonDetailView(DetailView):
 
 class GroupDetailView(DetailView):
     model = Group
+
+
+class GameDetailView(DetailView):
+    model = Game

@@ -6,7 +6,9 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
-                    <li class="breadcrumb-item"><a href="{% url "season-detail" object.season.id %}">Sezon {{ object.season.start_date }} - {{ object.season.end_date }}</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{% url "season-detail" object.season.id %}">Sezon {{ object.season.start_date }}
+                        - {{ object.season.end_date }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Grupa {{ object.name }}</li>
                 </ol>
             </nav>
@@ -15,15 +17,15 @@
                 <thead>
                     <tr>
                         <th></th>
-                        {% for player in object.players.all %}
-                            <th style="min-width: 80px; text-align: center;">{{ player.name }}</th>
+                        {% for member in object.members.all %}
+                            <th style="min-width: 80px; text-align: center;">{{ member.player.nick }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player, results in object.results_as_table %}
+                    {% for member, results in object.results_as_table %}
                         <tr>
-                            <td><strong>{{ player.name }}</strong></td>
+                            <td><strong>{{ member.player.nick }}</strong></td>
                             {% for result in results %}
                                 <td style="text-align: center">
                                     {% if result is None %}
@@ -37,6 +39,16 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <h3>Gry:</h3>
+            <ul>
+                {% for game in object.games.all %}
+                    <li>
+                        <a href="{% url "game-detail" game.pk %}">
+                            {{ game.black.player.nick }} (B) vs {{ game.white.player.nick }} (W) - {{ game.result }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 {% endblock %}

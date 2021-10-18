@@ -40,6 +40,13 @@
     </div>
 </nav>
 <div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     {% block content %}{% endblock %}
 </div>
 <script src="{% static "bootstrap/bootstrap.bundle.min.js" %}"></script>

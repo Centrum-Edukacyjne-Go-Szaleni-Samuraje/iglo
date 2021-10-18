@@ -3,6 +3,8 @@ from typing import Optional
 
 from django.db import models
 
+from accounts.models import User
+
 
 class Season(models.Model):
     number = models.IntegerField()

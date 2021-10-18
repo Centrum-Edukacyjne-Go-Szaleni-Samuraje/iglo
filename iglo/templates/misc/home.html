@@ -5,7 +5,7 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            <div class="card text-center mb-3 mt-3">
+            <div class="card text-center mb-3">
                 <div class="card-body">
                     <h1 class="card-title">Internetowa Go Liga O!</h1>
                     <p class="card-text">IGLO jest koleżeńską ligą dla entuzjastów Go. Ma na celu budowanie relacji z
@@ -15,14 +15,14 @@
                         silnych graczy.</p>
                     <p class="card-text">Każdy gracz znajdzie dla siebie grupe odpowiedającą jego poziomowi, zatem nie
                         czekaj tylko dołącz do nas!</p>
-                    <a href="#" class="btn btn-success">Zapisz się!</a>
+                    <a href="{% url "registration" %}" class="btn btn-success">Zapisz się!</a>
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-6 d-flex align-items-stretch">
-            <div class="card">
+        <div class="col-12 col-md-6 mb-3">
+            <div class="card h-100">
                 <div class="card-header">Zasady</div>
                 <div class="card-body">
                     <ul>
@@ -36,8 +36,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 d-flex align-items-stretch">
-            <div class="card">
+        <div class="col-12 col-md-6 mb-3">
+            <div class="card h-100">
                 <div class="card-header">Wykłady i komentarze</div>
                 <div class="card-body">
                     <ul>

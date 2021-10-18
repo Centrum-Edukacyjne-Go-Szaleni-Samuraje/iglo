@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(options["seasons_file"], "r") as f:
             data = json.load(f)
-            for season_data in reversed(data):
+            for season_number, season_data in enumerate(reversed(data), start=1):
                 start_date = datetime.datetime.fromtimestamp(
                     season_data["startDate"] / 1000
                 ).date()
@@ -23,6 +23,7 @@ class Command(BaseCommand):
                     season_data["endDate"] / 1000
                 ).date()
                 season = Season.objects.create(
+                    number=season_number,
                     start_date=start_date,
                     end_date=end_date,
                 )

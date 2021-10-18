@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block page_title %}Sezon #{{ object.number }}{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col">
@@ -7,16 +9,23 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Sezon {{ object.start_date }}- {{ object.end_date }}
+                        Sezon #{{ object.number }}
                     </li>
                 </ol>
             </nav>
-            <h2>Sezon {{ object.start_date }} - {{ object.end_date }}</h2>
-            <ul>
-                {% for group in object.groups.all %}
-                    <li><a href="{% url "group-detail" group.id %}">Grupa {{ group.name }}</a></li>
-                {% endfor %}
-            </ul>
+            <h2>Sezon #{{ object.number }}</h2>
+            <h5 class="text-muted mb-4">{{ season.start_date }} - {{ season.end_date }}</h5>
+            {% for group in object.groups.all %}
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Grupa {{ group.name }}</strong></div>
+                    <div class="card-body d-flex justify-content-between align-items-baseline">
+                        <p>Gracze:
+                            {% for member in group.members.all %}{{ member.player.nick }}{% if not forloop.last %},
+                            {% endif %}{% endfor %}</p>
+                        <a href="{% url "group-detail" season_number=group.season.number group_name=group.name %}" class="btn btn-primary">Zobacz</a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

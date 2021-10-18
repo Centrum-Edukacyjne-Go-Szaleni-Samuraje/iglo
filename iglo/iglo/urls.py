@@ -8,6 +8,6 @@ admin.site.site_header = "IGLO Administration"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='home.html')),
     path('', include('league.urls')),
+    path('', include('misc.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

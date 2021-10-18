@@ -5,14 +5,15 @@ from django.db import models
 
 
 class Season(models.Model):
+    number = models.IntegerField()
     start_date = models.DateField()
     end_date = models.DateField()
 
     class Meta:
-        ordering = ["-start_date"]
+        ordering = ["-number"]
 
     def __str__(self) -> str:
-        return f"{self.start_date} - {self.end_date}"
+        return f"#{self.number} ({self.start_date} - {self.end_date})"
 
 
 class Result(Enum):
@@ -82,7 +83,7 @@ class Member(models.Model):
 
 
 def game_upload_to(instance, filename) -> str:
-    return f"games/game-{instance.id}.sgf"
+    return f"games/season-{instance.group.season.number}-group-{instance.group.name}-game-{instance.black.player.nick}-{instance.white.player.nick}.sgf"
 
 
 class Game(models.Model):

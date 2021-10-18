@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block page_title %}Sezony{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col">
@@ -8,15 +10,20 @@
                     <li class="breadcrumb-item active" aria-current="page">Sezony</li>
                 </ol>
             </nav>
-            <h2>Sezony</h2>
-            <ul>
-                {% for season in object_list %}
-                    <li>
-                        <a href="{% url "season-detail" season.id %}">
-                            Sezon {{ season.start_date }} - {{ season.end_date }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+            <h2 class="mb-4">Sezony</h2>
+            {% for season in object_list %}
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between">
+                        <strong>Sezon #{{ season.number }}</strong>
+                        <span class="text-muted">{{ season.start_date }} - {{ season.end_date }}</span>
+                    </div>
+                    <div class="card-body d-flex justify-content-between align-items-baseline">
+                        <p class="card-text">Liczba grup: {{ season.groups.count }}</p>
+                        <a href="{% url "season-detail" number=season.number %}" class="btn btn-primary">Zobacz</a>
+                    </div>
+                    <a href="{% url "season-detail" season.id %}"></a>
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

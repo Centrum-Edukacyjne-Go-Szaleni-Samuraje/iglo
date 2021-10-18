@@ -1,0 +1,24 @@
+.group-table {
+    text-align: center;
+}
+
+.group-table__header {
+    min-width: 100px;
+
+}
+
+.group-table__result--empty {
+    background-color: lightgray;
+}
+
+.group-table__result--win {
+    background-color: lightgreen;
+}
+
+.group-table__result--lose {
+    background-color: lightcoral;
+}
+
+.wgo-ctrlgroup-left, .wgo-ctrlgroup-right {
+    display: none;
+}

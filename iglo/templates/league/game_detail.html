@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block page_title %}{{ object.black.player.nick }} vs {{ object.white.player.nick }}{% endblock %}
+
 {% block head %}
     {{ block.super }}
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/waltheri/wgo.js/wgo/wgo.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/waltheri/wgo.js/wgo/wgo.player.min.js"></script>
-    <link type="text/css" href="https://cdn.jsdelivr.net/gh/waltheri/wgo.js/wgo/wgo.player.css" rel="stylesheet" />
+    <script type="text/javascript" src="{% static "wgo/wgo.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "wgo/wgo.player.min.js" %}"></script>
+    <link type="text/css" href="{% static "wgo/wgo.player.css" %}" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -13,19 +17,28 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
-                    <li class="breadcrumb-item"><a
-                            href="{% url "season-detail" object.group.season.id %}">Sezon {{ object.group.season.start_date }}
-                        - {{ object.group.season.end_date }}</a></li>
-                    <li class="breadcrumb-item"><a
-                            href="{% url "group-detail" object.group.id %}">Grupa {{ object.group.name }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Gra {{ object.black.player.nick }}
-                        vs {{ object.white.player.nick }}</li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "season-detail" object.group.season.number %}">
+                            Sezon #{{ object.group.season.number }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
+                            Grupa {{ object.group.name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}</li>
                 </ol>
             </nav>
-            <h2>Gra {{ object.black.player.nick }} {% if object.black.rank %}[{{ object.black.rank }}]{% endif %} (B) vs {{ object.white.player.nick }} {% if object.white.rank %}[{{ object.white.rank }}]{% endif %} (W)</h2>
-            <p>Wynik: {{ object.result }}, Data: {{ object.date }}</p>
+            <h2>
+                {{ object.black.player.nick }} {% if object.black.rank %}[{{ object.black.rank }}]{% endif %} (B)
+                vs {{ object.white.player.nick }} {% if object.white.rank %}[{{ object.white.rank }}]{% endif %}(W)
+            </h2>
+            <h5 class="text-muted">Wynik: {{ object.result }}, Data: {{ object.date|date:"d/m/Y" }}</h5>
             {% if object.sgf %}
-            <div data-wgo="{{ object.sgf.url }}" style="width: 100%; height: 500px"></div>
+                <a href="{{ object.sgf.url }}" class="btn btn-primary mb-4">Pobierz SGF</a>
+                <div data-wgo="{{ object.sgf.url }}" data-wgo-layout="bottom: ['Control']" style="width: 100%; height: 700px"></div>
             {% endif %}
         </div>
     </div>

@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'misc',
     'league',
 ]
 
@@ -104,6 +105,10 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / "../../data/static"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 MEDIA_URL = '/media/'
 

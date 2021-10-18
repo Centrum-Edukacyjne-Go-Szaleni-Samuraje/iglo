@@ -4,7 +4,7 @@ from league.views import SeasonsListView, SeasonDetailView, GroupDetailView, Gam
 
 urlpatterns = [
     path('seasons', SeasonsListView.as_view(), name="seasons-list"),
-    path('seasons/<pk>', SeasonDetailView.as_view(), name="season-detail"),
-    path('groups/<pk>', GroupDetailView.as_view(), name="group-detail"),
-    path('games/<pk>', GameDetailView.as_view(), name="game-detail"),
+    path('seasons/<number>', SeasonDetailView.as_view(), name="season-detail"),
+    path('seasons/<season_number>/<group_name>', GroupDetailView.as_view(), name="group-detail"),
+    path('seasons/<season_number>/<group_name>/<black_player>-<white_player>', GameDetailView.as_view(), name="game-detail"),
 ]

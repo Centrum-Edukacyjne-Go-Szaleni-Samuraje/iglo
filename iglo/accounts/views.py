@@ -1,22 +1,16 @@
-from django import forms
 from django.contrib import messages
+from django.contrib.auth.views import LoginView as ContribLoginView, LogoutView as ContribLogoutView
+from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from accounts.forms import RegistrationForm
 from accounts.models import User
-
-
-class RegistrationForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField()
-    nick = forms.CharField()
-    rank = forms.CharField()
-    ogs = forms.CharField(required=False)
 
 
 class RegistrationView(FormView):
     template_name = "accounts/registration.html"
     form_class = RegistrationForm
-    success_url = "/"
+    success_url = reverse_lazy("accounts:login")
 
     def form_valid(self, form):
         User.objects.create_user(
@@ -25,6 +19,14 @@ class RegistrationView(FormView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Konto zostało utworzone. Sprawdź swoją skrzynke mailową!",
+            "Konto zostało utworzone. Możesz się zalogować.",
         )
         return super().form_valid(form)
+
+
+class LoginView(ContribLoginView):
+    template_name = "accounts/login.html"
+
+
+class LogoutView(ContribLogoutView):
+    next_page = "/"

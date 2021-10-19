@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block page_title %}Logowanie{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h2>Logowanie</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control{% if form.username.errors %} is-invalid{% endif %}" id="email"
+                           name="username" {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+                    <div class="invalid-feedback">{{ form.username.errors }}</div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Hasło</label>
+                    <input type="password" class="form-control {% if form.password.errors %} is-invalid{% endif %}"
+                           id="password" name="password">
+                    <div class="invalid-feedback">{{ form.password.errors }}</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Zaloguj</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

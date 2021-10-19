@@ -34,7 +34,7 @@ class Command(BaseCommand):
                         season=season,
                     )
                     players = []
-                    for player_name in group_data["players"]:
+                    for player_order, player_name in enumerate(group_data["players"], start=1):
                         player, _ = Player.objects.update_or_create(nick=player_name)
                         account, _ = Account.objects.update_or_create(
                             player=player, name=player_name, server=GameServer.KGS
@@ -42,6 +42,7 @@ class Command(BaseCommand):
                         member = Member.objects.create(
                             player=player,
                             group=group,
+                            order=player_order,
                             rank=None,
                         )
                         players.append(member)

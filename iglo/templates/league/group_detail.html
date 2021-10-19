@@ -19,14 +19,14 @@
                     <tr>
                         <th></th>
                         {% for member in object.members.all %}
-                            <th class="group-table__header">{{ member.player.nick }}</th>
+                            <th class="group-table__header"><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for member, results in object.results_as_table %}
                         <tr>
-                            <td class="group-table__header"><strong>{{ member.player.nick }}</strong></td>
+                            <td class="group-table__header"><strong><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong></td>
                             {% for result in results %}
                                 <td class="group-table__result {% if result is None %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
                                     {% if result is not None %}

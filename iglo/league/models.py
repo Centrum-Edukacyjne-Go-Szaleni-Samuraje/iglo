@@ -3,8 +3,6 @@ from typing import Optional
 
 from django.db import models
 
-from accounts.models import User
-
 
 class Season(models.Model):
     number = models.IntegerField()
@@ -54,8 +52,27 @@ class Group(models.Model):
         return table
 
 
+class PlayerManager(models.Manager):
+    def register_player(self, user, nick: str, rank: str, ogs: str) -> "Player":
+        player = self.create(
+            user=user,
+            nick=nick,
+            rank=rank,
+        )
+        Account.objects.create(
+            player=player,
+            name=ogs,
+            server=GameServer.OGS,
+        )
+        return player
+
+
 class Player(models.Model):
-    nick = models.CharField(max_length=32)
+    nick = models.CharField(max_length=32, unique=True)
+    user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL)
+    rank = models.CharField(max_length=3)
+
+    objects = PlayerManager()
 
     def __str__(self) -> str:
         return self.nick
@@ -76,9 +93,13 @@ class Account(models.Model):
 
 
 class Member(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.CharField(max_length=3, null=True)
+    order = models.SmallIntegerField()
+
+    class Meta:
+        ordering = ["order"]
 
     def __str__(self) -> str:
         return f"{self.player} - group: {self.group}"

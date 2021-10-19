@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block page_title %}{{ object.nick }}{% endblock %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <h2 class="mb-3">{{ object.nick }}</h2>
+            {% if object.memberships.exists %}
+                <h3>Sezony</h3>
+                <ul>
+                    {% for member in object.memberships.all %}
+                        <li>
+                            <a href="{% url "group-detail" season_number=member.group.season.number group_name=member.group.name %}">
+                                Sezon #{{ member.group.season.number }}, grupa {{ member.group.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Brak rozegranych sezonów.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

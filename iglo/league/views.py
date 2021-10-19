@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView
 
-from league.models import Season, Group, Game
+from league.models import Season, Group, Game, Player
 
 
 class SeasonsListView(ListView):
@@ -39,3 +39,8 @@ class GameDetailView(DetailView):
             black__player__nick=self.kwargs["black_player"],
             white__player__nick=self.kwargs["white_player"],
         )
+
+
+class PlayerDetailView(DetailView):
+    model = Player
+    slug_field = "nick"

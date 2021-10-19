@@ -6,7 +6,7 @@ from accounts.models import User
 class RegistrationForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(min_length=8)
-    nick = forms.CharField()
+    nick = forms.SlugField()
     rank = forms.CharField()
     ogs = forms.CharField(required=False)
 

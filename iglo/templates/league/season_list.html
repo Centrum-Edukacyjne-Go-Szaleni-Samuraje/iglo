@@ -10,7 +10,12 @@
                     <li class="breadcrumb-item active" aria-current="page">Sezony</li>
                 </ol>
             </nav>
-            <h2 class="mb-4">Sezony</h2>
+            <div class="d-flex align-items-baseline justify-content-between">
+                <h2 class="mb-4">Sezony</h2>
+                {% if user.is_admin %}
+                <a href="" class="btn btn-warning">Stwórz Sezon</a>
+                {% endif %}
+            </div>
             {% for season in object_list %}
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between">

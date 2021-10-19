@@ -20,5 +20,18 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
+    is_admin = models.BooleanField(default=False)
+
     objects = UserManager()
+
     USERNAME_FIELD = 'email'
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
+    @property
+    def is_staff(self):
+        return self.is_admin

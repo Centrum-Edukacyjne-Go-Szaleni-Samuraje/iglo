@@ -93,7 +93,9 @@ class Account(models.Model):
 
 
 class Member(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
+    player = models.ForeignKey(
+        Player, on_delete=models.CASCADE, related_name="memberships"
+    )
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.CharField(max_length=3, null=True)
     order = models.SmallIntegerField()
@@ -103,6 +105,22 @@ class Member(models.Model):
 
     def __str__(self) -> str:
         return f"{self.player} - group: {self.group}"
+
+    @property
+    def score(self) -> int:
+        return (
+            self.games_as_black.filter(result__startswith="B").count()
+            + self.games_as_white.filter(result__startswith="W").count()
+        )
+
+    @property
+    def sodos(self) -> int:
+        result = 0
+        for game in self.games_as_black.filter(result__startswith="B"):
+            result += game.white.score
+        for game in self.games_as_white.filter(result__startswith="W"):
+            result += game.black.score
+        return result
 
 
 def game_upload_to(instance, filename) -> str:

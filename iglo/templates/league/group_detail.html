@@ -21,6 +21,8 @@
                         {% for member in object.members.all %}
                             <th class="group-table__header"><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></th>
                         {% endfor %}
+                        <th class="group-table__header">Punkty</th>
+                        <th class="group-table__header">SODOS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,6 +36,8 @@
                                     {% endif %}
                                 </td>
                             {% endfor %}
+                            <td>{{ member.score }}</td>
+                            <td>{{ member.sodos }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

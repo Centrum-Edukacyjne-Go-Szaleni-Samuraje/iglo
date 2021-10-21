@@ -14,41 +14,57 @@
                 </ol>
             </nav>
             <h2 class="mb-4">Grupa {{ object.name }}</h2>
-            <table class="group-table mb-4">
-                <thead>
-                    <tr>
-                        <th></th>
-                        {% for member in object.members.all %}
-                            <th class="group-table__header"><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></th>
-                        {% endfor %}
-                        <th class="group-table__header">Punkty</th>
-                        <th class="group-table__header">SODOS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for member, results in object.results_as_table %}
+            <div class="d-flex justify-content-center">
+                <table class="group-table mb-4">
+                    <thead>
                         <tr>
-                            <td class="group-table__header"><strong><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong></td>
-                            {% for result in results %}
-                                <td class="group-table__result {% if result is None %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
-                                    {% if result is not None %}
-                                        {{ result.value }}
-                                    {% endif %}
-                                </td>
+                            <th></th>
+                            {% for member in object.members.all %}
+                                <th class="group-table__header d-none d-lg-table-cell"><a
+                                        href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                </th>
                             {% endfor %}
-                            <td>{{ member.score }}</td>
-                            <td>{{ member.sodos }}</td>
+                            <th class="group-table__header">Punkty</th>
+                            <th class="group-table__header">SODOS</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for member, results in object.results_as_table %}
+                            <tr class="group-table__row--result-{{ member.result.value.lower }}">
+                                <td class="group-table__header"><strong><a
+                                        href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong>
+                                </td>
+                                {% for result in results %}
+                                    <td class="group-table__result d-none d-lg-table-cell {% if result is None %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
+                                        {% if result is not None %}
+                                            {{ result.value }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                                <td>{{ member.score }}</td>
+                                <td>{{ member.sodos }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             <h3 class="mb-4">Gry</h3>
-            {% for game in object.games.all %}
+            {% for round in object.rounds.all %}
                 <div class="card mb-3">
-                    <div class="card-header">{{ game.black.player.nick }} (B) vs {{ game.white.player.nick }} (W)</div>
-                    <div class="card-body d-flex justify-content-between align-items-baseline">
-                        <p>Wynik: {{ game.result }}</p>
-                        <a href="{% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}" class="btn btn-primary">Zobacz</a>
+                    <div class="card-header">Runda #{{ round.number }}</div>
+                    <div class="card-body">
+                        {% for game in round.games.all %}
+                            <div class="card mb-3">
+                                <div class="card-header">{{ game.black.player.nick }} (B)
+                                    vs {{ game.white.player.nick }} (W)
+                                </div>
+                                <div class="card-body d-flex justify-content-between align-items-baseline">
+                                    <p>Wynik: {{ game.result }}</p>
+                                    <a href="{% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
+                                       class="btn btn-primary">Zobacz</a>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}

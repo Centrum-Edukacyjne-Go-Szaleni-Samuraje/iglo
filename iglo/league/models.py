@@ -8,6 +8,7 @@ class Season(models.Model):
     number = models.IntegerField()
     start_date = models.DateField()
     end_date = models.DateField()
+    promotion_count = models.SmallIntegerField()
 
     class Meta:
         ordering = ["-number"]
@@ -16,7 +17,7 @@ class Season(models.Model):
         return f"#{self.number} ({self.start_date} - {self.end_date})"
 
 
-class Result(Enum):
+class GameResult(Enum):
     WIN = "W"
     LOSE = "L"
 
@@ -28,7 +29,7 @@ class Group(models.Model):
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"
 
-    def results_as_table(self) -> list[tuple["Player", list[Optional[Result]]]]:
+    def results_as_table(self) -> list[tuple["Player", list[Optional[GameResult]]]]:
         table = []
         players_to_game = {
             frozenset({game.black.player, game.white.player}): game
@@ -44,9 +45,9 @@ class Group(models.Model):
                         frozenset({member.player, other_member.player})
                     ]
                     row.append(
-                        Result.WIN
+                        GameResult.WIN
                         if game.winner.player == member.player
-                        else Result.LOSE
+                        else GameResult.LOSE
                     )
             table.append((member, row))
         return table
@@ -92,6 +93,12 @@ class Account(models.Model):
         return f"{self.player} - {self.name} - {self.server}"
 
 
+class MemberResult(Enum):
+    PROMOTION = "PROMOTION"
+    STAY = "STAY"
+    RELEGATION = "RELEGATION"
+
+
 class Member(models.Model):
     player = models.ForeignKey(
         Player, on_delete=models.CASCADE, related_name="memberships"
@@ -122,13 +129,33 @@ class Member(models.Model):
             result += game.black.score
         return result
 
+    @property
+    def result(self) -> MemberResult:
+        members = sorted(
+            [member for member in self.group.members.all()],
+            key=lambda member: (-member.score, -member.sodos),
+        )
+        if self in members[:self.group.season.promotion_count]:
+            return MemberResult.PROMOTION
+        if self in members[-self.group.season.promotion_count:]:
+            return MemberResult.RELEGATION
+        return MemberResult.STAY
+
 
 def game_upload_to(instance, filename) -> str:
     return f"games/season-{instance.group.season.number}-group-{instance.group.name}-game-{instance.black.player.nick}-{instance.white.player.nick}.sgf"
 
 
+class Round(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="rounds")
+    number = models.SmallIntegerField()
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+
+
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
+    round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
     black = models.ForeignKey(
         Member, on_delete=models.CASCADE, related_name="games_as_black"
     )

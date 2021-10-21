@@ -1,5 +1,6 @@
 .group-table {
     text-align: center;
+    border-collapse: collapse;
 }
 
 .group-table__header {
@@ -8,15 +9,23 @@
 }
 
 .group-table__result--empty {
-    background-color: lightgray;
+    background-color: rgb(255, 212, 80);
 }
 
 .group-table__result--win {
-    background-color: lightgreen;
+    color: blue;
 }
 
 .group-table__result--lose {
-    background-color: lightcoral;
+    color: rgb(211, 47, 47);
+}
+
+.group-table__row--result-promotion {
+    background-color: #d9ead3;
+}
+
+.group-table__row--result-relegation {
+    background-color: #f4cccc;
 }
 
 .wgo-ctrlgroup-left, .wgo-ctrlgroup-right {

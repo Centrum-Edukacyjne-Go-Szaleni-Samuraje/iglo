@@ -22,6 +22,7 @@ class SeasonFactory(factory.django.DjangoModelFactory):
     start_date = factory.LazyFunction(lambda: datetime.date.today() + datetime.timedelta(days=7))
     end_date = factory.LazyFunction(lambda: datetime.date.today() + datetime.timedelta(days=7 * 6))
     promotion_count = 1
+    players_per_group = 3
 
 
 class GroupFactory(factory.django.DjangoModelFactory):
@@ -52,7 +53,7 @@ class GameFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Game
 
-    round = factory.SubFactory(RoundFactory)
+    round = factory.LazyAttribute(lambda g: RoundFactory(group=g.group))
     group = factory.SubFactory(GroupFactory)
     black = factory.SubFactory(MemberFactory)
     white = factory.SubFactory(MemberFactory)

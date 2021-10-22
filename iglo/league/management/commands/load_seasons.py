@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from league.models import Season, Group, Player, Game, GameServer, Member, Account, Round
+from league.models import Season, Group, Player, Game, GameServer, Member, Account, Round, SeasonState
 
 PARING_SYSTEM_6 = {
     frozenset({1, 6}): 1,
@@ -76,6 +76,8 @@ class Command(BaseCommand):
                     start_date=start_date,
                     end_date=end_date,
                     promotion_count=2,
+                    players_per_group=len(season_data["tables"][0]["players"]),
+                    state=SeasonState.STARTED,
                 )
                 for group_data in season_data["tables"]:
                     group_name = group_data["name"][-1]

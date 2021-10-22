@@ -1,7 +1,82 @@
+import datetime
+import string
 from enum import Enum
 from typing import Optional
 
 from django.db import models
+
+DAYS_PER_GAME = 7
+
+
+class SeasonState(Enum):
+    DRAFT = "DRAFT"
+    STARTED = "STARTED"
+
+
+class SeasonManager(models.Manager):
+    def prepare_season(
+            self, start_date: datetime.date, players_per_group: int, promotion_count: int
+    ) -> "Season":
+        previous_season = Season.objects.first()
+        number_of_members = Member.objects.filter(group__season=previous_season).count()
+        season = self.create(
+            state=SeasonState.DRAFT.value,
+            number=previous_season.number + 1,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+            promotion_count=promotion_count,
+            players_per_group=players_per_group,
+        )
+        group_names = string.ascii_uppercase[: number_of_members // players_per_group]
+        for group_name in group_names:
+            group = Group.objects.create(
+                name=group_name,
+                season=season,
+            )
+            is_last = group_name == group_names[-1]
+            if not group.is_first:
+                self._add_members(
+                    group=group,
+                    previous_season=previous_season,
+                    previous_group_name=group.higher_group_name,
+                    results={MemberResult.RELEGATION},
+                )
+            self._add_members(
+                group=group,
+                previous_season=previous_season,
+                previous_group_name=group.name,
+                results={MemberResult.STAY, MemberResult.RELEGATION} if is_last else {MemberResult.STAY},
+            )
+            if not is_last:
+                self._add_members(
+                    group=group,
+                    previous_season=previous_season,
+                    previous_group_name=group.lower_group_name,
+                    results={MemberResult.PROMOTION},
+                )
+        return season
+
+    def _add_members(
+            self,
+            group: "Group",
+            previous_season: "Season",
+            previous_group_name: str,
+            results: set["MemberResult"],
+    ) -> None:
+        try:
+            members_count = group.members.count()
+            previous_group = previous_season.groups.get(name=previous_group_name)
+            for member in previous_group.get_members_qualification():
+                if member.result in results:
+                    Member.objects.create(
+                        group=group,
+                        order=members_count + 1,
+                        player=member.player,
+                        rank=member.rank,
+                    )
+                    members_count += 1
+        except Group.DoesNotExist:
+            pass
 
 
 class Season(models.Model):
@@ -9,6 +84,10 @@ class Season(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     promotion_count = models.SmallIntegerField()
+    players_per_group = models.SmallIntegerField()
+    state = models.CharField(max_length=8)
+
+    objects = SeasonManager()
 
     class Meta:
         ordering = ["-number"]
@@ -51,6 +130,26 @@ class Group(models.Model):
                     )
             table.append((member, row))
         return table
+
+    @property
+    def is_first(self) -> bool:
+        return self.name == "A"
+
+    @property
+    def higher_group_name(self) -> Optional[str]:
+        if self.is_first:
+            return None
+        return chr(ord(self.name) - 1)
+
+    @property
+    def lower_group_name(self) -> str:
+        return chr(ord(self.name) + 1)
+
+    def get_members_qualification(self) -> list["Member"]:
+        return sorted(
+            [member for member in self.members.all()],
+            key=lambda member: (-member.score, -member.sodos),
+        )
 
 
 class PlayerManager(models.Manager):
@@ -116,8 +215,8 @@ class Member(models.Model):
     @property
     def score(self) -> int:
         return (
-            self.games_as_black.filter(result__startswith="B").count()
-            + self.games_as_white.filter(result__startswith="W").count()
+                self.games_as_black.filter(result__startswith="B").count()
+                + self.games_as_white.filter(result__startswith="W").count()
         )
 
     @property
@@ -131,13 +230,13 @@ class Member(models.Model):
 
     @property
     def result(self) -> MemberResult:
-        members = sorted(
-            [member for member in self.group.members.all()],
-            key=lambda member: (-member.score, -member.sodos),
-        )
-        if self in members[:self.group.season.promotion_count]:
+        members_qualification = self.group.get_members_qualification()
+        if (
+                self in members_qualification[: self.group.season.promotion_count]
+                and not self.group.is_first
+        ):
             return MemberResult.PROMOTION
-        if self in members[-self.group.season.promotion_count:]:
+        if self in members_qualification[-self.group.season.promotion_count:]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
 

@@ -1,5 +1,6 @@
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, FormView
 
+from league.forms import PrepareSeasonForm
 from league.models import Season, Group, Game, Player
 
 
@@ -44,3 +45,21 @@ class GameDetailView(DetailView):
 class PlayerDetailView(DetailView):
     model = Player
     slug_field = "nick"
+
+
+class PrepareSeasonView(FormView):
+    template_name = "league/season_prepare.html"
+    form_class = PrepareSeasonForm
+
+    def form_valid(self, form):
+        self.object = Season.objects.prepare_season(
+            start_date=form.cleaned_data["start_date"],
+            players_per_group=form.cleaned_data["players_per_group"],
+            promotion_count=form.cleaned_data["promotion_count"],
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+

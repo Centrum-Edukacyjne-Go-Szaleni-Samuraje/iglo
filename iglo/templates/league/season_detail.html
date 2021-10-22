@@ -13,8 +13,13 @@
                     </li>
                 </ol>
             </nav>
-            <h2>Sezon #{{ object.number }}</h2>
-            <h5 class="text-muted mb-4">{{ season.start_date }} - {{ season.end_date }}</h5>
+            <div class="d-flex align-items-center">
+                <h2>Sezon #{{ object.number }}</h2>
+                {% if season.state == "DRAFT" %}<span class="badge bg-warning text-dark ms-2">W PRZYGOTOWANIU</span>{% endif %}
+            </div>
+            <h5 class="text-muted mb-4">
+                {{ season.start_date }} - {{ season.end_date }}
+            </h5>
             {% for group in object.groups.all %}
                 <div class="card mb-3">
                     <div class="card-header"><strong>Grupa {{ group.name }}</strong></div>

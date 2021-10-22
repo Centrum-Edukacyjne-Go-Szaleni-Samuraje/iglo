@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Optional
 
 from django.db import models
+from django.urls import reverse
 
 DAYS_PER_GAME = 7
 
@@ -95,6 +96,9 @@ class Season(models.Model):
     def __str__(self) -> str:
         return f"#{self.number} ({self.start_date} - {self.end_date})"
 
+    def get_absolute_url(self):
+        return reverse("season-detail", kwargs={"number": self.number})
+
 
 class GameResult(Enum):
     WIN = "W"
@@ -120,14 +124,17 @@ class Group(models.Model):
                 if member == other_member:
                     row.append(None)
                 else:
-                    game = players_to_game[
-                        frozenset({member.player, other_member.player})
-                    ]
-                    row.append(
-                        GameResult.WIN
-                        if game.winner.player == member.player
-                        else GameResult.LOSE
-                    )
+                    try:
+                        game = players_to_game[
+                            frozenset({member.player, other_member.player})
+                        ]
+                        row.append(
+                            GameResult.WIN
+                            if game.winner.player == member.player
+                            else GameResult.LOSE
+                        )
+                    except KeyError:
+                        row.append(None)
             table.append((member, row))
         return table
 

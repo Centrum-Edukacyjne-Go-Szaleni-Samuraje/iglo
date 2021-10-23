@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 
-{% load crispy_forms_filters %}
-
-{% block page_title %}Logowanie{% endblock %}
+{% load  crispy_forms_filters %}
 
 {% block content %}
     <div class="row">
         <div class="col">
-            <h2>Logowanie</h2>
+            <h2>Stwórz Sezon</h2>
             <form method="post">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <button type="submit" class="btn btn-primary">Zaloguj</button>
+                <button type="submit" class="btn btn-primary">Stwórz</button>
             </form>
         </div>
     </div>

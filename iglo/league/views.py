@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, FormView
 
-from league.forms import PlayerSettingsForm
+from league.forms import PlayerSettingsForm, PrepareSeasonForm
 from league.models import Season, Group, Game, Player, Account, GameServer
 
 
@@ -97,3 +97,19 @@ class PlayerSettingsView(LoginRequiredMixin, FormView):
                 "Twoje dane zostały zmienione.",
             )
         return super().form_valid(form)
+
+      
+class PrepareSeasonView(FormView):
+    template_name = "league/season_prepare.html"
+    form_class = PrepareSeasonForm
+
+    def form_valid(self, form):
+        self.object = Season.objects.prepare_season(
+            start_date=form.cleaned_data["start_date"],
+            players_per_group=form.cleaned_data["players_per_group"],
+            promotion_count=form.cleaned_data["promotion_count"],
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()

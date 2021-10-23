@@ -14,3 +14,8 @@ class PlayerSettingsForm(forms.Form):
         if Player.objects.filter(nick=nick).exists():
             raise forms.ValidationError("Ten nick jest już zajęty.")
         return nick
+
+class PrepareSeasonForm(forms.Form):
+    start_date = forms.DateField(label="Data rozpoczęcia")
+    players_per_group = forms.IntegerField(label="Liczba graczy w grupie")
+    promotion_count = forms.IntegerField(label="Liczba graczy awansowanych")

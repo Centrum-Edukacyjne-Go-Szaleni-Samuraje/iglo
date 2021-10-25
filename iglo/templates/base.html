@@ -49,7 +49,7 @@
                             {% if user.player %}
                                 <li>
                                     <a class="dropdown-item"
-                                       href="{% url "player-settings" %}">Ustawienia</a>
+                                       href="{% url "player-settings" request.user.player.nick %}">Ustawienia</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item"

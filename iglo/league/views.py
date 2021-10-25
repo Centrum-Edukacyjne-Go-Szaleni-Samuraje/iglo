@@ -1,6 +1,8 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf.urls import url
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, FormView
 
@@ -51,14 +53,25 @@ class PlayerDetailView(DetailView):
     slug_field = "nick"
 
 
-class PlayerSettingsView(LoginRequiredMixin, FormView):
+class PlayerSettingsView(FormView):
     template_name = "league/player_settings.html"
     form_class = PlayerSettingsForm
     success_url = reverse_lazy("player-settings")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        current_player = Player.objects.get(user=self.request.user)
+    def dispatch(self, request, *args, **kwargs):
+        user = self.request.user
+        if not user.is_authenticated or not (user.is_staff or user.player.nick == kwargs['nick']):
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                "Nie posiadasz uprawnień do edycji tego konta.",
+            )
+            return redirect('/')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self):
+        current_player = get_object_or_404(Player, nick=self.kwargs['nick'])
+        context = super().get_context_data()
         context['nick'] = current_player.nick
         context['rank'] = current_player.rank
         try:
@@ -98,7 +111,7 @@ class PlayerSettingsView(LoginRequiredMixin, FormView):
             )
         return super().form_valid(form)
 
-      
+
 class PrepareSeasonView(FormView):
     template_name = "league/season_prepare.html"
     form_class = PrepareSeasonForm

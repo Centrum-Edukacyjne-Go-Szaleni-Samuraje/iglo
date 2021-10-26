@@ -13,7 +13,7 @@
             <div class="d-flex align-items-baseline justify-content-between">
                 <h2 class="mb-4">Sezony</h2>
                 {% if user.is_admin %}
-                <a href="{% url "seasons-prepare" %}" class="btn btn-warning">Stwórz Sezon</a>
+                <a href="{% url "seasons-prepare" %}" class="btn btn-warning{% if draft_seasons_exists %} disabled{% endif %}">Stwórz Sezon</a>
                 {% endif %}
             </div>
             {% for season in object_list %}

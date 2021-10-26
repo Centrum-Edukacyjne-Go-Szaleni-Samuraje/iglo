@@ -3,12 +3,16 @@ import datetime
 from django.views.generic import ListView, DetailView, FormView
 
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player
+from league.models import Season, Group, Game, Player, SeasonState
 from league.permissions import AdminPermissionRequired
 
 
 class SeasonsListView(ListView):
     model = Season
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        return context | {"draft_seasons_exists": Season.objects.filter(state=SeasonState.DRAFT.value).exists()}
 
 
 class SeasonDetailView(DetailView):

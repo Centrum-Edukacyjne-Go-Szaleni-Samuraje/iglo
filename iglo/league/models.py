@@ -19,6 +19,8 @@ class SeasonManager(models.Manager):
             self, start_date: datetime.date, players_per_group: int, promotion_count: int
     ) -> "Season":
         previous_season = Season.objects.first()
+        if previous_season.state == SeasonState.DRAFT.value:
+            raise ValueError("Poprzedni sezon nie został rozpoczęty.")
         number_of_members = Member.objects.filter(group__season=previous_season).count()
         season = self.create(
             state=SeasonState.DRAFT.value,
@@ -35,26 +37,27 @@ class SeasonManager(models.Manager):
                 season=season,
             )
             is_last = group_name == group_names[-1]
-            if not group.is_first:
+            if previous_season:
+                if not group.is_first:
+                    self._add_members(
+                        group=group,
+                        previous_season=previous_season,
+                        previous_group_name=group.higher_group_name,
+                        results={MemberResult.RELEGATION},
+                    )
                 self._add_members(
                     group=group,
                     previous_season=previous_season,
-                    previous_group_name=group.higher_group_name,
-                    results={MemberResult.RELEGATION},
+                    previous_group_name=group.name,
+                    results={MemberResult.STAY, MemberResult.RELEGATION} if is_last else {MemberResult.STAY},
                 )
-            self._add_members(
-                group=group,
-                previous_season=previous_season,
-                previous_group_name=group.name,
-                results={MemberResult.STAY, MemberResult.RELEGATION} if is_last else {MemberResult.STAY},
-            )
-            if not is_last:
-                self._add_members(
-                    group=group,
-                    previous_season=previous_season,
-                    previous_group_name=group.lower_group_name,
-                    results={MemberResult.PROMOTION},
-                )
+                if not is_last:
+                    self._add_members(
+                        group=group,
+                        previous_season=previous_season,
+                        previous_group_name=group.lower_group_name,
+                        results={MemberResult.PROMOTION},
+                    )
         return season
 
     def _add_members(

@@ -74,7 +74,7 @@ class MemberTestCase(TestCase):
 
 
 class SeasonTestCase(TestCase):
-    def test_prepare_season(self):
+    def test_prepare_season_from_previous(self):
         season = SeasonFactory(promotion_count=1, state=SeasonState.STARTED.value, number=1)
         group_a = GroupFactory(season=season, name="A")
         group_a_member_1 = MemberFactory(group=group_a, order=1)
@@ -136,3 +136,11 @@ class SeasonTestCase(TestCase):
         self.assertTrue(
             new_group_b.members.filter(player=group_b_member_3.player, order=3).exists()
         )
+
+    def test_prepare_season_when_previous_is_in_draft(self):
+        SeasonFactory(state=SeasonState.DRAFT.value)
+
+        with self.assertRaises(ValueError):
+            Season.objects.prepare_season(
+                start_date=datetime.date(2021, 1, 1), players_per_group=3, promotion_count=1
+            )

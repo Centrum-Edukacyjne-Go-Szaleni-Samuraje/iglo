@@ -1,7 +1,10 @@
+import datetime
+
 from django.views.generic import ListView, DetailView, FormView
 
 from league.forms import PrepareSeasonForm
 from league.models import Season, Group, Game, Player
+from league.permissions import AdminPermissionRequired
 
 
 class SeasonsListView(ListView):
@@ -47,9 +50,12 @@ class PlayerDetailView(DetailView):
     slug_field = "nick"
 
 
-class PrepareSeasonView(FormView):
+class PrepareSeasonView(AdminPermissionRequired, FormView):
     template_name = "league/season_prepare.html"
     form_class = PrepareSeasonForm
+
+    DEFAULT_PROMOTION_COUNT = 2
+    DEFAULT_PLAYERS_PER_GROUP = 6
 
     def form_valid(self, form):
         self.object = Season.objects.prepare_season(
@@ -59,7 +65,12 @@ class PrepareSeasonView(FormView):
         )
         return super().form_valid(form)
 
+    def get_initial(self):
+        return {
+            "start_date": datetime.date.today(),
+            "promotion_count": self.DEFAULT_PROMOTION_COUNT,
+            "players_per_group": self.DEFAULT_PLAYERS_PER_GROUP,
+        }
+
     def get_success_url(self):
         return self.object.get_absolute_url()
-
-

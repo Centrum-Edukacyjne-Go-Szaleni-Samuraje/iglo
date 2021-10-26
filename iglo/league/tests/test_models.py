@@ -75,7 +75,7 @@ class MemberTestCase(TestCase):
 
 class SeasonTestCase(TestCase):
     def test_prepare_season(self):
-        season = SeasonFactory(promotion_count=1, state=SeasonState.STARTED, number=1)
+        season = SeasonFactory(promotion_count=1, state=SeasonState.STARTED.value, number=1)
         group_a = GroupFactory(season=season, name="A")
         group_a_member_1 = MemberFactory(group=group_a, order=1)
         group_a_member_2 = MemberFactory(group=group_a, order=2)

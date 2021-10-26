@@ -77,7 +77,7 @@ class Command(BaseCommand):
                     end_date=end_date,
                     promotion_count=2,
                     players_per_group=len(season_data["tables"][0]["players"]),
-                    state=SeasonState.STARTED,
+                    state=SeasonState.STARTED.value,
                 )
                 for group_data in season_data["tables"]:
                     group_name = group_data["name"][-1]

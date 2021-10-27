@@ -4,14 +4,18 @@ from enum import Enum
 from typing import Optional
 
 from django.db import models
+from django.db.models import F
+from django.db.models.functions import Ord, Chr
 from django.urls import reverse
+
+from league.utils import round_robin
 
 DAYS_PER_GAME = 7
 
 
 class SeasonState(Enum):
     DRAFT = "DRAFT"
-    STARTED = "STARTED"
+    READY = "READY"
 
 
 class SeasonManager(models.Manager):
@@ -83,6 +87,15 @@ class SeasonManager(models.Manager):
             pass
 
 
+class SeasonNotInDraft(Exception):
+    pass
+
+
+def raise_if_not_in_draft(season: "Season") -> None:
+    if season.state != SeasonState.DRAFT.value:
+        raise SeasonNotInDraft()
+
+
 class Season(models.Model):
     number = models.IntegerField()
     start_date = models.DateField()
@@ -101,6 +114,42 @@ class Season(models.Model):
 
     def get_absolute_url(self):
         return reverse("season-detail", kwargs={"number": self.number})
+
+    def delete_group(self, group_id: int) -> None:
+        raise_if_not_in_draft(season=self)
+        group = self.groups.get(id=group_id)
+        self.groups.filter(name__gt=group.name).update(name=Chr(Ord("name") - 1))
+        group.delete()
+
+    def add_group(self) -> None:
+        raise_if_not_in_draft(season=self)
+        Group.objects.create(
+            season=self,
+            name=chr(ord("A") + self.groups.count())
+        )
+
+    def start(self) -> None:
+        raise_if_not_in_draft(season=self)
+        self.state = SeasonState.READY.value
+        self.save()
+        current_date = self.start_date
+        for group in self.groups.all():
+            members = list(group.members.all())
+            for round_number, round_pairs in enumerate(round_robin(n=len(members)), start=1):
+                round = Round.objects.create(
+                    number=round_number,
+                    group=group,
+                    start_date=current_date,
+                    end_date=current_date + datetime.timedelta(days=DAYS_PER_GAME - 1),
+                )
+                current_date += datetime.timedelta(days=DAYS_PER_GAME)
+                for pair in round_pairs:
+                    Game.objects.create(
+                        group=group,
+                        round=round,
+                        black=members[pair[0]],
+                        white=members[pair[1]],
+                    )
 
 
 class GameResult(Enum):
@@ -131,11 +180,14 @@ class Group(models.Model):
                         game = players_to_game[
                             frozenset({member.player, other_member.player})
                         ]
-                        row.append(
-                            GameResult.WIN
-                            if game.winner.player == member.player
-                            else GameResult.LOSE
-                        )
+                        if game.winner:
+                            row.append(
+                                GameResult.WIN
+                                if game.winner.player == member.player
+                                else GameResult.LOSE
+                            )
+                        else:
+                            row.append(None)
                     except KeyError:
                         row.append(None)
             table.append((member, row))
@@ -159,6 +211,52 @@ class Group(models.Model):
         return sorted(
             [member for member in self.members.all()],
             key=lambda member: (-member.score, -member.sodos),
+        )
+
+    def delete_member(self, member_id: int) -> None:
+        raise_if_not_in_draft(season=self.season)
+        member_to_remove = self.members.get(id=member_id)
+        self.members.filter(order__gt=member_to_remove.order).update(order=F('order') - 1)
+        member_to_remove.delete()
+
+    def move_member_up(self, member_id: int) -> None:
+        raise_if_not_in_draft(season=self.season)
+        member_to_move_up = self.members.get(id=member_id)
+        if member_to_move_up.order == 1:
+            return
+        member_to_move_down = self.members.get(order=member_to_move_up.order - 1)
+        member_to_move_down.order += 1
+        member_to_move_down.save()
+        member_to_move_up.order -= 1
+        member_to_move_up.save()
+
+    def move_member_down(self, member_id: int) -> None:
+        raise_if_not_in_draft(season=self.season)
+        member_to_move_down = self.members.get(id=member_id)
+        if member_to_move_down.order == self.members.count():
+            return
+        member_to_move_up = self.members.get(order=member_to_move_down.order + 1)
+        member_to_move_up.order -= 1
+        member_to_move_up.save()
+        member_to_move_down.order += 1
+        member_to_move_down.save()
+
+    def add_member(self, player_nick: str) -> None:
+        raise_if_not_in_draft(season=self.season)
+        player = Player.objects.get(nick=player_nick)
+        try:
+            current_group = self.season.groups.get(members__player=player)
+            if current_group == self:
+                return
+            current_member = current_group.members.get(player=player)
+            current_group.delete_member(member_id=current_member.id)
+        except Group.DoesNotExist:
+            pass
+        Member.objects.create(
+            group=self,
+            player=player,
+            rank=player.rank,
+            order=self.members.count() + 1,
         )
 
 

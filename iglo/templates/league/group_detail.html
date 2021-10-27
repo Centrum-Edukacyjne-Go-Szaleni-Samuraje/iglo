@@ -14,7 +14,7 @@
                 </ol>
             </nav>
             <h2 class="mb-4">Grupa {{ object.name }}</h2>
-            {% if object.season.state == "STARTED" %}
+            {% if object.season.state == "READY" %}
                 <div class="d-flex justify-content-center">
                     <table class="group-table mb-4">
                         <thead>
@@ -70,7 +70,15 @@
                     </div>
                 {% endfor %}
             {% elif object.season.state == "DRAFT" %}
-                <h3>Gracze</h3>
+                <div class="d-flex justify-content-between mb-3">
+                    <h3>Gracze</h3>
+                    {% if user.is_admin %}
+                        <form method="post" class="d-flex">{% csrf_token %}
+                            <input type="text" class="form-control me-2" placeholder="Nick" name="player_nick">
+                            <button type="submit" class="btn btn-primary" name="action-add">Dodaj</button>
+                        </form>
+                    {% endif %}
+                </div>
                 {% for member in object.members.all %}
                     <div class="card mb-3">
                         <div class="card-header">
@@ -79,9 +87,18 @@
                             {% if member.rank %}[{{ member.rank }}]{% endif %}
                         </div>
                         <div class="card-body">
-                            <button type="submit" class="btn btn-primary" {% if forloop.first %}disabled{% endif %}>▲</button>
-                            <button type="submit" class="btn btn-primary" {% if forloop.last %}disabled{% endif %}>▼</button>
-                            <button type="submit" class="btn btn-danger">Usuń</button>
+                            {% if user.is_admin %}
+                            <form method="post">{% csrf_token %}
+                                <input type="hidden" value="{{ member.id }}" name="member_id">
+                                <button type="submit" class="btn btn-primary" name="action-up"
+                                        {% if forloop.first %}disabled{% endif %}>▲
+                                </button>
+                                <button type="submit" class="btn btn-primary" name="action-down"
+                                        {% if forloop.last %}disabled{% endif %}>▼
+                                </button>
+                                <button type="submit" class="btn btn-danger" name="action-delete">Usuń</button>
+                            </form>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

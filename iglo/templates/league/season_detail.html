@@ -13,9 +13,19 @@
                     </li>
                 </ol>
             </nav>
-            <div class="d-flex align-items-center">
-                <h2>Sezon #{{ object.number }}</h2>
-                {% if season.state == "DRAFT" %}<span class="badge bg-warning text-dark ms-2">W PRZYGOTOWANIU</span>{% endif %}
+            <div class="d-flex justify-content-between">
+                <div class="d-flex align-items-center">
+                    <h2>Sezon #{{ object.number }}</h2>
+                    {% if season.state == "DRAFT" %}
+                        <span class="badge bg-warning text-dark ms-2">W PRZYGOTOWANIU</span>
+                    {% endif %}
+                </div>
+                {% if user.is_admin and season.state == "DRAFT" %}
+                    <form method="post" class="d-inline">{% csrf_token %}
+                        <button type="submit" class="btn btn-success" name="action-add-group">Dodaj Grupę</button>
+                        <button type="submit" class="btn btn-warning" name="action-start-season">Wystartuj Sezon</button>
+                    </form>
+                {% endif %}
             </div>
             <h5 class="text-muted mb-4">
                 {{ season.start_date }} - {{ season.end_date }}
@@ -27,7 +37,16 @@
                         <p>Gracze:
                             {% for member in group.members.all %}{{ member.player.nick }}{% if not forloop.last %},
                             {% endif %}{% endfor %}</p>
-                        <a href="{% url "group-detail" season_number=group.season.number group_name=group.name %}" class="btn btn-primary">Zobacz</a>
+                        <div>
+                            {% if user.is_admin and season.state == "DRAFT" %}
+                                <form method="post" class="d-inline">{% csrf_token %}
+                                    <input type="hidden" value="{{ group.id }}" name="group_id">
+                                    <button type="submit" class="btn btn-danger" name="action-delete-group">Usuń</button>
+                                </form>
+                            {% endif %}
+                            <a href="{% url "group-detail" season_number=group.season.number group_name=group.name %}"
+                               class="btn btn-primary">Zobacz</a>
+                        </div>
                     </div>
                 </div>
             {% endfor %}

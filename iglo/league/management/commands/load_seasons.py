@@ -9,7 +9,6 @@ PARING_SYSTEM_6 = {
     frozenset({1, 6}): 1,
     frozenset({2, 5}): 1,
     frozenset({3, 4}): 1,
-
     frozenset({1, 5}): 2,
     frozenset({2, 4}): 2,
     frozenset({3, 6}): 2,
@@ -77,7 +76,7 @@ class Command(BaseCommand):
                     end_date=end_date,
                     promotion_count=2,
                     players_per_group=len(season_data["tables"][0]["players"]),
-                    state=SeasonState.STARTED.value,
+                    state=SeasonState.READY.value,
                 )
                 for group_data in season_data["tables"]:
                     group_name = group_data["name"][-1]

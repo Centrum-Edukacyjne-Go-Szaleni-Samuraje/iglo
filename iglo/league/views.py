@@ -1,10 +1,11 @@
 import datetime
 
+from django.contrib import messages
 from django.views.generic import ListView, DetailView, FormView
 
 from league.forms import PrepareSeasonForm
 from league.models import Season, Group, Game, Player, SeasonState
-from league.permissions import AdminPermissionRequired
+from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
 
 class SeasonsListView(ListView):
@@ -15,7 +16,7 @@ class SeasonsListView(ListView):
         return context | {"draft_seasons_exists": Season.objects.filter(state=SeasonState.DRAFT.value).exists()}
 
 
-class SeasonDetailView(DetailView):
+class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
     model = Season
 
     def get_object(self, queryset=None):
@@ -23,8 +24,19 @@ class SeasonDetailView(DetailView):
             queryset = self.get_queryset()
         return queryset.get(number=self.kwargs["number"])
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        if "action-delete-group" in request.POST:
+            self.object.delete_group(group_id=int(request.POST["group_id"]))
+        elif "action-add-group" in request.POST:
+            self.object.add_group()
+        elif "action-start-season" in request.POST:
+            self.object.start()
+        return self.render_to_response(context)
 
-class GroupDetailView(DetailView):
+
+class GroupDetailView(AdminPermissionForModifyRequired, DetailView):
     model = Group
 
     def get_object(self, queryset=None):
@@ -33,6 +45,26 @@ class GroupDetailView(DetailView):
         return queryset.get(
             season__number=self.kwargs["season_number"], name=self.kwargs["group_name"]
         )
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        if "action-delete" in request.POST:
+            self.object.delete_member(member_id=int(request.POST["member_id"]))
+        elif "action-up" in request.POST:
+            self.object.move_member_up(member_id=int(request.POST["member_id"]))
+        elif "action-down" in request.POST:
+            self.object.move_member_down(member_id=int(request.POST["member_id"]))
+        elif "action-add" in request.POST:
+            try:
+                self.object.add_member(player_nick=request.POST["player_nick"])
+            except Player.DoesNotExist:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    "Gracz o podanym nicku nie istnieje.",
+                )
+        return self.render_to_response(context)
 
 
 class GameDetailView(DetailView):

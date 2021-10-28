@@ -20,7 +20,7 @@ class SeasonState(Enum):
 
 class SeasonManager(models.Manager):
     def prepare_season(
-            self, start_date: datetime.date, players_per_group: int, promotion_count: int
+        self, start_date: datetime.date, players_per_group: int, promotion_count: int
     ) -> "Season":
         previous_season = Season.objects.first()
         if previous_season.state == SeasonState.DRAFT.value:
@@ -30,7 +30,8 @@ class SeasonManager(models.Manager):
             state=SeasonState.DRAFT.value,
             number=previous_season.number + 1,
             start_date=start_date,
-            end_date=start_date + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+            end_date=start_date
+            + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
@@ -53,7 +54,9 @@ class SeasonManager(models.Manager):
                     group=group,
                     previous_season=previous_season,
                     previous_group_name=group.name,
-                    results={MemberResult.STAY, MemberResult.RELEGATION} if is_last else {MemberResult.STAY},
+                    results={MemberResult.STAY, MemberResult.RELEGATION}
+                    if is_last
+                    else {MemberResult.STAY},
                 )
                 if not is_last:
                     self._add_members(
@@ -65,11 +68,11 @@ class SeasonManager(models.Manager):
         return season
 
     def _add_members(
-            self,
-            group: "Group",
-            previous_season: "Season",
-            previous_group_name: str,
-            results: set["MemberResult"],
+        self,
+        group: "Group",
+        previous_season: "Season",
+        previous_group_name: str,
+        results: set["MemberResult"],
     ) -> None:
         try:
             members_count = group.members.count()
@@ -123,10 +126,7 @@ class Season(models.Model):
 
     def add_group(self) -> None:
         raise_if_not_in_draft(season=self)
-        Group.objects.create(
-            season=self,
-            name=chr(ord("A") + self.groups.count())
-        )
+        Group.objects.create(season=self, name=chr(ord("A") + self.groups.count()))
 
     def start(self) -> None:
         raise_if_not_in_draft(season=self)
@@ -135,7 +135,9 @@ class Season(models.Model):
         current_date = self.start_date
         for group in self.groups.all():
             members = list(group.members.all())
-            for round_number, round_pairs in enumerate(round_robin(n=len(members)), start=1):
+            for round_number, round_pairs in enumerate(
+                round_robin(n=len(members)), start=1
+            ):
                 round = Round.objects.create(
                     number=round_number,
                     group=group,
@@ -216,7 +218,9 @@ class Group(models.Model):
     def delete_member(self, member_id: int) -> None:
         raise_if_not_in_draft(season=self.season)
         member_to_remove = self.members.get(id=member_id)
-        self.members.filter(order__gt=member_to_remove.order).update(order=F('order') - 1)
+        self.members.filter(order__gt=member_to_remove.order).update(
+            order=F("order") - 1
+        )
         member_to_remove.delete()
 
     def move_member_up(self, member_id: int) -> None:
@@ -261,7 +265,7 @@ class Group(models.Model):
 
 
 class PlayerManager(models.Manager):
-    def register_player(self, user, nick: str, rank: str, ogs: str) -> "Player":
+    def register_player(self, user, nick: str, rank: int, ogs: str) -> "Player":
         player = self.create(
             user=user,
             nick=nick,
@@ -278,7 +282,7 @@ class PlayerManager(models.Manager):
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
     user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL)
-    rank = models.CharField(max_length=3)
+    rank = models.IntegerField(null=True)
 
     objects = PlayerManager()
 
@@ -311,40 +315,35 @@ class Member(models.Model):
         Player, on_delete=models.CASCADE, related_name="memberships"
     )
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
-    rank = models.CharField(max_length=3, null=True)
+    rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
 
     class Meta:
         ordering = ["order"]
 
     def __str__(self) -> str:
-        return f"{self.player} - group: {self.group}"
+        return self.player.nick
 
     @property
     def score(self) -> int:
-        return (
-                self.games_as_black.filter(result__startswith="B").count()
-                + self.games_as_white.filter(result__startswith="W").count()
-        )
+        return self.won_games.count()
 
     @property
     def sodos(self) -> int:
         result = 0
-        for game in self.games_as_black.filter(result__startswith="B"):
+        for game in self.won_games.all():
             result += game.white.score
-        for game in self.games_as_white.filter(result__startswith="W"):
-            result += game.black.score
         return result
 
     @property
     def result(self) -> MemberResult:
         members_qualification = self.group.get_members_qualification()
         if (
-                self in members_qualification[: self.group.season.promotion_count]
-                and not self.group.is_first
+            self in members_qualification[: self.group.season.promotion_count]
+            and not self.group.is_first
         ):
             return MemberResult.PROMOTION
-        if self in members_qualification[-self.group.season.promotion_count:]:
+        if self in members_qualification[-self.group.season.promotion_count :]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
 
@@ -360,6 +359,12 @@ class Round(models.Model):
     end_date = models.DateField(null=True)
 
 
+class WinType(models.TextChoices):
+    POINTS = "points", "Punkty"
+    RESIGN = "resign", "Rezygnacja"
+    TIME = "time", "Czas"
+
+
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
@@ -369,17 +374,49 @@ class Game(models.Model):
     white = models.ForeignKey(
         Member, on_delete=models.CASCADE, related_name="games_as_white"
     )
-    result = models.CharField(max_length=8, null=True)
+
+    winner = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="won_games",
+    )
+    win_type = models.CharField(choices=WinType.choices, max_length=8, null=True)
+    points_difference = models.SmallIntegerField(null=True, blank=True)
+
     date = models.DateTimeField(null=True)
     server = models.CharField(max_length=3, choices=GameServer.choices)
-    link = models.URLField(null=True)
-    sgf = models.FileField(null=True, upload_to=game_upload_to)
+    link = models.URLField(null=True, blank=True)
+    sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
 
     def __str__(self) -> str:
         return f"B: {self.black} - W: {self.white} - winner: {self.winner}"
 
     @property
-    def winner(self) -> Optional[Member]:
-        if not self.result:
+    def is_played(self) -> bool:
+        return bool(self.winner)
+
+    @property
+    def result(self) -> Optional[str]:
+        if not self.is_played:
             return None
-        return self.black if self.result[0] == "B" else self.white
+        winner_color = "B" if self.winner == self.black else "W"
+        if self.win_type:
+            win_type = (
+                self.points_difference
+                if self.win_type == WinType.POINTS
+                else self.win_type
+            )
+            return f"{winner_color}+{win_type}"
+        return winner_color
+
+    def get_absolute_url(self):
+        return reverse(
+            "game-detail",
+            kwargs={
+                "season_number": self.group.season.number,
+                "group_name": self.group.name,
+                "black_player": self.black.player.nick,
+                "white_player": self.white.player.nick,
+            },
+        )

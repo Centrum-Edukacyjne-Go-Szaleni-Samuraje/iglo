@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from league.models import Season, Group, Player, Game, GameServer, Member, Account, Round, SeasonState
+from league.models import Season, Group, Player, Game, GameServer, Member, Account, Round, SeasonState, WinType
 
 PARING_SYSTEM_6 = {
     frozenset({1, 6}): 1,
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                                 round=rounds[paring_system[frozenset({player_index + 1, other_player_index + 1})] - 1],
                                 black=players[player_index],
                                 white=players[other_player_index],
-                                result="B" if result == 1 else "W",
+                                winner=players[player_index] if result == 1 else players[other_player_index],
                                 server=GameServer.KGS,
                                 date=datetime.datetime.combine(
                                     season.start_date, datetime.datetime.min.time()

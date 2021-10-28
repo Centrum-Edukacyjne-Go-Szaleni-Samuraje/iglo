@@ -1,9 +1,9 @@
 import datetime
 
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView, FormView, UpdateView
 
-from league.forms import PrepareSeasonForm
+from league.forms import PrepareSeasonForm, GameResultUpdateForm
 from league.models import Season, Group, Game, Player, SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -13,7 +13,11 @@ class SeasonsListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
-        return context | {"draft_seasons_exists": Season.objects.filter(state=SeasonState.DRAFT.value).exists()}
+        return context | {
+            "draft_seasons_exists": Season.objects.filter(
+                state=SeasonState.DRAFT.value
+            ).exists()
+        }
 
 
 class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
@@ -78,6 +82,30 @@ class GameDetailView(DetailView):
             group__name=self.kwargs["group_name"],
             black__player__nick=self.kwargs["black_player"],
             white__player__nick=self.kwargs["white_player"],
+        )
+
+
+class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
+    model = Game
+    form_class = GameResultUpdateForm
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+    def form_valid(self, form):
+        messages.add_message(
+            request=self.request,
+            level=messages.SUCCESS,
+            message="Gra została zaktualizowana pomyślnie.",
+        )
+        return super().form_valid(form)
+
+    def test_func(self):
+        return super().test_func() or (
+            self.request.user.is_authenticated
+            and self.request.user.player
+            and self.request.user.player.nick
+            in [self.kwargs["black_player"], self.kwargs["white_player"]]
         )
 
 

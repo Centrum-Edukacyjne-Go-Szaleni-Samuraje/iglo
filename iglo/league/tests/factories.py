@@ -11,7 +11,7 @@ class PlayerFactory(factory.django.DjangoModelFactory):
         model = Player
 
     nick = factory.Sequence(lambda n: f"player-{n}")
-    rank = "9d"
+    rank = 1000
 
 
 class SeasonFactory(factory.django.DjangoModelFactory):

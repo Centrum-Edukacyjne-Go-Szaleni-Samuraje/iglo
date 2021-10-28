@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static crispy_forms_filters %}
 
 {% block page_title %}{{ object.black.player.nick }} vs {{ object.white.player.nick }}{% endblock %}
 
@@ -13,32 +13,42 @@
 
 {% block content %}
     <div class="row">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
-                    <li class="breadcrumb-item">
-                        <a href="{% url "season-detail" object.group.season.number %}">
-                            Sezon #{{ object.group.season.number }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
-                            Grupa {{ object.group.name }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}</li>
-                </ol>
-            </nav>
-            <h2>
-                {{ object.black.player.nick }} {% if object.black.rank %}[{{ object.black.rank }}]{% endif %} (B)
-                vs {{ object.white.player.nick }} {% if object.white.rank %}[{{ object.white.rank }}]{% endif %}(W)
-            </h2>
-            <h5 class="text-muted">Wynik: {{ object.result }}, Data: {{ object.date|date:"d/m/Y" }}</h5>
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
+                <li class="breadcrumb-item">
+                    <a href="{% url "season-detail" object.group.season.number %}">
+                        Sezon #{{ object.group.season.number }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
+                        Grupa {{ object.group.name }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}</li>
+            </ol>
+        </nav>
+        <div>
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>
+                    {{ object.black.player.nick }} (B) vs {{ object.white.player.nick }} (W)
+                </h2>
+                {% if user.is_admin or user.player == object.black.player or user.player == object.white.player %}
+                    <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
+                       class="btn btn-success">
+                        Edytuj
+                    </a>
+                {% endif %}
+            </div>
+            <h5 class="text-muted mb-3">{% if object.is_played %}Wynik: {{ object.result }}, Data:
+                {{ object.date|date:"d/m/Y" }}{% else %}Gra nierozegrana{% endif %}</h5>
             {% if object.sgf %}
                 <a href="{{ object.sgf.url }}" class="btn btn-primary mb-4">Pobierz SGF</a>
-                <div data-wgo="{{ object.sgf.url }}" data-wgo-layout="bottom: ['Control']" style="width: 100%; height: 700px"></div>
+                <div data-wgo="{{ object.sgf.url }}" data-wgo-layout="bottom: ['Control']"
+                     style="width: 100%; height: 700px"></div>
             {% endif %}
         </div>
     </div>

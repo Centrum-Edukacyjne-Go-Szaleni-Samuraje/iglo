@@ -20,9 +20,9 @@ class MemberTestCase(TestCase):
         member_2 = MemberFactory(group=group)
         member_3 = MemberFactory(group=group)
         member_4 = MemberFactory(group=group)
-        GameFactory(group=group, white=member_1, black=member_2, result="W")
-        GameFactory(group=group, white=member_3, black=member_1, result="B")
-        GameFactory(group=group, white=member_1, black=member_4, result="B")
+        GameFactory(group=group, white=member_1, black=member_2, winner=member_1)
+        GameFactory(group=group, white=member_3, black=member_1, winner=member_1)
+        GameFactory(group=group, white=member_1, black=member_4, winner=member_4)
 
         self.assertEqual(member_1.score, 2)
 
@@ -32,12 +32,12 @@ class MemberTestCase(TestCase):
         member_2 = MemberFactory(group=group)
         member_3 = MemberFactory(group=group)
         member_4 = MemberFactory(group=group)
-        GameFactory(group=group, white=member_1, black=member_2, result="W")
-        GameFactory(group=group, white=member_3, black=member_1, result="B")
-        GameFactory(group=group, white=member_1, black=member_4, result="B")
-        GameFactory(group=group, white=member_2, black=member_3, result="W")
-        GameFactory(group=group, white=member_4, black=member_2, result="B")
-        GameFactory(group=group, white=member_3, black=member_4, result="W")
+        GameFactory(group=group, white=member_1, black=member_2, winner=member_1)
+        GameFactory(group=group, white=member_3, black=member_1, winner=member_1)
+        GameFactory(group=group, white=member_1, black=member_4, winner=member_4)
+        GameFactory(group=group, white=member_2, black=member_3, winner=member_2)
+        GameFactory(group=group, white=member_4, black=member_2, winner=member_2)
+        GameFactory(group=group, white=member_3, black=member_4, winner=member_3)
 
         self.assertEqual(member_1.sodos, 3)
 
@@ -46,9 +46,9 @@ class MemberTestCase(TestCase):
         member_1 = MemberFactory(group=group)
         member_2 = MemberFactory(group=group)
         member_3 = MemberFactory(group=group)
-        GameFactory(group=group, white=member_1, black=member_2, result="W")
-        GameFactory(group=group, white=member_1, black=member_3, result="W")
-        GameFactory(group=group, white=member_2, black=member_3, result="W")
+        GameFactory(group=group, white=member_1, black=member_2, winner=member_1)
+        GameFactory(group=group, white=member_1, black=member_3, winner=member_1)
+        GameFactory(group=group, white=member_2, black=member_3, winner=member_2)
 
         self.assertEqual(member_1.result, MemberResult.PROMOTION)
 
@@ -57,9 +57,9 @@ class MemberTestCase(TestCase):
         member_1 = MemberFactory(group=group)
         member_2 = MemberFactory(group=group)
         member_3 = MemberFactory(group=group)
-        GameFactory(group=group, white=member_1, black=member_2, result="W")
-        GameFactory(group=group, white=member_1, black=member_3, result="W")
-        GameFactory(group=group, white=member_2, black=member_3, result="W")
+        GameFactory(group=group, white=member_1, black=member_2, winner=member_1)
+        GameFactory(group=group, white=member_1, black=member_3, winner=member_1)
+        GameFactory(group=group, white=member_2, black=member_3, winner=member_2)
 
         self.assertEqual(member_3.result, MemberResult.RELEGATION)
 
@@ -68,9 +68,9 @@ class MemberTestCase(TestCase):
         member_1 = MemberFactory(group=group)
         member_2 = MemberFactory(group=group)
         member_3 = MemberFactory(group=group)
-        GameFactory(group=group, white=member_1, black=member_2, result="W")
-        GameFactory(group=group, white=member_1, black=member_3, result="W")
-        GameFactory(group=group, white=member_2, black=member_3, result="W")
+        GameFactory(group=group, white=member_1, black=member_2, winner=member_1)
+        GameFactory(group=group, white=member_1, black=member_3, winner=member_1)
+        GameFactory(group=group, white=member_2, black=member_3, winner=member_2)
 
         self.assertEqual(member_2.result, MemberResult.STAY)
 
@@ -85,26 +85,26 @@ class SeasonTestCase(TestCase):
         group_a_member_2 = MemberFactory(group=group_a, order=2)
         group_a_member_3 = MemberFactory(group=group_a, order=3)
         GameFactory(
-            group=group_a, white=group_a_member_1, black=group_a_member_2, result="W"
+            group=group_a, white=group_a_member_1, black=group_a_member_2, winner=group_a_member_1
         )
         GameFactory(
-            group=group_a, white=group_a_member_1, black=group_a_member_3, result="W"
+            group=group_a, white=group_a_member_1, black=group_a_member_3, winner=group_a_member_1
         )
         GameFactory(
-            group=group_a, white=group_a_member_2, black=group_a_member_3, result="W"
+            group=group_a, white=group_a_member_2, black=group_a_member_3, winner=group_a_member_2
         )
         group_b = GroupFactory(season=season, name="B")
         group_b_member_1 = MemberFactory(group=group_b, order=1)
         group_b_member_2 = MemberFactory(group=group_b, order=2)
         group_b_member_3 = MemberFactory(group=group_b, order=3)
         GameFactory(
-            group=group_b, white=group_b_member_1, black=group_b_member_2, result="W"
+            group=group_b, white=group_b_member_1, black=group_b_member_2, winner=group_a_member_1
         )
         GameFactory(
-            group=group_b, white=group_b_member_1, black=group_b_member_3, result="W"
+            group=group_b, white=group_b_member_1, black=group_b_member_3, winner=group_a_member_1
         )
         GameFactory(
-            group=group_b, white=group_b_member_2, black=group_b_member_3, result="W"
+            group=group_b, white=group_b_member_2, black=group_b_member_3, winner=group_a_member_2
         )
 
         new_season = Season.objects.prepare_season(

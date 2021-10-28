@@ -9,10 +9,27 @@
     <div class="row">
         <div class="col">
             <h2 class="mb-3">{{ object.nick }}</h2>
-            {% if object.memberships.exists %}
+            {% if current_game %}
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Nadchodząca gra</strong></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>{{ current_game.black.player.nick }} vs {{ current_game.white.player.nick }}</h5>
+                            <span class="text-muted">Sezon #{{ current_game.group.season.number }} / Grupa #{{ current_game.group.name }} / Runda #{{ current_game.round.number }}</span>
+                        </div>
+                        {% if user.is_admin or user.player == current_game.black.player or user.player == current_game.white.player %}
+                    <a href="{% url "game-update" season_number=current_game.group.season.number group_name=current_game.group.name black_player=current_game.black.player.nick white_player=current_game.white.player.nick %}"
+                       class="btn btn-success">
+                        Edytuj
+                    </a>
+                {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if memberships %}
                 <h3>Sezony</h3>
                 <ul>
-                    {% for member in object.memberships.all %}
+                    {% for member in memberships %}
                         <li>
                             <a href="{% url "group-detail" season_number=member.group.season.number group_name=member.group.name %}">
                                 Sezon #{{ member.group.season.number }}, grupa {{ member.group.name }}

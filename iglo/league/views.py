@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib import messages
+from django.db.models import Q
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
 from league.forms import PrepareSeasonForm, GameResultUpdateForm
@@ -112,6 +113,17 @@ class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
 class PlayerDetailView(DetailView):
     model = Player
     slug_field = "nick"
+
+    def get_context_data(self, **kwargs):
+        today = datetime.date.today()
+        return super().get_context_data(**kwargs) | {
+            "memberships": self.object.memberships.order_by("-group__season__number"),
+            "current_game": Game.objects.filter(
+                Q(white__player=self.object) | Q(black__player=self.object)
+            )
+            .filter(winner__isnull=True)
+            .earliest("round__number"),
+        }
 
 
 class PrepareSeasonView(AdminPermissionRequired, FormView):

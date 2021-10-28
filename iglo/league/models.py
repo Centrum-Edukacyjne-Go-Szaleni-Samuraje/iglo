@@ -281,8 +281,8 @@ class PlayerManager(models.Manager):
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
-    user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL)
-    rank = models.IntegerField(null=True)
+    user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
+    rank = models.IntegerField(null=True, blank=True)
 
     objects = PlayerManager()
 

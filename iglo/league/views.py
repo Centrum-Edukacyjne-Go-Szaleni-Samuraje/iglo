@@ -115,14 +115,19 @@ class PlayerDetailView(DetailView):
     slug_field = "nick"
 
     def get_context_data(self, **kwargs):
-        today = datetime.date.today()
+        try:
+            current_game = (
+                Game.objects.filter(
+                    Q(white__player=self.object) | Q(black__player=self.object)
+                )
+                .filter(winner__isnull=True)
+                .earliest("round__number")
+            )
+        except Game.DoesNotExist:
+            current_game = None
         return super().get_context_data(**kwargs) | {
             "memberships": self.object.memberships.order_by("-group__season__number"),
-            "current_game": Game.objects.filter(
-                Q(white__player=self.object) | Q(black__player=self.object)
-            )
-            .filter(winner__isnull=True)
-            .earliest("round__number"),
+            "current_game": current_game,
         }
 
 

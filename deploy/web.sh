@@ -1,7 +1,5 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 ./manage.py collectstatic --noinput
 ./manage.py migrate --noinput
-uwsgi --socket :9999 --module iglo.wsgi
-
-
+uwsgi --socket :$VIRTUAL_PORT --module iglo.wsgi

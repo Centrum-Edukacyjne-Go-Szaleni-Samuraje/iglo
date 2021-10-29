@@ -33,8 +33,3 @@ networks:
   default:
     external:
       name: nginx-proxy
-$ docker run --detach \
-    --name your-proxied-app \
-    --env "VIRTUAL_HOST=iglo.konradhala.pl" \
-    --env "LETSENCRYPT_HOST=iglo.konradhalas.pl" \
-    nginx

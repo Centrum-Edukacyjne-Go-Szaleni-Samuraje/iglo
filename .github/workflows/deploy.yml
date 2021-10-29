@@ -5,6 +5,14 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Set env to staging
+        if: endsWith(github.ref, '/develop')
+        run: |
+          echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+      - name: Set env to production
+        if: endsWith(github.ref, '/master')
+        run: |
+          echo "ENVIRONMENT=production" >> $GITHUB_ENV
       - name: ls -a via ssh
         uses: fifsky/ssh-action@master
         with:

@@ -5,6 +5,7 @@ on:
     branches: [ master, develop ]
     types:
       - completed
+      - requested
 jobs:
   deploy:
     name: Deploy

@@ -22,7 +22,7 @@ class RoundRobinTestCase(SimpleTestCase):
         )
 
     def test_make_pairs_for_six(self):
-        result = round_robin(n=4)
+        result = round_robin(n=6)
 
         self.assertEqual(
             result,

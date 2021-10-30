@@ -19,7 +19,7 @@ jobs:
         if: endsWith(github.ref, '/master')
         run: |
           echo "ENVIRONMENT=production" >> $GITHUB_ENV
-      - name: ls -a via ssh
+      - name: Deploy
         uses: fifsky/ssh-action@master
         with:
           command: |

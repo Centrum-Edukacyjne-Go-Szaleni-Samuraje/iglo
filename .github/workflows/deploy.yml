@@ -16,7 +16,13 @@ jobs:
       - name: ls -a via ssh
         uses: fifsky/ssh-action@master
         with:
-          command: ls -a
+          command: |
+            cd apps/iglo_$ENVIRONMENT/repo
+            git fetch --all
+            git checkout ${{ github.ref }}
+            git pull --ff-only
+            cd ..
+            ./repo/deploy/deploy.sh
           host: ${{ secrets.HOST }}
           user: ${{ secrets.USER }}
           key: ${{ secrets.KEY}}

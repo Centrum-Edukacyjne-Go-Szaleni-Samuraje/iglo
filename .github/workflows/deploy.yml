@@ -11,16 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Echo ref
-        run: echo ${{ github.event.workflow_run.head_branch }}
-      - name: Set branch name
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
       - name: Set env to staging
-        if: endsWith(github.ref, '/develop')
+        if: github.event.workflow_run.head_branch == 'develop'
         run: |
           echo "ENVIRONMENT=staging" >> $GITHUB_ENV
       - name: Set env to production
-        if: endsWith(github.ref, '/master')
+        if: github.event.workflow_run.head_branch == 'master'
         run: |
           echo "ENVIRONMENT=production" >> $GITHUB_ENV
       - name: Deploy
@@ -30,7 +26,7 @@ jobs:
             export ENVIRONMENT=${{ env.ENVIRONMENT }}
             cd apps/iglo_${{ env.ENVIRONMENT }}/repo
             git fetch --all
-            git checkout ${{ env.BRANCH_NAME }}
+            git checkout ${{ github.event.workflow_run.head_branch }}
             git pull --ff-only
             cd ..
             ./repo/deploy/deploy.sh

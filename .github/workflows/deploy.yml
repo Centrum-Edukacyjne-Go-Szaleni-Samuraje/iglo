@@ -5,7 +5,6 @@ on:
     branches: [ master, develop ]
     types:
       - completed
-      - requested
 jobs:
   deploy:
     name: Deploy
@@ -14,14 +13,20 @@ jobs:
     steps:
       - name: Set branch name
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Set env to staging
         if: endsWith(github.ref, '/develop')
         run: |
           echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Set env to production
         if: endsWith(github.ref, '/master')
         run: |
           echo "ENVIRONMENT=production" >> $GITHUB_ENV
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Deploy
         uses: fifsky/ssh-action@master
         with:

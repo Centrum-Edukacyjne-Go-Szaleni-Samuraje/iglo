@@ -17,7 +17,7 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd apps/iglo_$ENVIRONMENT/repo
+            cd apps/iglo_${{ env.ENVIRONMENT }}/repo
             git fetch --all
             git checkout ${{ github.ref }}
             git pull --ff-only

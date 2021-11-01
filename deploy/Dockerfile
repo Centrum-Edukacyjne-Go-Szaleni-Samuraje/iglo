@@ -13,7 +13,3 @@ RUN poetry install
 ADD . /app/
 
 WORKDIR /app/iglo
-
-EXPOSE 9999
-
-CMD /app/deploy/run.sh

@@ -1,6 +1,32 @@
 import os
 from pathlib import Path
 
+import dj_database_url
+import sentry_sdk
+from django.core.exceptions import ImproperlyConfigured
+from sentry_sdk.integrations.django import DjangoIntegration
+
+
+def env(key, as_bool=False, as_list=False, as_int=False, required=True, default=None):
+    try:
+        value = os.environ[key]
+        if not value:
+            raise ValueError()
+        elif as_bool:
+            return value.lower() == 'true'
+        elif as_list:
+            return value.split(',')
+        elif as_int:
+            return int(value)
+        return value
+    except (KeyError, ValueError):
+        if default is not None:
+            return default
+        if not required:
+            return None
+        raise ImproperlyConfigured('missing environment variable: {0}'.format(key))
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,12 +34,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-1-q)d#l=pqgz^9354^2uri96f&lmqb(ieh*$jdvv2$fnhvad%6"
+SECRET_KEY = env("SECRET_KEY", default="secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "true") == "true"
+DEBUG = env("DEBUG", as_bool=True, default=True)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [env("DOMAIN", default="*")]
 
 # Application definition
 
@@ -65,12 +91,7 @@ WSGI_APPLICATION = "iglo.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3"
-        if DEBUG
-        else BASE_DIR / "../../data/db.sqlite3",
-    }
+    'default': dj_database_url.config(default="sqlite://./db.sqlite3"),
 }
 
 # Password validation
@@ -133,3 +154,13 @@ LOGIN_REDIRECT_URL = "/"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+LOGIN_URL = '/login'
+
+if "SENTRY_DSN" in os.environ:
+    sentry_sdk.init(
+        dsn=env("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True
+    )

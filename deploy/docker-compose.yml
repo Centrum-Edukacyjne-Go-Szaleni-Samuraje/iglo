@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: /app/deploy/web.sh
+    expose:
+      - $VIRTUAL_PORT
+    environment:
+      VIRTUAL_HOST: $VIRTUAL_HOST
+      VIRTUAL_PORT: $VIRTUAL_PORT
+      LETSENCRYPT_HOST: $LETSENCRYPT_HOST
+      LETSENCRYPT_EMAIL: $LETSENCRYPT_EMAIL
+      DEBUG: $DEBUG
+      SECRET_KEY: $SECRET_KEY
+      DATABASE_URL: $DATABASE_URL
+      DOMAIN: $DOMAIN
+      SENTRY_DSN: $SENTRY_DSN
+    depends_on:
+      - db
+    volumes:
+      - "${DATA_PATH}/static:/data/static"
+      - "${DATA_PATH}/media:/data/media"
+  db:
+    image: postgres:14.0-alpine
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - "${DATA_PATH}/postgres:/var/lib/postgresql/data/pgdata"
+      - "${DATA_PATH}/pg_backups:/backups"

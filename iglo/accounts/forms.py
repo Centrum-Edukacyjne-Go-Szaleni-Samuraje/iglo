@@ -7,7 +7,7 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(min_length=8)
     nick = forms.SlugField()
-    rank = forms.CharField()
+    rank = forms.IntegerField()
     ogs = forms.CharField(required=False)
 
     def clean_email(self):

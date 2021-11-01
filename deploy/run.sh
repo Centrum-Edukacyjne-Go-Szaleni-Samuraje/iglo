@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-
-./manage.py collectstatic --noinput
-./manage.py migrate --noinput
-uwsgi --socket :9999 --module iglo.wsgi
-
-

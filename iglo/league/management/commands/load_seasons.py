@@ -3,13 +3,23 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from league.models import Season, Group, Player, Game, GameServer, Member, Account, Round, SeasonState
+from league.models import (
+    Season,
+    Group,
+    Player,
+    Game,
+    GameServer,
+    Member,
+    Account,
+    Round,
+    SeasonState,
+    WinType,
+)
 
 PARING_SYSTEM_6 = {
     frozenset({1, 6}): 1,
     frozenset({2, 5}): 1,
     frozenset({3, 4}): 1,
-
     frozenset({1, 5}): 2,
     frozenset({2, 4}): 2,
     frozenset({3, 6}): 2,
@@ -77,7 +87,7 @@ class Command(BaseCommand):
                     end_date=end_date,
                     promotion_count=2,
                     players_per_group=len(season_data["tables"][0]["players"]),
-                    state=SeasonState.STARTED,
+                    state=SeasonState.READY.value,
                 )
                 for group_data in season_data["tables"]:
                     group_name = group_data["name"][-1]
@@ -89,10 +99,16 @@ class Command(BaseCommand):
                         Round.objects.create(
                             group=group,
                             number=number,
-                        ) for number in range(1, len(group_data["players"]))
+                        )
+                        for number in range(1, len(group_data["players"]))
                     ]
                     players = []
-                    for player_order, player_name in enumerate(group_data["players"], start=1):
+                    for player_order, player_name in enumerate(
+                        group_data["players"], start=1
+                    ):
+                        if not player_name:
+                            players.append(None)
+                            continue
                         player, _ = Player.objects.update_or_create(nick=player_name)
                         account, _ = Account.objects.update_or_create(
                             player=player, name=player_name, server=GameServer.KGS
@@ -104,17 +120,34 @@ class Command(BaseCommand):
                             rank=None,
                         )
                         players.append(member)
-                    paring_system = PARING_SYSTEM_6 if len(group_data["players"]) == 6 else PARING_SYSTEM_8
+                    paring_system = (
+                        PARING_SYSTEM_6
+                        if len(group_data["players"]) == 6
+                        else PARING_SYSTEM_8
+                    )
                     for player_index, result_row in enumerate(group_data["results"]):
                         for other_player_index, result in enumerate(result_row):
-                            if player_index <= other_player_index:
+                            if (
+                                player_index <= other_player_index
+                                or not players[player_index]
+                                or not players[other_player_index]
+                            ):
                                 continue
                             Game.objects.create(
                                 group=group,
-                                round=rounds[paring_system[frozenset({player_index + 1, other_player_index + 1})] - 1],
+                                round=rounds[
+                                    paring_system[
+                                        frozenset(
+                                            {player_index + 1, other_player_index + 1}
+                                        )
+                                    ]
+                                    - 1
+                                ],
                                 black=players[player_index],
                                 white=players[other_player_index],
-                                result="B" if result == 1 else "W",
+                                winner=players[player_index]
+                                if result == 1
+                                else players[other_player_index],
                                 server=GameServer.KGS,
                                 date=datetime.datetime.combine(
                                     season.start_date, datetime.datetime.min.time()

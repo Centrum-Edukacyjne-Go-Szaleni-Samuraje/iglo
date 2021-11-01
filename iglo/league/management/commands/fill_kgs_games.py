@@ -90,13 +90,12 @@ class Command(BaseCommand):
                     }
                     game.black = name_to_player[kgs_game.black.name.lower()]
                     game.white = name_to_player[kgs_game.white.name.lower()]
-                    game.black.rank = kgs_game.black.rank
                     game.black.save()
-                    game.white.rank = kgs_game.white.rank
                     game.white.save()
                     game.link = kgs_game.link
                     game.date = kgs_game.date
-                    game.result = kgs_game.result
+                    # TODO: parse result
+                    # game.result = kgs_game.result
                     game.sgf.save(f"game-{game.id}.sgf", ContentFile(kgs_game.sgf))
                     game.save()
                     print("  > updated")

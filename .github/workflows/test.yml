@@ -1,0 +1,13 @@
+name: Test
+on: [ push, pull_request ]
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Build docker image
+        run: docker build -f deploy/Dockerfile . -t web
+      - name: Run tests
+        run: docker run web python manage.py test

@@ -1,7 +1,6 @@
 from django.urls import path
 
-from league.views import SeasonsListView, SeasonDetailView, GroupDetailView, GameDetailView, PlayerDetailView, PlayerSettingsView, PrepareSeasonView
-, GameUpdateView
+from league.views import SeasonsListView, SeasonDetailView, GroupDetailView, GameDetailView, PlayerDetailView, PlayerSettingsView, PrepareSeasonView, GameUpdateView
 
 urlpatterns = [
     path('seasons', SeasonsListView.as_view(), name="seasons-list"),

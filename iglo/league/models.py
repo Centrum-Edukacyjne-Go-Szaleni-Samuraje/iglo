@@ -20,7 +20,7 @@ class SeasonState(Enum):
 
 class SeasonManager(models.Manager):
     def prepare_season(
-        self, start_date: datetime.date, players_per_group: int, promotion_count: int
+            self, start_date: datetime.date, players_per_group: int, promotion_count: int
     ) -> "Season":
         previous_season = Season.objects.first()
         if previous_season.state == SeasonState.DRAFT.value:
@@ -31,7 +31,7 @@ class SeasonManager(models.Manager):
             number=previous_season.number + 1,
             start_date=start_date,
             end_date=start_date
-            + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+                     + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
@@ -68,11 +68,11 @@ class SeasonManager(models.Manager):
         return season
 
     def _add_members(
-        self,
-        group: "Group",
-        previous_season: "Season",
-        previous_group_name: str,
-        results: set["MemberResult"],
+            self,
+            group: "Group",
+            previous_season: "Season",
+            previous_group_name: str,
+            results: set["MemberResult"],
     ) -> None:
         try:
             members_count = group.members.count()
@@ -136,7 +136,7 @@ class Season(models.Model):
         for group in self.groups.all():
             members = list(group.members.all())
             for round_number, round_pairs in enumerate(
-                round_robin(n=len(members)), start=1
+                    round_robin(n=len(members)), start=1
             ):
                 round = Round.objects.create(
                     number=round_number,
@@ -266,42 +266,33 @@ class Group(models.Model):
 
 class PlayerManager(models.Manager):
     def register_player(self, user, nick: str, rank: int, ogs: str) -> "Player":
-        player = self.create(
+        return self.create(
             user=user,
             nick=nick,
             rank=rank,
+            ogs_username=ogs,
         )
-        Account.objects.create(
-            player=player,
-            name=ogs,
-            server=GameServer.OGS,
-        )
-        return player
 
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
     user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
+    ogs_username = models.CharField(max_length=32, null=True, blank=True)
+    kgs_username = models.CharField(max_length=32, null=True, blank=True)
 
     objects = PlayerManager()
 
     def __str__(self) -> str:
         return self.nick
 
+    def get_absolute_url(self) -> str:
+        return reverse("player-detail", kwargs={"slug": self.nick})
+
 
 class GameServer(models.TextChoices):
     OGS = ("OGS", "OGS")
     KGS = ("KGS", "KGS")
-
-
-class Account(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    name = models.CharField(max_length=32)
-    server = models.CharField(max_length=3, choices=GameServer.choices)
-
-    def __str__(self) -> str:
-        return f"{self.player} - {self.name} - {self.server}"
 
 
 class MemberResult(Enum):
@@ -339,11 +330,11 @@ class Member(models.Model):
     def result(self) -> MemberResult:
         members_qualification = self.group.get_members_qualification()
         if (
-            self in members_qualification[: self.group.season.promotion_count]
-            and not self.group.is_first
+                self in members_qualification[: self.group.season.promotion_count]
+                and not self.group.is_first
         ):
             return MemberResult.PROMOTION
-        if self in members_qualification[-self.group.season.promotion_count :]:
+        if self in members_qualification[-self.group.season.promotion_count:]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
 

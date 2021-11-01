@@ -4,8 +4,10 @@ from django.contrib import messages
 from django.db.models import Q
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
-from league.forms import PrepareSeasonForm, GameResultUpdateForm
-from league.models import Season, Group, Game, Player, SeasonState
+from league.forms import GameResultUpdateForm
+from league.forms import PrepareSeasonForm
+from league.models import Season, Group, Game, Player
+from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
 
@@ -129,6 +131,35 @@ class PlayerDetailView(DetailView):
             "memberships": self.object.memberships.order_by("-group__season__number"),
             "current_game": current_game,
         }
+
+
+class PlayerUpdateView(AdminPermissionRequired, UpdateView):
+    model = Player
+    fields = [
+        "nick",
+        "rank",
+        "ogs_username",
+        "kgs_username",
+    ]
+    slug_field = "nick"
+
+    def form_valid(self, form):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Twoje dane zostały zmienione.",
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+    def test_func(self):
+        return super().test_func() or (
+            self.request.user.is_authenticated
+            and self.request.user.player
+            and self.request.user.player.nick == self.kwargs["slug"]
+        )
 
 
 class PrepareSeasonView(AdminPermissionRequired, FormView):

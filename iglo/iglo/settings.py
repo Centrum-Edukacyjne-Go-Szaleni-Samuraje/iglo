@@ -2,7 +2,9 @@ import os
 from pathlib import Path
 
 import dj_database_url
+import sentry_sdk
 from django.core.exceptions import ImproperlyConfigured
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 def env(key, as_bool=False, as_list=False, as_int=False, required=True, default=None):
@@ -154,3 +156,11 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 LOGIN_URL = '/login'
+
+if "SENTRY_DSN" in os.environ:
+    sentry_sdk.init(
+        dsn=env("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True
+    )

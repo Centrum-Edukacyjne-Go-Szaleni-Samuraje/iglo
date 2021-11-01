@@ -10,7 +10,6 @@ from league.models import (
     Game,
     GameServer,
     Member,
-    Account,
     Round,
     SeasonState,
     WinType,
@@ -109,10 +108,7 @@ class Command(BaseCommand):
                         if not player_name:
                             players.append(None)
                             continue
-                        player, _ = Player.objects.update_or_create(nick=player_name)
-                        account, _ = Account.objects.update_or_create(
-                            player=player, name=player_name, server=GameServer.KGS
-                        )
+                        player, _ = Player.objects.update_or_create(nick=player_name, kgs_username=player_name)
                         member = Member.objects.create(
                             player=player,
                             group=group,

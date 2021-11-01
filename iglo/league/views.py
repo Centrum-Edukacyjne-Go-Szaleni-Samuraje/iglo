@@ -1,17 +1,14 @@
 import datetime
 
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, FormView, UpdateView
-from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
 from league.forms import GameResultUpdateForm
-from league.forms import PlayerSettingsForm, PrepareSeasonForm
-from league.models import Season, Group, Game, Player, Account, GameServer
+from league.forms import PrepareSeasonForm
+from league.models import Season, Group, Game, Player
 from league.models import SeasonState
+from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
 
 class SeasonsListView(ListView):
@@ -136,63 +133,33 @@ class PlayerDetailView(DetailView):
         }
 
 
-class PlayerSettingsView(FormView):
-    template_name = "league/player_settings.html"
-    form_class = PlayerSettingsForm
-    success_url = reverse_lazy("player-settings")
-
-    def dispatch(self, request, *args, **kwargs):
-        user = self.request.user
-        if not user.is_authenticated or not (user.is_staff or user.player.nick == kwargs['nick']):
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                "Nie posiadasz uprawnień do edycji tego konta.",
-            )
-            return redirect('/')
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self):
-        current_player = get_object_or_404(Player, nick=self.kwargs['nick'])
-        context = super().get_context_data()
-        context['nick'] = current_player.nick
-        context['rank'] = current_player.rank
-        try:
-            ogs_account = Account.objects.get(player=current_player, server=GameServer.OGS)
-            context['nick_ogs'] = ogs_account.name
-        except ObjectDoesNotExist:
-            pass
-        try:
-            kgs_account = Account.objects.get(player=current_player, server=GameServer.KGS)
-            context['nick_kgs'] = kgs_account.name
-        except ObjectDoesNotExist:
-            pass
-        return context
+class PlayerUpdateView(AdminPermissionRequired, UpdateView):
+    model = Player
+    fields = [
+        "nick",
+        "rank",
+        "ogs_username",
+        "kgs_username",
+    ]
+    slug_field = "nick"
 
     def form_valid(self, form):
-        current_player = Player.objects.get(user=self.request.user)
-        if new_nick := form.cleaned_data['nick']:
-            current_player.nick = new_nick
-        if new_rank := form.cleaned_data['rank']:
-            current_player.rank = new_rank
-        current_player.save()
-
-        if new_ogs_nick := form.cleaned_data.get('nick_ogs'):
-            ogs_account, _ = Account.objects.get_or_create(player=current_player, server=GameServer.OGS)
-            ogs_account.name = new_ogs_nick
-            ogs_account.save()
-        if new_kgs_nick := form.cleaned_data.get('nick_kgs'):
-            kgs_account, _ = Account.objects.get_or_create(player=current_player, server=GameServer.KGS)
-            kgs_account.name = new_kgs_nick
-            kgs_account.save()
-
-        if any(form.cleaned_data.values()):
-            messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                "Twoje dane zostały zmienione.",
-            )
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Twoje dane zostały zmienione.",
+        )
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+    def test_func(self):
+        return super().test_func() or (
+            self.request.user.is_authenticated
+            and self.request.user.player
+            and self.request.user.player.nick == self.kwargs["slug"]
+        )
 
 
 class PrepareSeasonView(AdminPermissionRequired, FormView):

@@ -1,7 +1,7 @@
 from django import forms
 
 from league import texts
-from league.models import Game, Member, Player
+from league.models import Game, Member, Player, WinType
 
 
 class PrepareSeasonForm(forms.Form):
@@ -31,6 +31,14 @@ class GameResultUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["winner"].queryset = Member.objects.filter(id__in=[self.instance.black.id, self.instance.white.id])
+
+    def clean(self):
+        cleaned_data = super().clean()
+        win_type = cleaned_data["win_type"]
+        winner = cleaned_data["winner"]
+        if win_type != WinType.NOT_PLAYED and not winner:
+            self.add_error(field="winner", error=texts.WINNER_REQUIRED_ERROR)
+        return cleaned_data
 
 
 class PlayerUpdateForm(forms.ModelForm):

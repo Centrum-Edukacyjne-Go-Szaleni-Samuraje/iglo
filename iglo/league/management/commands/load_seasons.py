@@ -145,6 +145,7 @@ class Command(BaseCommand):
                                 if result == 1
                                 else players[other_player_index],
                                 server=GameServer.KGS,
+                                win_type=WinType.POINTS,
                                 date=datetime.datetime.combine(
                                     season.start_date, datetime.datetime.min.time()
                                 ),

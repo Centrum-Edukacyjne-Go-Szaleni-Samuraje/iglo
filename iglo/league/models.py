@@ -8,6 +8,7 @@ from django.db.models import F
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 
+from league import texts
 from league.utils import round_robin
 
 DAYS_PER_GAME = 7
@@ -166,7 +167,7 @@ class Group(models.Model):
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"
 
-    def results_as_table(self) -> list[tuple["Player", list[Optional[GameResult]]]]:
+    def results_as_table(self) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
         table = []
         players_to_game = {
             frozenset({game.black.player, game.white.player}): game
@@ -176,22 +177,15 @@ class Group(models.Model):
             row = []
             for other_member in self.members.all():
                 if member == other_member:
-                    row.append(None)
+                    row.append((other_member, None))
                 else:
                     try:
                         game = players_to_game[
                             frozenset({member.player, other_member.player})
                         ]
-                        if game.winner:
-                            row.append(
-                                GameResult.WIN
-                                if game.winner.player == member.player
-                                else GameResult.LOSE
-                            )
-                        else:
-                            row.append(None)
+                        row.append((other_member, game.game_result_for(member)))
                     except KeyError:
-                        row.append(None)
+                        row.append((other_member, None))
             table.append((member, row))
         return table
 
@@ -266,7 +260,9 @@ class Group(models.Model):
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
-    user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
+    user = models.OneToOneField(
+        "accounts.User", null=True, on_delete=models.SET_NULL, blank=True
+    )
     rank = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
@@ -339,9 +335,10 @@ class Round(models.Model):
 
 
 class WinType(models.TextChoices):
-    POINTS = "points", "Punkty"
-    RESIGN = "resign", "Rezygnacja"
-    TIME = "time", "Czas"
+    POINTS = "points", texts.WIN_TYPE_POINTS
+    RESIGN = "resign", texts.WIN_TYPE_RESIGN
+    TIME = "time", texts.WIN_TYPE_TIME
+    NOT_PLAYED = "not_played", texts.WIN_TYPE_NOT_PLAYED
 
 
 class Game(models.Model):
@@ -359,8 +356,9 @@ class Game(models.Model):
         on_delete=models.CASCADE,
         null=True,
         related_name="won_games",
+        blank=True,
     )
-    win_type = models.CharField(choices=WinType.choices, max_length=8, null=True)
+    win_type = models.CharField(choices=WinType.choices, max_length=16, null=True)
     points_difference = models.SmallIntegerField(null=True, blank=True)
 
     date = models.DateTimeField(null=True)
@@ -373,18 +371,20 @@ class Game(models.Model):
 
     @property
     def is_played(self) -> bool:
-        return bool(self.winner)
+        return bool(self.win_type)
 
     @property
     def result(self) -> Optional[str]:
         if not self.is_played:
             return None
+        if not self.winner:
+            return WinType(self.win_type).label
         winner_color = "B" if self.winner == self.black else "W"
         if self.win_type:
             win_type = (
                 self.points_difference
                 if self.win_type == WinType.POINTS
-                else self.win_type
+                else WinType(self.win_type).label
             )
             return f"{winner_color}+{win_type}"
         return winner_color
@@ -399,3 +399,8 @@ class Game(models.Model):
                 "white_player": self.white.player.nick,
             },
         )
+
+    def game_result_for(self, member: Member) -> Optional[GameResult]:
+        if not self.win_type:
+            return None
+        return GameResult.WIN if self.winner == member else GameResult.LOSE

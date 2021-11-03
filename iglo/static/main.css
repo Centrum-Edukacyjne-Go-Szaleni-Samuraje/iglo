@@ -9,7 +9,7 @@
 }
 
 .group-table__result--empty {
-    background-color: rgb(255, 212, 80);
+    color: grey;
 }
 
 .group-table__result--win {

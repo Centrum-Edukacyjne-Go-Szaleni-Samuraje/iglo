@@ -35,9 +35,11 @@
                                     <td class="group-table__header"><strong><a
                                             href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong>
                                     </td>
-                                    {% for result in results %}
-                                        <td class="group-table__result d-none d-lg-table-cell {% if result is None %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
-                                            {% if result is not None %}
+                                    {% for other_member, result in results %}
+                                        <td class="group-table__result d-none d-lg-table-cell {% if member ==  other_member %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
+                                            {% if member ==  other_member %}
+                                                X
+                                            {% elif result is not None %}
                                                 {{ result.value }}
                                             {% endif %}
                                         </td>
@@ -54,7 +56,8 @@
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between">
                             <strong>Runda #{{ round.number }}</strong>
-                            {% if round.start_date and round.end_date %}{{ round.start_date }} - {{ round.end_date }}{% endif %}
+                            {% if round.start_date and round.end_date %}{{ round.start_date }} -
+                                {{ round.end_date }}{% endif %}
                         </div>
                         <div class="card-body">
                             {% for game in round.games.all %}
@@ -63,7 +66,8 @@
                                         vs {{ game.white.player.nick }} (W)
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-baseline">
-                                        <p>{% if game.is_played %}Wynik: {{ game.result }}{% else %}Gra nierozegrana{% endif %}</p>
+                                        <p>{% if game.is_played %}Wynik: {{ game.result }}{% else %}Gra jeszcze się nie
+                                            odbyła.{% endif %}</p>
                                         <a href="{% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
                                            class="btn btn-primary">Zobacz</a>
                                     </div>

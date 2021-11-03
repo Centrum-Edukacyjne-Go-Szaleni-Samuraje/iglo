@@ -44,7 +44,7 @@
                 {% endif %}
             </div>
             <h5 class="text-muted mb-3">{% if object.is_played %}Wynik: {{ object.result }}, Data:
-                {{ object.date|date:"d/m/Y" }}{% else %}Gra nierozegrana{% endif %}</h5>
+                {{ object.date|date:"d/m/Y" }}{% else %}Gra jeszcze się nie odbyła.{% endif %}</h5>
             {% if object.sgf %}
                 <a href="{{ object.sgf.url }}" class="btn btn-primary mb-4">Pobierz SGF</a>
                 <div data-wgo="{{ object.sgf.url }}" data-wgo-layout="bottom: ['Control']"

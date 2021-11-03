@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_filters %}
+
 {% block page_title %}Rejestracja{% endblock %}
 
 {% block content %}
@@ -9,44 +11,7 @@
             <p>W celu rozpoczęcia gry w lidze konieczne jest posiadanie konta w naszym systemie.</p>
             <form method="post">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-mail</label>
-                    <input type="email" class="form-control{% if form.email.errors %} is-invalid{% endif %}" id="email"
-                           name="email" {% if form.email.value %}value="{{ form.email.value }}"{% endif %}>
-                    <div class="invalid-feedback">{{ form.email.errors }}</div>
-                    <small class="form-text text-muted">Twój adres e-mail będzie widoczny tylko dla administratorów
-                        ligi. Będziesz używać go do logowania oraz bedziemy przesyłać na niego powiadomienia.</small>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Hasło</label>
-                    <input type="password" class="form-control {% if form.password.errors %} is-invalid{% endif %}"
-                           id="password" name="password">
-                    <div class="invalid-feedback">{{ form.password.errors }}</div>
-                    <small class="form-text text-muted">Hasło musi mieć conajmniej 8 znaków.</small>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label for="nick" class="form-label">Nick</label>
-                    <input type="text" class="form-control{% if form.nick.errors %} is-invalid{% endif %}" id="nick"
-                           name="nick" {% if form.nick.value %}value="{{ form.nick.value }}"{% endif %}>
-                    <div class="invalid-feedback">{{ form.nick.errors }}</div>
-                    <small class="form-text text-muted">Pod tą nazwą będziesz widoczny dla innych graczy.</small>
-                </div>
-                <div class="mb-3">
-                    <label for="rank" class="form-label">Ranking</label>
-                    <input type="text" class="form-control{% if form.rank.errors %} is-invalid{% endif %}" id="rank"
-                           name="rank" {% if form.rank.value %}value="{{ form.rank.value }}"{% endif %}>
-                    <div class="invalid-feedback">{{ form.rank.errors }}</div>
-                    <small class="form-text text-muted">Twoja aktualna siła w punktach GoR</small>
-                </div>
-                <div class="mb-3">
-                    <label for="ogs" class="form-label">Konto OGS</label>
-                    <input type="text" class="form-control{% if form.ogs.errors %} is-invalid{% endif %}" id="ogs"
-                           name="ogs" {% if form.email.value %}value="{{ form.ogs.value }}"{% endif %}>
-                    <div class="invalid-feedback">{{ form.ogs.errors }}</div>
-                    <small class="form-text text-muted">Nazwa Twojego konta w serwisie OGS. Jeżeli jest taka sama jak
-                        Twój nick to możesz zostawić to pole puste.</small>
-                </div>
+                {{ form | crispy }}
                 <button type="submit" class="btn btn-primary">Zarejestruj</button>
             </form>
         </div>

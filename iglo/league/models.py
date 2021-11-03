@@ -247,7 +247,7 @@ class Group(models.Model):
 
     def add_member(self, player_nick: str) -> None:
         raise_if_not_in_draft(season=self.season)
-        player = Player.objects.get(nick=player_nick)
+        player = Player.objects.get(nick__iexact=player_nick)
         try:
             current_group = self.season.groups.get(members__player=player)
             if current_group == self:
@@ -264,24 +264,12 @@ class Group(models.Model):
         )
 
 
-class PlayerManager(models.Manager):
-    def register_player(self, user, nick: str, rank: int, ogs: str) -> "Player":
-        return self.create(
-            user=user,
-            nick=nick,
-            rank=rank,
-            ogs_username=ogs,
-        )
-
-
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
     user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
-
-    objects = PlayerManager()
 
     def __str__(self) -> str:
         return self.nick

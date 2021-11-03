@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
-from league.forms import GameResultUpdateForm
+from league import texts
+from league.forms import GameResultUpdateForm, PlayerUpdateForm
 from league.forms import PrepareSeasonForm
 from league.models import Season, Group, Game, Player
 from league.models import SeasonState
@@ -69,7 +70,7 @@ class GroupDetailView(AdminPermissionForModifyRequired, DetailView):
                 messages.add_message(
                     self.request,
                     messages.WARNING,
-                    "Gracz o podanym nicku nie istnieje.",
+                    texts.MISSING_PLAYER_ERROR,
                 )
         return self.render_to_response(context)
 
@@ -135,19 +136,14 @@ class PlayerDetailView(DetailView):
 
 class PlayerUpdateView(AdminPermissionRequired, UpdateView):
     model = Player
-    fields = [
-        "nick",
-        "rank",
-        "ogs_username",
-        "kgs_username",
-    ]
+    form_class = PlayerUpdateForm
     slug_field = "nick"
 
     def form_valid(self, form):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Twoje dane zostały zmienione.",
+            texts.PLAYER_UPDATE_SUCCESS,
         )
         return super().form_valid(form)
 

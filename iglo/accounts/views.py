@@ -1,8 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth.views import LoginView as ContribLoginView, LogoutView as ContribLogoutView
+from django.contrib.auth.views import (
+    LoginView as ContribLoginView,
+    LogoutView as ContribLogoutView,
+)
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from accounts import texts
 from accounts.forms import RegistrationForm
 from accounts.models import User
 from league.models import Player
@@ -17,16 +21,15 @@ class RegistrationView(FormView):
         user = User.objects.create_user(
             email=form.cleaned_data["email"], password=form.cleaned_data["password"]
         )
-        Player.objects.register_player(
+        Player.objects.create(
             user=user,
             nick=form.cleaned_data["nick"],
             rank=form.cleaned_data["rank"],
-            ogs=form.cleaned_data["ogs"] or form.cleaned_data["nick"],
         )
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Konto zostało utworzone. Możesz się zalogować.",
+            texts.REGISTRATION_SUCCESS,
         )
         return super().form_valid(form)
 

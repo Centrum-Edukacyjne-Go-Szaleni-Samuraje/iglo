@@ -1,3 +1,4 @@
+import datetime
 import os
 from pathlib import Path
 
@@ -146,6 +147,7 @@ MEDIA_ROOT = BASE_DIR / "../../data/media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DATE_FORMAT = "d/m/Y"
+DATETIME_FORMAT = "d/m/Y H:i"
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -164,3 +166,5 @@ if "SENTRY_DSN" in os.environ:
         traces_sample_rate=1.0,
         send_default_pii=True
     )
+
+DEFAULT_GAME_TIME = datetime.time(18, 0)

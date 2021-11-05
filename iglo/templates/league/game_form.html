@@ -4,6 +4,13 @@
 
 {% block page_title %}{{ object.black.player.nick }} vs {{ object.white.player.nick }}{% endblock %}
 
+{% block head %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "flatpickr/flatpickr.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "flatpickr/pl.min.js" %}"></script>
+    <link href="{% static "flatpickr/flatpickr.min.css" %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
     <div class="row">
     <div class="col">
@@ -41,4 +48,7 @@
             </form>
         </div>
     </div>
+    <script type="text/javascript">
+        flatpickr("#id_date", { enableTime: true, locale: "pl" });
+    </script>
 {% endblock %}

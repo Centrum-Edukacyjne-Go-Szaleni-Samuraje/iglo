@@ -14,6 +14,7 @@ class GameResultUpdateForm(forms.ModelForm):
     class Meta:
         model = Game
         fields = [
+            "date",
             "winner",
             "win_type",
             "points_difference",
@@ -21,6 +22,7 @@ class GameResultUpdateForm(forms.ModelForm):
             "sgf",
         ]
         labels = {
+            "date": texts.DATE_LABEL,
             "winner": texts.WINNER_LABEL,
             "win_type": texts.WIN_TYPE_LABEL,
             "points_difference": texts.POINTS_DIFFERENCE_LABEL,
@@ -36,7 +38,7 @@ class GameResultUpdateForm(forms.ModelForm):
         cleaned_data = super().clean()
         win_type = cleaned_data["win_type"]
         winner = cleaned_data["winner"]
-        if win_type != WinType.NOT_PLAYED and not winner:
+        if win_type and win_type != WinType.NOT_PLAYED and not winner:
             self.add_error(field="winner", error=texts.WINNER_REQUIRED_ERROR)
         return cleaned_data
 

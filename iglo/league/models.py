@@ -4,6 +4,7 @@ import string
 from enum import Enum
 from typing import Optional
 
+from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
 from django.db.models.functions import Ord, Chr
@@ -129,6 +130,7 @@ class Season(models.Model):
                         round=round,
                         black=members[pair[0]],
                         white=members[pair[1]],
+                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME)
                     )
 
 
@@ -365,10 +367,10 @@ class Game(models.Model):
         related_name="won_games",
         blank=True,
     )
-    win_type = models.CharField(choices=WinType.choices, max_length=16, null=True)
+    win_type = models.CharField(choices=WinType.choices, max_length=16, null=True, blank=True)
     points_difference = models.SmallIntegerField(null=True, blank=True)
 
-    date = models.DateTimeField(null=True)
+    date = models.DateTimeField(null=True, blank=True)
     server = models.CharField(max_length=3, choices=GameServer.choices)
     link = models.URLField(null=True, blank=True)
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)

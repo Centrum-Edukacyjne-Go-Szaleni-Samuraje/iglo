@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.db.models import Q
 from django.test import TestCase
 
@@ -85,26 +86,44 @@ class SeasonTestCase(TestCase):
         group_a_member_2 = MemberFactory(group=group_a, order=2)
         group_a_member_3 = MemberFactory(group=group_a, order=3)
         GameFactory(
-            group=group_a, white=group_a_member_1, black=group_a_member_2, winner=group_a_member_1
+            group=group_a,
+            white=group_a_member_1,
+            black=group_a_member_2,
+            winner=group_a_member_1,
         )
         GameFactory(
-            group=group_a, white=group_a_member_1, black=group_a_member_3, winner=group_a_member_1
+            group=group_a,
+            white=group_a_member_1,
+            black=group_a_member_3,
+            winner=group_a_member_1,
         )
         GameFactory(
-            group=group_a, white=group_a_member_2, black=group_a_member_3, winner=group_a_member_2
+            group=group_a,
+            white=group_a_member_2,
+            black=group_a_member_3,
+            winner=group_a_member_2,
         )
         group_b = GroupFactory(season=season, name="B")
         group_b_member_1 = MemberFactory(group=group_b, order=1)
         group_b_member_2 = MemberFactory(group=group_b, order=2)
         group_b_member_3 = MemberFactory(group=group_b, order=3)
         GameFactory(
-            group=group_b, white=group_b_member_1, black=group_b_member_2, winner=group_a_member_1
+            group=group_b,
+            white=group_b_member_1,
+            black=group_b_member_2,
+            winner=group_a_member_1,
         )
         GameFactory(
-            group=group_b, white=group_b_member_1, black=group_b_member_3, winner=group_a_member_1
+            group=group_b,
+            white=group_b_member_1,
+            black=group_b_member_3,
+            winner=group_a_member_1,
         )
         GameFactory(
-            group=group_b, white=group_b_member_2, black=group_b_member_3, winner=group_a_member_2
+            group=group_b,
+            white=group_b_member_2,
+            black=group_b_member_3,
+            winner=group_a_member_2,
         )
 
         new_season = Season.objects.prepare_season(
@@ -149,7 +168,10 @@ class SeasonTestCase(TestCase):
         group_a_member_1 = MemberFactory(group=group_a, order=1)
         group_a_member_2 = MemberFactory(group=group_a, order=2)
         GameFactory(
-            group=group_a, white=group_a_member_1, black=group_a_member_2, winner=group_a_member_2
+            group=group_a,
+            white=group_a_member_1,
+            black=group_a_member_2,
+            winner=group_a_member_2,
         )
         new_player_1 = PlayerFactory(rank=100)
         new_player_2 = PlayerFactory(rank=200)
@@ -205,7 +227,9 @@ class SeasonTestCase(TestCase):
         self.assertEqual(group.name, "A")
 
     def test_start(self):
-        season = SeasonFactory(state=SeasonState.DRAFT.value, start_date=datetime.date(2021, 1, 1))
+        season = SeasonFactory(
+            state=SeasonState.DRAFT.value, start_date=datetime.date(2021, 1, 1)
+        )
         group = GroupFactory(season=season)
         member_1 = MemberFactory(group=group)
         member_2 = MemberFactory(group=group)
@@ -238,11 +262,17 @@ class SeasonTestCase(TestCase):
 
     def _game_exists(self, round: Round, member_1: Member, member_2: Member) -> bool:
         return (
-            Game.objects.filter(group=round.group, round=round)
-                .filter(
+            Game.objects.filter(
+                group=round.group,
+                round=round,
+                date=datetime.datetime.combine(
+                    round.end_date, settings.DEFAULT_GAME_TIME
+                ),
+            )
+            .filter(
                 Q(black=member_1, white=member_2) | Q(black=member_2, white=member_1)
             )
-                .exists()
+            .exists()
         )
 
 

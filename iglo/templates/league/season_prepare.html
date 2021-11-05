@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 
-{% load  crispy_forms_filters %}
+{% load static crispy_forms_filters %}
 
 {% block page_title %}Stwórz Sezon{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "flatpickr/flatpickr.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "flatpickr/pl.min.js" %}"></script>
+    <link href="{% static "flatpickr/flatpickr.min.css" %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -15,4 +22,7 @@
             </form>
         </div>
     </div>
+    <script type="text/javascript">
+        flatpickr("#id_start_date", { locale: "pl" });
+    </script>
 {% endblock %}

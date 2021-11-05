@@ -266,6 +266,7 @@ class Player(models.Model):
     rank = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
+    # auto_join = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.nick

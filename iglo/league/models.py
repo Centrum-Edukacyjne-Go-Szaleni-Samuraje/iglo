@@ -1,10 +1,11 @@
 import datetime
+import math
 import string
 from enum import Enum
 from typing import Optional
 
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 
@@ -26,7 +27,6 @@ class SeasonManager(models.Manager):
         previous_season = Season.objects.first()
         if previous_season.state == SeasonState.DRAFT.value:
             raise ValueError("Poprzedni sezon nie został rozpoczęty.")
-        number_of_members = Member.objects.filter(group__season=previous_season).count()
         season = self.create(
             state=SeasonState.DRAFT.value,
             number=previous_season.number + 1,
@@ -36,60 +36,37 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        group_names = string.ascii_uppercase[: number_of_members // players_per_group]
-        for group_name in group_names:
+        season_players = []
+        for group in previous_season.groups.order_by("name"):
+            members = group.get_members_qualification()
+            group_players = [
+                member.player for member in members if member.player.auto_join
+            ]
+            season_players = (
+                    season_players[: -previous_season.promotion_count]
+                    + group_players[: previous_season.promotion_count]
+                    + season_players[-previous_season.promotion_count:]
+                    + group_players[previous_season.promotion_count:]
+            )
+        season_players.extend(
+            Player.objects.filter(auto_join=True)
+                .order_by("-rank")
+                .exclude(id__in=[p.id for p in season_players])
+        )
+        for group_order in range(math.ceil(len(season_players) / players_per_group)):
             group = Group.objects.create(
-                name=group_name,
+                name=string.ascii_uppercase[group_order],
                 season=season,
             )
-            is_last = group_name == group_names[-1]
-            if previous_season:
-                if not group.is_first:
-                    self._add_members(
-                        group=group,
-                        previous_season=previous_season,
-                        previous_group_name=group.higher_group_name,
-                        results={MemberResult.RELEGATION},
-                    )
-                self._add_members(
+            for player_order, player in enumerate(season_players[group_order * players_per_group: (group_order + 1) * players_per_group], start=1):
+                Member.objects.create(
                     group=group,
-                    previous_season=previous_season,
-                    previous_group_name=group.name,
-                    results={MemberResult.STAY, MemberResult.RELEGATION}
-                    if is_last
-                    else {MemberResult.STAY},
+                    order=player_order,
+                    player=player,
+                    rank=player.rank,
                 )
-                if not is_last:
-                    self._add_members(
-                        group=group,
-                        previous_season=previous_season,
-                        previous_group_name=group.lower_group_name,
-                        results={MemberResult.PROMOTION},
-                    )
+
         return season
-
-    def _add_members(
-            self,
-            group: "Group",
-            previous_season: "Season",
-            previous_group_name: str,
-            results: set["MemberResult"],
-    ) -> None:
-        try:
-            members_count = group.members.count()
-            previous_group = previous_season.groups.get(name=previous_group_name)
-            for member in previous_group.get_members_qualification():
-                if member.result in results:
-                    Member.objects.create(
-                        group=group,
-                        order=members_count + 1,
-                        player=member.player,
-                        rank=member.rank,
-                    )
-                    members_count += 1
-        except Group.DoesNotExist:
-            pass
-
 
 class SeasonNotInDraft(Exception):
     pass
@@ -167,7 +144,9 @@ class Group(models.Model):
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"
 
-    def results_as_table(self) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
+    def results_as_table(
+            self,
+    ) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
         table = []
         players_to_game = {
             frozenset({game.black.player, game.white.player}): game
@@ -266,7 +245,7 @@ class Player(models.Model):
     rank = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
-    # auto_join = models.BooleanField(default=True)
+    auto_join = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.nick
@@ -286,6 +265,17 @@ class MemberResult(Enum):
     RELEGATION = "RELEGATION"
 
 
+class MemberManager(models.Manager):
+    def get_current_membership(self, player: "Player") -> Optional["Member"]:
+        try:
+            return self.filter(
+                player=player,
+                group__season__end_date__gte=datetime.date.today(),
+            ).latest("group__season__number")
+        except Member.DoesNotExist:
+            return None
+
+
 class Member(models.Model):
     player = models.ForeignKey(
         Player, on_delete=models.CASCADE, related_name="memberships"
@@ -293,6 +283,8 @@ class Member(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
+
+    objects = MemberManager()
 
     class Meta:
         ordering = ["order"]
@@ -342,6 +334,18 @@ class WinType(models.TextChoices):
     NOT_PLAYED = "not_played", texts.WIN_TYPE_NOT_PLAYED
 
 
+class GameManager(models.Manager):
+    def get_current_game(self, member: Member) -> Optional["Game"]:
+        try:
+            return (
+                Game.objects.filter(Q(white=member) | Q(black=member))
+                    .filter(win_type__isnull=True)
+                    .earliest("round__number")
+            )
+        except Game.DoesNotExist:
+            return None
+
+
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
@@ -366,6 +370,8 @@ class Game(models.Model):
     server = models.CharField(max_length=3, choices=GameServer.choices)
     link = models.URLField(null=True, blank=True)
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
+
+    objects = GameManager()
 
     def __str__(self) -> str:
         return f"B: {self.black} - W: {self.white} - winner: {self.winner}"

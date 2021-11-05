@@ -1,9 +1,11 @@
+from binhex import REASONABLY_LARGE
+
 from django.contrib import messages
 from django.contrib.auth.views import (
     LoginView as ContribLoginView,
     LogoutView as ContribLogoutView,
 )
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView
 
 from accounts import texts
@@ -36,6 +38,12 @@ class RegistrationView(FormView):
 
 class LoginView(ContribLoginView):
     template_name = "accounts/login.html"
+
+    def get_success_url(self):
+        try:
+            return reverse("player-detail", kwargs={"slug": self.request.user.player.nick})
+        except Player.DoesNotExist:
+            return super().get_success_url()
 
 
 class LogoutView(ContribLogoutView):

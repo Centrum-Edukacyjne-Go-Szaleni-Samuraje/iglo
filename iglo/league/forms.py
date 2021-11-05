@@ -49,18 +49,21 @@ class PlayerUpdateForm(forms.ModelForm):
             "rank",
             "ogs_username",
             "kgs_username",
+            "auto_join",
         ]
         labels = {
             "rank": texts.RANK_LABEL,
             "ogs_username": texts.OGS_USERNAME_LABEL,
             "kgs_username": texts.KGS_USERNAME_LABEL,
+            "auto_join": texts.AUTO_JOIN_LABEL,
         }
         help_texts = {
             "rank": texts.RANK_HELP_TEXT,
+            "auto_join": texts.AUTO_JOIN_HELP_TEXT,
         }
 
     def clean_nick(self):
         nick = self.cleaned_data["nick"]
-        if Player.objects.filter(nick__iexact=nick).exists():
+        if Player.objects.exclude(id=self.instance.id).filter(nick__iexact=nick).exists():
             raise forms.ValidationError(texts.NICK_ERROR)
         return nick

@@ -141,6 +141,39 @@ class SeasonTestCase(TestCase):
             new_group_b.members.filter(player=group_b_member_3.player, order=3).exists()
         )
 
+    def test_prepare_season_with_new_players(self):
+        season = SeasonFactory(
+            promotion_count=1, state=SeasonState.READY.value, number=1
+        )
+        group_a = GroupFactory(season=season, name="A")
+        group_a_member_1 = MemberFactory(group=group_a, order=1)
+        group_a_member_2 = MemberFactory(group=group_a, order=2)
+        GameFactory(
+            group=group_a, white=group_a_member_1, black=group_a_member_2, winner=group_a_member_2
+        )
+        new_player_1 = PlayerFactory(rank=100)
+        new_player_2 = PlayerFactory(rank=200)
+
+        new_season = Season.objects.prepare_season(
+            start_date=datetime.date(2021, 1, 1), players_per_group=2, promotion_count=1
+        )
+
+        self.assertEqual(new_season.groups.count(), 2)
+        new_group_a = new_season.groups.get(name="A")
+        self.assertTrue(
+            new_group_a.members.filter(player=group_a_member_2.player, order=1).exists()
+        )
+        self.assertTrue(
+            new_group_a.members.filter(player=group_a_member_1.player, order=2).exists()
+        )
+        new_group_b = new_season.groups.get(name="B")
+        self.assertTrue(
+            new_group_b.members.filter(player=new_player_2, order=1).exists()
+        )
+        self.assertTrue(
+            new_group_b.members.filter(player=new_player_1, order=2).exists()
+        )
+
     def test_prepare_season_when_previous_is_in_draft(self):
         SeasonFactory(state=SeasonState.DRAFT.value)
 

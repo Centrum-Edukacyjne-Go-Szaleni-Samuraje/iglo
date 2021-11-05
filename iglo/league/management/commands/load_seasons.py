@@ -80,6 +80,7 @@ class Command(BaseCommand):
                 end_date = datetime.datetime.fromtimestamp(
                     season_data["endDate"] / 1000
                 ).date()
+                is_last_season = season_number == len(data)
                 season = Season.objects.create(
                     number=season_number,
                     start_date=start_date,
@@ -108,7 +109,16 @@ class Command(BaseCommand):
                         if not player_name:
                             players.append(None)
                             continue
-                        player, _ = Player.objects.update_or_create(nick=player_name, kgs_username=player_name)
+                        try:
+                            player = Player.objects.get(nick__iexact=player_name)
+                            player.auto_join = is_last_season
+                            player.save()
+                        except Player.DoesNotExist:
+                            player = Player.objects.create(
+                                nick=player_name,
+                                kgs_username=player_name,
+                                auto_join=is_last_season,
+                            )
                         member = Member.objects.create(
                             player=player,
                             group=group,

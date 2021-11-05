@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, FormView, UpdateView
 from league import texts
 from league.forms import GameResultUpdateForm, PlayerUpdateForm
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player
+from league.models import Season, Group, Game, Player, Member
 from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -118,18 +118,17 @@ class PlayerDetailView(DetailView):
     slug_field = "nick"
 
     def get_context_data(self, **kwargs):
-        try:
-            current_game = (
-                Game.objects.filter(
-                    Q(white__player=self.object) | Q(black__player=self.object)
-                )
-                .filter(winner__isnull=True)
-                .earliest("round__number")
-            )
-        except Game.DoesNotExist:
+        current_membership = Member.objects.get_current_membership(player=self.object)
+        if current_membership:
+            current_game = Game.objects.get_current_game(member=current_membership)
+        else:
             current_game = None
+        memberships = self.object.memberships.order_by("-group__season__number")
+        if current_membership:
+            memberships = memberships.exclude(id=current_membership.id)
         return super().get_context_data(**kwargs) | {
-            "memberships": self.object.memberships.order_by("-group__season__number"),
+            "current_membership": current_membership,
+            "memberships": memberships,
             "current_game": current_game,
         }
 

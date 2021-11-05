@@ -239,6 +239,8 @@ class Group(models.Model):
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
+    first_name = models.CharField(max_length=32)
+    last_name = models.CharField(max_length=32)
     user = models.OneToOneField(
         "accounts.User", null=True, on_delete=models.SET_NULL, blank=True
     )

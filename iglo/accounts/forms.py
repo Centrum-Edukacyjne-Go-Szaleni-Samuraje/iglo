@@ -8,6 +8,8 @@ from league.models import Player
 
 class RegistrationForm(forms.Form):
     nick = forms.SlugField(help_text=texts.NICK_HELP_TEXT)
+    first_name = forms.CharField(label=texts.FIRST_NAME_LABEL)
+    last_name = forms.CharField(label=texts.LAST_NAME_LABEL)
     rank = forms.IntegerField(help_text=texts.RANK_HELP_TEXT)
     email = forms.EmailField(help_text=texts.EMAIL_HELP_TEXT)
     password = forms.CharField(

@@ -26,6 +26,8 @@ class RegistrationView(FormView):
         Player.objects.create(
             user=user,
             nick=form.cleaned_data["nick"],
+            first_name=form.cleaned_data["first_name"],
+            last_name=form.cleaned_data["last_name"],
             rank=form.cleaned_data["rank"],
         )
         messages.add_message(

@@ -46,13 +46,16 @@ class PlayerUpdateForm(forms.ModelForm):
         model = Player
         fields = [
             "nick",
+            "first_name",
+            "last_name",
             "rank",
             "ogs_username",
             "kgs_username",
             "auto_join",
         ]
         labels = {
-            "rank": texts.RANK_LABEL,
+            "first_name": texts.FIRST_NAME_LABEL,
+            "last_name": texts.LAST_NAME_LABEL,
             "ogs_username": texts.OGS_USERNAME_LABEL,
             "kgs_username": texts.KGS_USERNAME_LABEL,
             "auto_join": texts.AUTO_JOIN_LABEL,

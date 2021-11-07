@@ -23,7 +23,7 @@ class SeasonState(Enum):
 
 class SeasonManager(models.Manager):
     def prepare_season(
-            self, start_date: datetime.date, players_per_group: int, promotion_count: int
+        self, start_date: datetime.date, players_per_group: int, promotion_count: int
     ) -> "Season":
         previous_season = Season.objects.first()
         if previous_season.state == SeasonState.DRAFT.value:
@@ -33,7 +33,7 @@ class SeasonManager(models.Manager):
             number=previous_season.number + 1,
             start_date=start_date,
             end_date=start_date
-                     + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+            + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
@@ -44,22 +44,29 @@ class SeasonManager(models.Manager):
                 member.player for member in members if member.player.auto_join
             ]
             season_players = (
-                    season_players[: -previous_season.promotion_count]
-                    + group_players[: previous_season.promotion_count]
-                    + season_players[-previous_season.promotion_count:]
-                    + group_players[previous_season.promotion_count:]
+                season_players[: -previous_season.promotion_count]
+                + group_players[: previous_season.promotion_count]
+                + season_players[-previous_season.promotion_count :]
+                + group_players[previous_season.promotion_count :]
             )
         season_players.extend(
             Player.objects.filter(auto_join=True)
-                .order_by("-rank")
-                .exclude(id__in=[p.id for p in season_players])
+            .order_by("-rank")
+            .exclude(id__in=[p.id for p in season_players])
         )
         for group_order in range(math.ceil(len(season_players) / players_per_group)):
             group = Group.objects.create(
                 name=string.ascii_uppercase[group_order],
                 season=season,
             )
-            for player_order, player in enumerate(season_players[group_order * players_per_group: (group_order + 1) * players_per_group], start=1):
+            for player_order, player in enumerate(
+                season_players[
+                    group_order
+                    * players_per_group : (group_order + 1)
+                    * players_per_group
+                ],
+                start=1,
+            ):
                 Member.objects.create(
                     group=group,
                     order=player_order,
@@ -68,6 +75,7 @@ class SeasonManager(models.Manager):
                 )
 
         return season
+
 
 class SeasonNotInDraft(Exception):
     pass
@@ -115,7 +123,7 @@ class Season(models.Model):
         for group in self.groups.all():
             members = list(group.members.all())
             for round_number, round_pairs in enumerate(
-                    round_robin(n=len(members)), start=1
+                round_robin(n=len(members)), start=1
             ):
                 round = Round.objects.create(
                     number=round_number,
@@ -130,7 +138,9 @@ class Season(models.Model):
                         round=round,
                         black=members[pair[0]],
                         white=members[pair[1]],
-                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME)
+                        date=datetime.datetime.combine(
+                            round.end_date, settings.DEFAULT_GAME_TIME
+                        ),
                     )
 
 
@@ -147,7 +157,7 @@ class Group(models.Model):
         return f"{self.name} - season: {self.season}"
 
     def results_as_table(
-            self,
+        self,
     ) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
         table = []
         players_to_game = {
@@ -304,18 +314,18 @@ class Member(models.Model):
     def sodos(self) -> int:
         result = 0
         for game in self.won_games.all():
-            result += game.white.score
+            result += game.loser.score
         return result
 
     @property
     def result(self) -> MemberResult:
         members_qualification = self.group.get_members_qualification()
         if (
-                self in members_qualification[: self.group.season.promotion_count]
-                and not self.group.is_first
+            self in members_qualification[: self.group.season.promotion_count]
+            and not self.group.is_first
         ):
             return MemberResult.PROMOTION
-        if self in members_qualification[-self.group.season.promotion_count:]:
+        if self in members_qualification[-self.group.season.promotion_count :]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
 
@@ -343,8 +353,8 @@ class GameManager(models.Manager):
         try:
             return (
                 Game.objects.filter(Q(white=member) | Q(black=member))
-                    .filter(win_type__isnull=True)
-                    .earliest("round__number")
+                .filter(win_type__isnull=True)
+                .earliest("round__number")
             )
         except Game.DoesNotExist:
             return None
@@ -367,7 +377,9 @@ class Game(models.Model):
         related_name="won_games",
         blank=True,
     )
-    win_type = models.CharField(choices=WinType.choices, max_length=16, null=True, blank=True)
+    win_type = models.CharField(
+        choices=WinType.choices, max_length=16, null=True, blank=True
+    )
     points_difference = models.SmallIntegerField(null=True, blank=True)
 
     date = models.DateTimeField(null=True, blank=True)
@@ -415,3 +427,9 @@ class Game(models.Model):
         if not self.win_type:
             return None
         return GameResult.WIN if self.winner == member else GameResult.LOSE
+
+    @property
+    def loser(self) -> Optional["Member"]:
+        if not self.winner:
+            return None
+        return self.white if self.winner == self.black else self.black

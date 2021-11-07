@@ -34,13 +34,13 @@ class MemberTestCase(TestCase):
         member_3 = MemberFactory(group=group)
         member_4 = MemberFactory(group=group)
         GameFactory(group=group, white=member_1, black=member_2, winner=member_1)
-        GameFactory(group=group, white=member_3, black=member_1, winner=member_1)
+        GameFactory(group=group, white=member_3, black=member_1, winner=member_3)
         GameFactory(group=group, white=member_1, black=member_4, winner=member_4)
         GameFactory(group=group, white=member_2, black=member_3, winner=member_2)
         GameFactory(group=group, white=member_4, black=member_2, winner=member_2)
         GameFactory(group=group, white=member_3, black=member_4, winner=member_3)
 
-        self.assertEqual(member_1.sodos, 3)
+        self.assertEqual(member_1.sodos, 2)
 
     def test_result_for_promotion(self):
         group = GroupFactory(name="B")

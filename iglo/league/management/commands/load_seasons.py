@@ -71,6 +71,7 @@ class Command(BaseCommand):
         parser.add_argument("seasons_file", type=str)
 
     def handle(self, *args, **options):
+        loaded_seasons = 0
         with open(options["seasons_file"], "r") as f:
             data = json.load(f)
             for season_number, season_data in enumerate(reversed(data), start=1):
@@ -80,6 +81,9 @@ class Command(BaseCommand):
                 end_date = datetime.datetime.fromtimestamp(
                     season_data["endDate"] / 1000
                 ).date()
+                if Season.objects.filter(start_date=start_date, end_date=end_date).exists():
+                    continue
+                loaded_seasons += 1
                 is_last_season = season_number == len(data)
                 season = Season.objects.create(
                     number=season_number,
@@ -163,5 +167,5 @@ class Command(BaseCommand):
                             )
 
         self.stdout.write(
-            self.style.SUCCESS(f"Successfully loaded {len(data)} seasons")
+            self.style.SUCCESS(f"Successfully loaded {loaded_seasons} seasons")
         )

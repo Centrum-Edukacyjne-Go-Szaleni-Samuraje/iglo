@@ -26,6 +26,11 @@ class Command(BaseCommand):
 
             for player_info in islice(reader, 1, None):
                 print(player_info)
+                try:
+                    first_name, last_name = player_info['full_name'].split(maxsplit=1)
+                except ValueError:
+                    first_name, last_name = player_info['full_name'], ''
+
                 user, _ = User.objects.get_or_create(
                     email__iexact=player_info['email'],
                     defaults={
@@ -36,7 +41,9 @@ class Command(BaseCommand):
                     nick__iexact=player_info['nick'],
                     defaults={
                         'nick': player_info['nick'],
+                        'first_name': first_name,
+                        'last_name': last_name,
                         'user': user,
-                        'rank': player_info['rank'] or 1200
+                        'rank': player_info['rank'] or 100,
                     }
                 )

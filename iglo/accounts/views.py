@@ -4,12 +4,16 @@ from django.contrib import messages
 from django.contrib.auth.views import (
     LoginView as ContribLoginView,
     LogoutView as ContribLogoutView,
+    PasswordResetView as ContribPasswordResetView,
+    PasswordResetDoneView as ContribPasswordResetDoneView,
+    PasswordResetConfirmView as ContribPasswordResetConfirmView,
+    PasswordResetCompleteView as ContribPasswordResetCompleteView
 )
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView
 
 from accounts import texts
-from accounts.forms import RegistrationForm
+from accounts.forms import RegistrationForm, PasswordResetForm
 from accounts.models import User
 from league.models import Player
 
@@ -50,3 +54,24 @@ class LoginView(ContribLoginView):
 
 class LogoutView(ContribLogoutView):
     next_page = "/"
+
+
+class PasswordResetView(ContribPasswordResetView):
+    form_class = PasswordResetForm
+    email_template_name = 'accounts/password_reset_email.html'
+    subject_template_name = 'accounts/password_reset_subject.txt'
+    template_name = 'accounts/password_reset.html'
+    success_url = reverse_lazy('accounts:password_reset_done')
+
+
+class PasswordResetDoneView(ContribPasswordResetDoneView):
+    template_name = 'accounts/password_reset_done.html'
+
+
+class PasswordResetConfirmView(ContribPasswordResetConfirmView):
+    success_url = reverse_lazy('accounts:password_reset_complete')
+    template_name = 'accounts/password_reset_confirm.html'
+
+
+class PasswordResetCompleteView(ContribPasswordResetCompleteView):
+    template_name = 'accounts/password_reset_complete.html'

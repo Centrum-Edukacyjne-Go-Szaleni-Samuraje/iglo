@@ -169,5 +169,14 @@ if "SENTRY_DSN" in os.environ:
 
 DEFAULT_GAME_TIME = datetime.time(18, 0)
 
-if DEBUG:
+DEFAULT_FROM_EMAIL = "IGLO <no-reply@szalenisamuraje.org>"
+
+if "EMAIL_HOST" in os.environ and "EMAIL_HOST_USER" in os.environ and "EMAIL_HOST_PASSWORD" is os.environ:
+    EMAIL_HOST = env("EMAIL_HOST")
+    EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="{% static "bootstrap/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static 'fontawesome/css/all.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static "main.css" %}">
     <title>IGLO | {% block page_title %}{% endblock %}</title>
     {% block head %}
@@ -40,26 +41,33 @@
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
+                    {% if user.player %}
+                        <a href="{% url "player-detail" user.player.nick %}" class="btn btn-warning">
+                            <i class="fas fa-calendar-alt"></i> {{ user.player.nick }}
+                        </a>
+                    {% endif %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        <a class="nav-link" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ user.email }}
+                            <i class="fas fa-chevron-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             {% if user.player %}
                                 <li>
                                     <a class="dropdown-item"
-                                       href="{% url "player-detail" user.player.nick %}">Profil</a>
+                                       href="{% url "player-settings" request.user.player.nick %}">
+                                        <i class="fas fa-cog"></i> Ustawienia
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item"
-                                       href="{% url "player-settings" request.user.player.nick %}">Ustawienia</a>
+                                    <hr class="dropdown-divider">
                                 </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url "accounts:logout" %}">Wyloguj</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url "accounts:logout" %}">
+                                    <i class="fas fa-sign-out-alt"></i> Wyloguj
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 {% else %}
@@ -83,7 +91,7 @@
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
     {% endif %}

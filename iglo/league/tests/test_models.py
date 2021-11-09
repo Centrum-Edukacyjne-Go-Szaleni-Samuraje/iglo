@@ -4,7 +4,15 @@ from django.conf import settings
 from django.db.models import Q
 from django.test import TestCase
 
-from league.models import MemberResult, Season, SeasonState, Game, Round, Member
+from league.models import (
+    MemberResult,
+    Season,
+    SeasonState,
+    Game,
+    Round,
+    Member,
+    GroupType,
+)
 from league.tests.factories import (
     MemberFactory,
     GroupFactory,
@@ -138,6 +146,7 @@ class SeasonTestCase(TestCase):
         self.assertEqual(new_season.promotion_count, 1)
         self.assertEqual(new_season.groups.count(), 2)
         new_group_a = new_season.groups.get(name="A")
+        self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
         self.assertEqual(new_group_a.members.count(), 3)
         self.assertTrue(
             new_group_a.members.filter(player=group_a_member_1.player, order=1).exists()
@@ -149,6 +158,7 @@ class SeasonTestCase(TestCase):
             new_group_a.members.filter(player=group_b_member_1.player, order=3).exists()
         )
         new_group_b = new_season.groups.get(name="B")
+        self.assertEqual(new_group_b.type, GroupType.ROUND_ROBIN)
         self.assertEqual(new_group_b.members.count(), 3)
         self.assertTrue(
             new_group_b.members.filter(player=group_a_member_3.player, order=1).exists()
@@ -196,6 +206,42 @@ class SeasonTestCase(TestCase):
             new_group_b.members.filter(player=new_player_1, order=2).exists()
         )
 
+    def test_prepare_season_with_mcmahon_group(self):
+        season = SeasonFactory(
+            promotion_count=1, state=SeasonState.READY.value, number=1
+        )
+        group_a = GroupFactory(season=season, name="A")
+        group_a_member_1 = MemberFactory(group=group_a)
+        group_a_member_2 = MemberFactory(group=group_a)
+        GameFactory(
+            group=group_a,
+            white=group_a_member_1,
+            black=group_a_member_2,
+            winner=group_a_member_2,
+        )
+        new_player_1 = PlayerFactory(rank=100)
+        new_player_2 = PlayerFactory(rank=200)
+        new_player_3 = PlayerFactory(rank=300)
+
+        new_season = Season.objects.prepare_season(
+            start_date=datetime.date(2021, 1, 1), players_per_group=2, promotion_count=1
+        )
+
+        self.assertEqual(new_season.groups.count(), 2)
+        new_group_a = new_season.groups.get(name="A")
+        self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
+        new_group_b = new_season.groups.get(name="B")
+        self.assertEqual(new_group_b.type, GroupType.MCMAHON)
+        self.assertTrue(
+            new_group_b.members.filter(player=new_player_3, order=1).exists()
+        )
+        self.assertTrue(
+            new_group_b.members.filter(player=new_player_2, order=2).exists()
+        )
+        self.assertTrue(
+            new_group_b.members.filter(player=new_player_1, order=3).exists()
+        )
+
     def test_prepare_season_when_previous_is_in_draft(self):
         SeasonFactory(state=SeasonState.DRAFT.value)
 
@@ -217,7 +263,7 @@ class SeasonTestCase(TestCase):
         self.assertEqual(season.groups.count(), 1)
         self.assertEqual(group_2.name, "A")
 
-    def test_add_gorup(self):
+    def test_add_group(self):
         season = SeasonFactory(state=SeasonState.DRAFT.value)
 
         season.add_group()
@@ -228,9 +274,11 @@ class SeasonTestCase(TestCase):
 
     def test_start(self):
         season = SeasonFactory(
-            state=SeasonState.DRAFT.value, start_date=datetime.date(2021, 1, 1)
+            state=SeasonState.DRAFT.value,
+            start_date=datetime.date(2021, 1, 1),
+            players_per_group=4,
         )
-        group = GroupFactory(season=season)
+        group = GroupFactory(season=season, type=GroupType.ROUND_ROBIN)
         member_1 = MemberFactory(group=group)
         member_2 = MemberFactory(group=group)
         member_3 = MemberFactory(group=group)
@@ -259,6 +307,18 @@ class SeasonTestCase(TestCase):
         self.assertEqual(round_3.end_date, datetime.date(2021, 1, 21))
         self.assertTrue(self._game_exists(round_3, member_1, member_2))
         self.assertTrue(self._game_exists(round_3, member_3, member_4))
+
+    def test_start_with_mcmahon_group(self):
+        season = SeasonFactory(
+            state=SeasonState.DRAFT.value, start_date=datetime.date(2021, 1, 1)
+        )
+        group = GroupFactory(season=season, type=GroupType.MCMAHON)
+        MemberFactory(group=group)
+        MemberFactory(group=group)
+
+        season.start()
+
+        self.assertFalse(group.rounds.exists())  # this is temporary solution
 
     def _game_exists(self, round: Round, member_1: Member, member_2: Member) -> bool:
         return (

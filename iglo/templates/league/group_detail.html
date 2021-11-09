@@ -9,46 +9,69 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
                     <li class="breadcrumb-item"><a
-                            href="{% url "season-detail" object.season.number %}">Sezon #{{ object.season.number }}</a></li>
+                            href="{% url "season-detail" object.season.number %}">Sezon #{{ object.season.number }}</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Grupa {{ object.name }}</li>
                 </ol>
             </nav>
-            <h2 class="mb-4">Grupa {{ object.name }}</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2>Grupa {{ object.name }}</h2>
+                <span class="badge bg-secondary ms-3">{{ group.get_type_display | upper }}</span>
+            </div>
             {% if object.season.state == "READY" %}
                 <div class="d-flex justify-content-center">
                     <table class="group-table mb-4">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                {% for member in object.members.all %}
-                                    <th class="group-table__header d-none d-lg-table-cell"><a
-                                            href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
-                                    </th>
-                                {% endfor %}
-                                <th class="group-table__header">Punkty</th>
-                                <th class="group-table__header">SODOS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for member, results in object.results_as_table %}
-                                <tr class="group-table__row--result-{{ member.result.value.lower }}">
-                                    <td class="group-table__header"><strong><a
-                                            href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong>
-                                    </td>
-                                    {% for other_member, result in results %}
-                                        <td class="group-table__result d-none d-lg-table-cell {% if member ==  other_member %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
-                                            {% if member ==  other_member %}
-                                                X
-                                            {% elif result is not None %}
-                                                {{ result.value }}
-                                            {% endif %}
-                                        </td>
+                        {% if object.type == "round_robin" %}
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for member in object.members.all %}
+                                        <th class="group-table__header d-none d-lg-table-cell"><a
+                                                href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                        </th>
                                     {% endfor %}
+                                    <th class="group-table__header">Punkty</th>
+                                    <th class="group-table__header">SODOS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member, results in object.results_as_table %}
+                                    <tr class="group-table__row--result-{{ member.result.value.lower }}">
+                                        <td class="group-table__header"><strong><a
+                                                href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong>
+                                        </td>
+                                        {% for other_member, result in results %}
+                                            <td class="group-table__result d-none d-lg-table-cell {% if member ==  other_member %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
+                                                {% if member ==  other_member %}
+                                                    X
+                                                {% elif result is not None %}
+                                                    {{ result.value }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                        <td>{{ member.score }}</td>
+                                        <td>{{ member.sodos }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        {% else %}
+                            <thead>
+                                <tr>
+                                    <th class="group-table__header">Nr.</th>
+                                    <th class="group-table__header">Gracz</th>
+                                    <th class="group-table__header">Punkty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for member in object.get_members_qualification %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></td>
                                     <td>{{ member.score }}</td>
-                                    <td>{{ member.sodos }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
+                            </tbody>
+                        {% endif %}
                     </table>
                 </div>
                 <h3 class="mb-4">Gry</h3>

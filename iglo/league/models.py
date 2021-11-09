@@ -54,18 +54,24 @@ class SeasonManager(models.Manager):
             .order_by("-rank")
             .exclude(id__in=[p.id for p in season_players])
         )
+        last_group = None
         for group_order in range(math.ceil(len(season_players) / players_per_group)):
-            group = Group.objects.create(
-                name=string.ascii_uppercase[group_order],
-                season=season,
-            )
+            group_players = season_players[
+                group_order * players_per_group : (group_order + 1) * players_per_group
+            ]
+            if len(group_players) < players_per_group and last_group:
+                group = last_group
+                group.type = GroupType.MCMAHON
+                group.save()
+            else:
+                group = Group.objects.create(
+                    name=string.ascii_uppercase[group_order],
+                    season=season,
+                    type=GroupType.ROUND_ROBIN,
+                )
+                last_group = group
             for player_order, player in enumerate(
-                season_players[
-                    group_order
-                    * players_per_group : (group_order + 1)
-                    * players_per_group
-                ],
-                start=1,
+                group_players, start=group.members.count() + 1
             ):
                 Member.objects.create(
                     group=group,
@@ -120,7 +126,7 @@ class Season(models.Model):
         self.state = SeasonState.READY.value
         self.save()
         current_date = self.start_date
-        for group in self.groups.all():
+        for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             for round_number, round_pairs in enumerate(
                 round_robin(n=len(members)), start=1
@@ -149,9 +155,15 @@ class GameResult(Enum):
     LOSE = "L"
 
 
+class GroupType(models.TextChoices):
+    ROUND_ROBIN = "round_robin", "Każdy z każdym"
+    MCMAHON = "mcmahon", "McMahon"
+
+
 class Group(models.Model):
     name = models.CharField(max_length=1)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
+    type = models.CharField(choices=GroupType.choices, max_length=16)
 
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"

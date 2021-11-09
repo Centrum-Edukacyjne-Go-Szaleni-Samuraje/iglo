@@ -13,6 +13,7 @@ from league.models import (
     Round,
     SeasonState,
     WinType,
+    GroupType,
 )
 
 PARING_SYSTEM_6 = {
@@ -81,7 +82,9 @@ class Command(BaseCommand):
                 end_date = datetime.datetime.fromtimestamp(
                     season_data["endDate"] / 1000
                 ).date()
-                if Season.objects.filter(start_date=start_date, end_date=end_date).exists():
+                if Season.objects.filter(
+                    start_date=start_date, end_date=end_date
+                ).exists():
                     continue
                 loaded_seasons += 1
                 is_last_season = season_number == len(data)
@@ -91,13 +94,14 @@ class Command(BaseCommand):
                     end_date=end_date,
                     promotion_count=2,
                     players_per_group=len(season_data["tables"][0]["players"]),
-                    state=SeasonState.READY.value,
+                    state=SeasonState.FINISHED,
                 )
                 for group_data in season_data["tables"]:
                     group_name = group_data["name"][-1]
                     group = Group.objects.create(
                         name=group_name,
                         season=season,
+                        type=GroupType.ROUND_ROBIN,
                     )
                     rounds = [
                         Round.objects.create(

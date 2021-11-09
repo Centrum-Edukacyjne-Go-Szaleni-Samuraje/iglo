@@ -6,7 +6,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import F, Q, TextChoices
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 
@@ -16,9 +16,10 @@ from league.utils import round_robin
 DAYS_PER_GAME = 7
 
 
-class SeasonState(Enum):
-    DRAFT = "DRAFT"
-    READY = "READY"
+class SeasonState(TextChoices):
+    DRAFT = "draft", texts.SEASON_STATE_DRAFT
+    IN_PROGRESS = "in_progress", texts.SEASON_STATE_IN_PROGRES
+    FINISHED = "finished", texts.SEASON_STATE_FINISHED
 
 
 class SeasonManager(models.Manager):
@@ -26,10 +27,10 @@ class SeasonManager(models.Manager):
         self, start_date: datetime.date, players_per_group: int, promotion_count: int
     ) -> "Season":
         previous_season = Season.objects.first()
-        if previous_season.state == SeasonState.DRAFT.value:
-            raise ValueError("Poprzedni sezon nie został rozpoczęty.")
+        if previous_season.state != SeasonState.FINISHED:
+            raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
         season = self.create(
-            state=SeasonState.DRAFT.value,
+            state=SeasonState.DRAFT,
             number=previous_season.number + 1,
             start_date=start_date,
             end_date=start_date
@@ -83,13 +84,12 @@ class SeasonManager(models.Manager):
         return season
 
 
-class SeasonNotInDraft(Exception):
+class WrongSeasonStateError(Exception):
     pass
 
 
-def raise_if_not_in_draft(season: "Season") -> None:
-    if season.state != SeasonState.DRAFT.value:
-        raise SeasonNotInDraft()
+class GamesWithoutResultError(Exception):
+    pass
 
 
 class Season(models.Model):
@@ -98,7 +98,7 @@ class Season(models.Model):
     end_date = models.DateField()
     promotion_count = models.SmallIntegerField()
     players_per_group = models.SmallIntegerField()
-    state = models.CharField(max_length=8)
+    state = models.CharField(max_length=16, choices=SeasonState.choices)
 
     objects = SeasonManager()
 
@@ -112,18 +112,18 @@ class Season(models.Model):
         return reverse("season-detail", kwargs={"number": self.number})
 
     def delete_group(self, group_id: int) -> None:
-        raise_if_not_in_draft(season=self)
+        self.validate_state(state=SeasonState.DRAFT)
         group = self.groups.get(id=group_id)
         self.groups.filter(name__gt=group.name).update(name=Chr(Ord("name") - 1))
         group.delete()
 
     def add_group(self) -> None:
-        raise_if_not_in_draft(season=self)
+        self.validate_state(state=SeasonState.DRAFT)
         Group.objects.create(season=self, name=chr(ord("A") + self.groups.count()))
 
     def start(self) -> None:
-        raise_if_not_in_draft(season=self)
-        self.state = SeasonState.READY.value
+        self.validate_state(state=SeasonState.DRAFT)
+        self.state = SeasonState.IN_PROGRESS
         self.save()
         current_date = self.start_date
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
@@ -148,6 +148,17 @@ class Season(models.Model):
                             round.end_date, settings.DEFAULT_GAME_TIME
                         ),
                     )
+
+    def finish(self) -> None:
+        self.validate_state(state=SeasonState.IN_PROGRESS)
+        if Game.objects.filter(group__season=self, win_type__isnull=True).exists():
+            raise GamesWithoutResultError()
+        self.state = SeasonState.FINISHED
+        self.save()
+
+    def validate_state(self, state: SeasonState) -> None:
+        if self.state != state:
+            raise WrongSeasonStateError()
 
 
 class GameResult(Enum):
@@ -213,7 +224,7 @@ class Group(models.Model):
         )
 
     def delete_member(self, member_id: int) -> None:
-        raise_if_not_in_draft(season=self.season)
+        self.season.validate_state(state=SeasonState.DRAFT)
         member_to_remove = self.members.get(id=member_id)
         self.members.filter(order__gt=member_to_remove.order).update(
             order=F("order") - 1
@@ -221,7 +232,7 @@ class Group(models.Model):
         member_to_remove.delete()
 
     def move_member_up(self, member_id: int) -> None:
-        raise_if_not_in_draft(season=self.season)
+        self.season.validate_state(state=SeasonState.DRAFT)
         member_to_move_up = self.members.get(id=member_id)
         if member_to_move_up.order == 1:
             return
@@ -232,7 +243,7 @@ class Group(models.Model):
         member_to_move_up.save()
 
     def move_member_down(self, member_id: int) -> None:
-        raise_if_not_in_draft(season=self.season)
+        self.season.validate_state(state=SeasonState.DRAFT)
         member_to_move_down = self.members.get(id=member_id)
         if member_to_move_down.order == self.members.count():
             return
@@ -243,7 +254,7 @@ class Group(models.Model):
         member_to_move_down.save()
 
     def add_member(self, player_nick: str) -> None:
-        raise_if_not_in_draft(season=self.season)
+        self.season.validate_state(state=SeasonState.DRAFT)
         player = Player.objects.get(nick__iexact=player_nick)
         try:
             current_group = self.season.groups.get(members__player=player)

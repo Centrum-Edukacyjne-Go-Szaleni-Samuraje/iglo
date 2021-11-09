@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, FormView, UpdateView
 from league import texts
 from league.forms import GameResultUpdateForm, PlayerUpdateForm
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player, Member
+from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError
 from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -18,8 +18,8 @@ class SeasonsListView(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
         return context | {
-            "draft_seasons_exists": Season.objects.filter(
-                state=SeasonState.DRAFT.value
+            "can_prepare_season": not Season.objects.exclude(
+                state=SeasonState.FINISHED
             ).exists()
         }
 
@@ -41,6 +41,15 @@ class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
             self.object.add_group()
         elif "action-start-season" in request.POST:
             self.object.start()
+        elif "action-finish-season" in request.POST:
+            try:
+                self.object.finish()
+            except GamesWithoutResultError:
+                messages.add_message(
+                    request=request,
+                    level=messages.WARNING,
+                    message=texts.GAMES_WITHOUT_RESULT_ERROR,
+                )
         return self.render_to_response(context)
 
 
@@ -105,11 +114,11 @@ class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
         return super().form_valid(form)
 
     def test_func(self):
+        game = self.get_object()  # TODO: this is not prefect
         return super().test_func() or (
             self.request.user.is_authenticated
-            and self.request.user.player
-            and self.request.user.player.nick
-            in [self.kwargs["black_player"], self.kwargs["white_player"]]
+            and self.request.user.player in [game.black.player, game.white.player]
+            and game.group.season.state == SeasonState.IN_PROGRESS
         )
 
 

@@ -18,7 +18,7 @@
                 <h2>Grupa {{ object.name }}</h2>
                 <span class="badge bg-secondary ms-3">{{ group.get_type_display | upper }}</span>
             </div>
-            {% if object.season.state == "READY" %}
+            {% if object.season.state != "draft" %}
                 <div class="d-flex justify-content-center">
                     <table class="group-table mb-4">
                         {% if object.type == "round_robin" %}
@@ -100,7 +100,7 @@
                         </div>
                     </div>
                 {% endfor %}
-            {% elif object.season.state == "DRAFT" %}
+            {% elif object.season.state == "draft" %}
                 <div class="d-flex justify-content-between mb-3">
                     <h3>Gracze</h3>
                     {% if user.is_admin %}

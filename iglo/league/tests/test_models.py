@@ -12,6 +12,7 @@ from league.models import (
     Round,
     Member,
     GroupType,
+    GamesWithoutResultError,
 )
 from league.tests.factories import (
     MemberFactory,
@@ -86,9 +87,7 @@ class MemberTestCase(TestCase):
 
 class SeasonTestCase(TestCase):
     def test_prepare_season_from_previous(self):
-        season = SeasonFactory(
-            promotion_count=1, state=SeasonState.READY.value, number=1
-        )
+        season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
         group_a = GroupFactory(season=season, name="A")
         group_a_member_1 = MemberFactory(group=group_a, order=1)
         group_a_member_2 = MemberFactory(group=group_a, order=2)
@@ -138,7 +137,7 @@ class SeasonTestCase(TestCase):
             start_date=datetime.date(2021, 1, 1), players_per_group=3, promotion_count=1
         )
 
-        self.assertEqual(new_season.state, SeasonState.DRAFT.value)
+        self.assertEqual(new_season.state, SeasonState.DRAFT)
         self.assertEqual(new_season.number, 2)
         self.assertEqual(new_season.start_date, datetime.date(2021, 1, 1))
         self.assertEqual(new_season.end_date, datetime.date(2021, 1, 14))
@@ -171,9 +170,7 @@ class SeasonTestCase(TestCase):
         )
 
     def test_prepare_season_with_new_players(self):
-        season = SeasonFactory(
-            promotion_count=1, state=SeasonState.READY.value, number=1
-        )
+        season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
         group_a = GroupFactory(season=season, name="A")
         group_a_member_1 = MemberFactory(group=group_a, order=1)
         group_a_member_2 = MemberFactory(group=group_a, order=2)
@@ -207,9 +204,7 @@ class SeasonTestCase(TestCase):
         )
 
     def test_prepare_season_with_mcmahon_group(self):
-        season = SeasonFactory(
-            promotion_count=1, state=SeasonState.READY.value, number=1
-        )
+        season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
         group_a = GroupFactory(season=season, name="A")
         group_a_member_1 = MemberFactory(group=group_a)
         group_a_member_2 = MemberFactory(group=group_a)
@@ -243,7 +238,17 @@ class SeasonTestCase(TestCase):
         )
 
     def test_prepare_season_when_previous_is_in_draft(self):
-        SeasonFactory(state=SeasonState.DRAFT.value)
+        SeasonFactory(state=SeasonState.DRAFT)
+
+        with self.assertRaises(ValueError):
+            Season.objects.prepare_season(
+                start_date=datetime.date(2021, 1, 1),
+                players_per_group=3,
+                promotion_count=1,
+            )
+
+    def test_prepare_season_when_previous_is_in_progress(self):
+        SeasonFactory(state=SeasonState.IN_PROGRESS)
 
         with self.assertRaises(ValueError):
             Season.objects.prepare_season(
@@ -253,7 +258,7 @@ class SeasonTestCase(TestCase):
             )
 
     def test_delete_group(self):
-        season = SeasonFactory(state=SeasonState.DRAFT.value)
+        season = SeasonFactory(state=SeasonState.DRAFT)
         group_1 = GroupFactory(season=season, name="A")
         group_2 = GroupFactory(season=season, name="B")
 
@@ -264,7 +269,7 @@ class SeasonTestCase(TestCase):
         self.assertEqual(group_2.name, "A")
 
     def test_add_group(self):
-        season = SeasonFactory(state=SeasonState.DRAFT.value)
+        season = SeasonFactory(state=SeasonState.DRAFT)
 
         season.add_group()
 
@@ -274,7 +279,7 @@ class SeasonTestCase(TestCase):
 
     def test_start(self):
         season = SeasonFactory(
-            state=SeasonState.DRAFT.value,
+            state=SeasonState.DRAFT,
             start_date=datetime.date(2021, 1, 1),
             players_per_group=4,
         )
@@ -287,7 +292,7 @@ class SeasonTestCase(TestCase):
         season.start()
 
         season.refresh_from_db()
-        self.assertEqual(season.state, SeasonState.READY.value)
+        self.assertEqual(season.state, SeasonState.IN_PROGRESS)
         self.assertEqual(group.rounds.count(), 3)
         round_1 = group.rounds.get(number=1)
         self.assertEqual(round_1.games.count(), 2)
@@ -308,9 +313,25 @@ class SeasonTestCase(TestCase):
         self.assertTrue(self._game_exists(round_3, member_1, member_2))
         self.assertTrue(self._game_exists(round_3, member_3, member_4))
 
+    def test_finish(self):
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+
+        season.finish()
+
+        season.refresh_from_db()
+        self.assertEqual(season.state, SeasonState.FINISHED)
+
+    def test_finish_when_games_without_result(self):
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+        group = GroupFactory(season=season)
+        GameFactory(group=group)
+
+        with self.assertRaises(GamesWithoutResultError):
+            season.finish()
+
     def test_start_with_mcmahon_group(self):
         season = SeasonFactory(
-            state=SeasonState.DRAFT.value, start_date=datetime.date(2021, 1, 1)
+            state=SeasonState.DRAFT, start_date=datetime.date(2021, 1, 1)
         )
         group = GroupFactory(season=season, type=GroupType.MCMAHON)
         MemberFactory(group=group)
@@ -338,7 +359,7 @@ class SeasonTestCase(TestCase):
 
 class GroupTestCase(TestCase):
     def test_delete_member(self):
-        group = GroupFactory(season__state=SeasonState.DRAFT.value)
+        group = GroupFactory(season__state=SeasonState.DRAFT)
         member_1 = MemberFactory(group=group, order=1)
         member_2 = MemberFactory(group=group, order=2)
         member_3 = MemberFactory(group=group, order=2)
@@ -352,7 +373,7 @@ class GroupTestCase(TestCase):
         self.assertEqual(member_3.order, 2)
 
     def test_move_member_up(self):
-        group = GroupFactory(season__state=SeasonState.DRAFT.value)
+        group = GroupFactory(season__state=SeasonState.DRAFT)
         member_1 = MemberFactory(group=group, order=1)
         member_2 = MemberFactory(group=group, order=2)
 
@@ -364,7 +385,7 @@ class GroupTestCase(TestCase):
         self.assertEqual(member_1.order, 2)
 
     def test_move_member_down(self):
-        group = GroupFactory(season__state=SeasonState.DRAFT.value)
+        group = GroupFactory(season__state=SeasonState.DRAFT)
         member_1 = MemberFactory(group=group, order=1)
         member_2 = MemberFactory(group=group, order=2)
 
@@ -376,7 +397,7 @@ class GroupTestCase(TestCase):
         self.assertEqual(member_2.order, 1)
 
     def test_add_member(self):
-        season = SeasonFactory(state=SeasonState.DRAFT.value)
+        season = SeasonFactory(state=SeasonState.DRAFT)
         group_1 = GroupFactory(season=season)
         MemberFactory(group=group_1, order=1)
         group_2 = GroupFactory(season=season)

@@ -41,3 +41,16 @@
 .form-control[readonly] {
     background-color: white;
 }
+
+.season-state--draft {
+    background-color: #ffc107;
+    color: black;
+}
+
+.season-state--in_progress {
+    background-color: #198754;
+}
+
+.season-state--finished {
+    background-color: #6c757d;
+}

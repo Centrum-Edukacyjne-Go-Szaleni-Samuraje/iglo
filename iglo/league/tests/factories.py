@@ -39,6 +39,7 @@ class MemberFactory(factory.django.DjangoModelFactory):
 
     player = factory.SubFactory(PlayerFactory)
     order = factory.Sequence(lambda n: n)
+    group = factory.SubFactory(GroupFactory)
 
 
 class RoundFactory(factory.django.DjangoModelFactory):

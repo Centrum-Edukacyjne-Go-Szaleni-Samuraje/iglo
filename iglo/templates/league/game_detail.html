@@ -33,20 +33,20 @@
         </nav>
         <div>
             <div class="d-flex justify-content-between align-items-center">
-                <h2>
-                    {{ object.black.player.nick }} (B) vs {{ object.white.player.nick }} (W)
-                </h2>
+                <div class="fs-2 mb-3">
+                    {% include "league/includes/game_players.html" with game=object %}
+                </div>
                 {% if user.is_admin or user.player == object.black.player or user.player == object.white.player %}
                     <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
-                       class="btn btn-success">
-                        Edytuj
+                       class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edytuj
                     </a>
                 {% endif %}
             </div>
-            <h5 class="text-muted mb-3">
-                {% if object.is_played %}Wynik: {{ object.result }}
-                {% else %}Gra jeszcze się nie odbyła.{% endif %}
-                Data: {{ object.date }}</h5>
+            <h5>
+                {% if object.is_played %}{{ object.result }}{% else %}Gra jeszcze się nie odbyła.{% endif %}
+            </h5>
+            <i class="fas fa-calendar-day"></i> {{ object.date }}
             {% if object.sgf %}
                 <a href="{{ object.sgf.url }}" class="btn btn-primary mb-4">Pobierz SGF</a>
                 <div data-wgo="{{ object.sgf.url }}" data-wgo-layout="bottom: ['Control']"

@@ -6,7 +6,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.db import models
-from django.db.models import F, Q, TextChoices
+from django.db.models import F, Q, TextChoices, QuerySet
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 
@@ -372,15 +372,18 @@ class WinType(models.TextChoices):
 
 
 class GameManager(models.Manager):
-    def get_current_game(self, member: Member) -> Optional["Game"]:
+    def get_upcoming_game(self, member: Member) -> Optional["Game"]:
         try:
             return (
-                Game.objects.filter(Q(white=member) | Q(black=member))
+                self.get_for_member(member=member)
                 .filter(win_type__isnull=True)
                 .earliest("round__number")
             )
         except Game.DoesNotExist:
             return None
+
+    def get_for_member(self, member: Member) -> QuerySet:
+        return self.filter(Q(white=member) | Q(black=member)).order_by("round__number")
 
 
 class Game(models.Model):

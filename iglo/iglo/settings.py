@@ -171,7 +171,7 @@ DEFAULT_GAME_TIME = datetime.time(18, 0)
 
 DEFAULT_FROM_EMAIL = "IGLO <no-reply@szalenisamuraje.org>"
 
-if "EMAIL_HOST" in os.environ and "EMAIL_HOST_USER" in os.environ and "EMAIL_HOST_PASSWORD" is os.environ:
+if "EMAIL_HOST" in os.environ and "EMAIL_HOST_USER" in os.environ and "EMAIL_HOST_PASSWORD" in os.environ:
     EMAIL_HOST = env("EMAIL_HOST")
     EMAIL_HOST_USER = env("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")

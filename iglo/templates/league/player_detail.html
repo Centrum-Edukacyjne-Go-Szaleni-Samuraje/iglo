@@ -46,6 +46,33 @@
                                         </div>
                                         <div>
                                             {% if user.is_admin or user.player == game.black.player or user.player == game.white.player %}
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#contact-modal-{{ game.id }}">
+                                                    <i class="fas fa-envelope"></i> Kontakt
+                                                </button>
+                                                <div class="modal fade" id="contact-modal-{{ game.id }}" tabindex="-1"
+                                                     aria-labelledby="contactModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="contactModalLabel">Dane
+                                                                    kontaktowe</h5>
+                                                                <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                {% if user.player == game.black.player %}{{ game.white.player.first_name}} {{ game.white.player.last_name}}{% else %}{{ game.black.player.first_name}} {{ game.black.player.last_name}}{% endif %}<br>
+                                                                {% if user.player == game.black.player %}<a href="mailto:{{ game.white.player.user.email }}">{{ game.white.player.user.email }}</a>{% else %}<a href="mailto:{{ game.white.black.user.email }}">{{ game.black.player.user.email }}</a>{% endif %}
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-success"
+                                                                        data-bs-dismiss="modal">Zamknij
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
                                                    class="btn btn-primary">
                                                     <i class="fas fa-edit"></i> Edytuj

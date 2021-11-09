@@ -26,6 +26,7 @@
                 {% url "rules" as rules_url %}
                 {% url "accounts:login" as login_url %}
                 {% url "accounts:registration" as registration_url %}
+                {% url "player-detail" user.player.nick as profile_url %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == home_url %}active{% endif %}" aria-current="page"
                        href="{{ home_url }}">Home</a>
@@ -42,14 +43,16 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
                     {% if user.player %}
-                        <a href="{% url "player-detail" user.player.nick %}" class="btn btn-warning">
-                            <i class="fas fa-calendar-alt"></i> {{ user.player.nick }}
-                        </a>
+                        <li class="nav-item">
+                            <a href="{{ profile_url }}" class="nav-link {% if request.get_full_path == profile_url %}active{% endif %}">
+                                <i class="fas fa-calendar-alt"></i> Twoje Gry
+                            </a>
+                        </li>
                     {% endif %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link" href="#" id="navbarDropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-chevron-down"></i>
+                            {{ user.email }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             {% if user.player %}

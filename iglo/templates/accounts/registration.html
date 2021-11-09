@@ -1,36 +1,32 @@
-{% extends "base.html" %}
+{% extends "accounts/base.html" %}
 
 {% load crispy_forms_filters %}
 
 {% block page_title %}Rejestracja{% endblock %}
 
-{% block content %}
-    <div class="row">
-        <div class="col">
-            <h2>Rejestracja</h2>
-            <p>W celu rozpoczęcia gry w lidze konieczne jest posiadanie konta w naszym systemie.</p>
-            <form method="post">
-                {% csrf_token %}
-                {{ form | crispy }}
-                <button type="submit" class="btn btn-primary">Zarejestruj</button>
-            </form>
-        </div>
-    </div>
+{% block form_content %}
+    <h2>Rejestracja</h2>
+    <p>W celu rozpoczęcia gry w lidze konieczne jest posiadanie konta w naszym systemie.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <button type="submit" class="btn btn-primary">Zarejestruj</button>
+    </form>
     <div class="modal fade" id="gor-modal" tabindex="-1" aria-labelledby="gor-modal"
-                 aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Punkty GoR</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            ...
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Zamknij</button>
-                        </div>
-                    </div>
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Punkty GoR</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Zamknij</button>
                 </div>
             </div>
+        </div>
+    </div>
 {% endblock %}

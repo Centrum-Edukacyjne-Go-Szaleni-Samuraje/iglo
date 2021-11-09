@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import password_validation
+from django.contrib.auth.forms import PasswordResetForm as ContribPasswordResetForm
 
 from accounts import texts
 from accounts.models import User
@@ -34,3 +35,8 @@ class RegistrationForm(forms.Form):
         if Player.objects.filter(nick__iexact=nick).exists():
             raise forms.ValidationError(texts.NICK_ERROR)
         return nick
+
+
+class PasswordResetForm(ContribPasswordResetForm):
+    def get_users(self, email):
+        return User.objects.filter(email__iexact=email)

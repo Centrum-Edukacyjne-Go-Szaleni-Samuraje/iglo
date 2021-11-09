@@ -168,3 +168,6 @@ if "SENTRY_DSN" in os.environ:
     )
 
 DEFAULT_GAME_TIME = datetime.time(18, 0)
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

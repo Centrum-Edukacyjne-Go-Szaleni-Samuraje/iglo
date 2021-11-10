@@ -3,6 +3,7 @@ import math
 import random
 import string
 from enum import Enum
+from functools import lru_cache
 from typing import Optional
 
 from django.conf import settings
@@ -192,11 +193,13 @@ class Group(models.Model):
         table = []
         players_to_game = {
             frozenset({game.black.player, game.white.player}): game
-            for game in self.games.all()
+            for game in self.games.select_related(
+                "black__player", "white__player", "winner"
+            ).all()
         }
-        for member in self.members.all():
+        for member in self.members.select_related("player").all():
             row = []
-            for other_member in self.members.all():
+            for other_member in self.members.select_related("player").all():
                 if member == other_member:
                     row.append((other_member, None))
                 else:
@@ -224,9 +227,15 @@ class Group(models.Model):
     def lower_group_name(self) -> str:
         return chr(ord(self.name) + 1)
 
+    @lru_cache(maxsize=None)
     def get_members_qualification(self) -> list["Member"]:
         return sorted(
-            [member for member in self.members.all()],
+            [
+                member
+                for member in self.members.select_related("player")
+                .prefetch_related("won_games", "games_as_black", "games_as_white")
+                .all()
+            ],
             key=lambda member: (-member.points, -member.sodos)
             if self.type == GroupType.ROUND_ROBIN
             else (-member.points, -member.score, -member.sos, -member.sosos),
@@ -343,19 +352,23 @@ class Member(models.Model):
         return self.player.nick
 
     @property
+    @lru_cache(maxsize=None)
     def points(self) -> int:
         return self.won_games.count()
 
     @property
+    @lru_cache(maxsize=None)
     def score(self) -> float:
-        return self.won_games.exclude(win_type=WinType.NOT_PLAYED).count() + (
-            0.5
-            * Game.objects.get_for_member(self)
-            .filter(win_type=WinType.NOT_PLAYED, winner__isnull=True)
-            .count()
-        )
+        result = 0.0
+        for game in self.won_games.all():
+            if game.win_type == WinType.NOT_PLAYED and not game.winner:
+                result += 0.5
+            else:
+                result += 1
+        return result
 
     @property
+    @lru_cache(maxsize=None)
     def sodos(self) -> int:
         result = 0
         for game in self.won_games.all():
@@ -363,16 +376,22 @@ class Member(models.Model):
         return result
 
     @property
+    @lru_cache(maxsize=None)
     def sos(self) -> float:
         result = 0
-        for game in Game.objects.get_for_member(member=self):
+        for game in self.games_as_white.all():
+            result += game.get_opponent(self).score
+        for game in self.games_as_black.all():
             result += game.get_opponent(self).score
         return result
 
     @property
+    @lru_cache(maxsize=None)
     def sosos(self) -> float:
         result = 0
-        for game in Game.objects.get_for_member(member=self):
+        for game in self.games_as_white.all():
+            result += game.get_opponent(self).sos
+        for game in self.games_as_black.all():
             result += game.get_opponent(self).sos
         return result
 

@@ -31,7 +31,7 @@ class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
-        return queryset.get(number=self.kwargs["number"])
+        return queryset.prefetch_related("groups__members__player").get(number=self.kwargs["number"])
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -61,7 +61,7 @@ class GroupDetailView(AdminPermissionForModifyRequired, DetailView):
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(
-            queryset,
+            queryset.prefetch_related("rounds__games__white__player", "rounds__games__black__player", "rounds__games__winner__player"),
             season__number=self.kwargs["season_number"],
             name=self.kwargs["group_name"],
         )

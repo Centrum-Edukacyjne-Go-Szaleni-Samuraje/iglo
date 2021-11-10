@@ -694,6 +694,169 @@
           "Czerminiak",
           "Oyasumi"
         ]
+      },
+      {
+        "name": "Grupa H",
+        "type": "MCMAHON",
+        "players": [
+          "Wojtek",
+          "arnoldm",
+          "Przemo",
+          "pmilian",
+          "picyr",
+          "jolmenik",
+          "janusz",
+          "Lunakill",
+          "KNYF",
+          "Parzivalll"
+        ],
+        "rounds": [
+          {
+            "games": [
+              {
+                "white": "arnoldm",
+                "black": "Parzivalll",
+                "winner": "arnoldm"
+              },
+              {
+                "white": "Lunakill",
+                "black": "janusz",
+                "winner": "janusz"
+              },
+              {
+                "white": "pmilian",
+                "black": "jolmenik",
+                "winner": "jolmenik"
+              },
+              {
+                "white": "KNYF",
+                "black": "picyr",
+                "winner": "picyr"
+              },
+              {
+                "white": "Wojtek",
+                "black": "Przemo",
+                "winner": "Wojtek"
+              }
+            ]
+          },
+          {
+            "games": [
+              {
+                "white": "janusz",
+                "black": "arnoldm",
+                "winner": "arnoldm"
+              },
+              {
+                "white": "jolmenik",
+                "black": "Wojtek",
+                "winner": "Wojtek"
+              },
+              {
+                "white": "picyr",
+                "black": "pmilian",
+                "winner": "pmilian"
+              },
+              {
+                "white": "Przemo",
+                "black": "KNYF",
+                "winner": "Przemo"
+              },
+              {
+                "white": "Lunakill",
+                "black": "Parzivalll",
+                "winner": "Lunakill"
+              }
+            ]
+          },
+          {
+            "games": [
+              {
+                "white": "arnoldm",
+                "black": "Wojtek",
+                "winner": "Wojtek"
+              },
+              {
+                "white": "picyr",
+                "black": "jolmenik",
+                "winner": "picyr"
+              },
+              {
+                "white": "pmilian",
+                "black": "janusz",
+                "winner": "pmilian"
+              },
+              {
+                "white": "Przemo",
+                "black": "Lunakill",
+                "winner": "Przemo"
+              },
+              {
+                "white": "KNYF",
+                "black": "Parzivalll",
+                "winner": "KNYF"
+              }
+            ]
+          },
+          {
+            "games": [
+              {
+                "white": "Wojtek",
+                "black": "pmilian",
+                "winner": "pmilian"
+              },
+              {
+                "white": "Lunakill",
+                "black": "arnoldm",
+                "winner": "arnoldm"
+              },
+              {
+                "white": "Przemo",
+                "black": "picyr",
+                "winner": "Przemo"
+              },
+              {
+                "white": "jolmenik",
+                "black": "Parzivalll",
+                "winner": "jolmenik"
+              },
+              {
+                "white": "janusz",
+                "black": "KNYF",
+                "winner": "janusz"
+              }
+            ]
+          },
+          {
+            "games": [
+              {
+                "white": "janusz",
+                "black": "Wojtek",
+                "winner": "Wojtek"
+              },
+              {
+                "white": "arnoldm",
+                "black": "pmilian",
+                "winner": "arnoldm"
+              },
+              {
+                "white": "jolmenik",
+                "black": "Przemo",
+                "winner": "Przemo"
+              },
+              {
+                "white": "picyr",
+                "black": "Parzivalll",
+                "winner": "picyr"
+              },
+              {
+                "white": "KNYF",
+                "black": "Lunakill",
+                "winner": null
+              }
+            ]
+          }
+        ]
       }
     ]
   },

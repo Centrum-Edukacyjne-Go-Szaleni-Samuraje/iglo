@@ -52,7 +52,7 @@
                                                 {% endif %}
                                             </td>
                                         {% endfor %}
-                                        <td>{{ member.score }}</td>
+                                        <td>{{ member.points }}</td>
                                         <td>{{ member.sodos }}</td>
                                     </tr>
                                 {% endfor %}
@@ -60,19 +60,25 @@
                         {% else %}
                             <thead>
                                 <tr>
-                                    <th class="group-table__header">Nr.</th>
+                                    <th class="group-table__header">Pozycja</th>
                                     <th class="group-table__header">Gracz</th>
                                     <th class="group-table__header">Punkty</th>
+                                    <th class="group-table__header">Score</th>
+                                    <th class="group-table__header">SOS</th>
+                                    <th class="group-table__header">SOSOS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for member in object.get_members_qualification %}
-                                    <tr>
+                                    <tr class="group-table__row--result-{{ member.result.value.lower }}">
                                         <td>{{ forloop.counter }}</td>
                                         <td>
-                                            <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                            <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a> <span class="text-muted">[{{ member.rank }}]</span>
                                         </td>
+                                        <td>{{ member.points }}</td>
                                         <td>{{ member.score }}</td>
+                                        <td>{{ member.sos }}</td>
+                                        <td>{{ member.sosos }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

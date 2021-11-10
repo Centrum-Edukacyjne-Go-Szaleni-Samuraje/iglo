@@ -97,19 +97,13 @@ class Command(BaseCommand):
                     state=SeasonState.FINISHED,
                 )
                 for group_data in season_data["tables"]:
+                    group_type = GroupType.MCMAHON if group_data.get("type") == "MCMAHON" else GroupType.ROUND_ROBIN
                     group_name = group_data["name"][-1]
                     group = Group.objects.create(
                         name=group_name,
                         season=season,
-                        type=GroupType.ROUND_ROBIN,
+                        type=group_type,
                     )
-                    rounds = [
-                        Round.objects.create(
-                            group=group,
-                            number=number,
-                        )
-                        for number in range(1, len(group_data["players"]))
-                    ]
                     players = []
                     for player_order, player_name in enumerate(
                         group_data["players"], start=1
@@ -134,41 +128,64 @@ class Command(BaseCommand):
                             rank=None,
                         )
                         players.append(member)
-                    paring_system = (
-                        PARING_SYSTEM_6
-                        if len(group_data["players"]) == 6
-                        else PARING_SYSTEM_8
-                    )
-                    for player_index, result_row in enumerate(group_data["results"]):
-                        for other_player_index, result in enumerate(result_row):
-                            if (
-                                player_index <= other_player_index
-                                or not players[player_index]
-                                or not players[other_player_index]
-                            ):
-                                continue
-                            Game.objects.create(
+                    if group_type == GroupType.MCMAHON:
+                        for number, round_data in enumerate(group_data["rounds"], start=1):
+                            round = Round.objects.create(
                                 group=group,
-                                round=rounds[
-                                    paring_system[
-                                        frozenset(
-                                            {player_index + 1, other_player_index + 1}
-                                        )
-                                    ]
-                                    - 1
-                                ],
-                                black=players[player_index],
-                                white=players[other_player_index],
-                                winner=players[player_index]
-                                if result == 1
-                                else players[other_player_index],
-                                server=GameServer.KGS,
-                                win_type=WinType.POINTS,
-                                date=datetime.datetime.combine(
-                                    season.start_date, datetime.datetime.min.time()
-                                ),
-                                link=None,
+                                number=number,
                             )
+                            for game_data in round_data["games"]:
+                                Game.objects.create(
+                                    round=round,
+                                    group=group,
+                                    black=group.members.get(player__nick=game_data["black"]),
+                                    white=group.members.get(player__nick=game_data["white"]),
+                                    winner=group.members.get(player__nick=game_data["winner"]) if game_data["winner"] else None,
+                                    win_type=WinType.POINTS if game_data["winner"] else WinType.NOT_PLAYED,
+                                )
+                    else:
+                        paring_system = (
+                            PARING_SYSTEM_6
+                            if len(group_data["players"]) == 6
+                            else PARING_SYSTEM_8
+                        )
+                        rounds = [
+                            Round.objects.create(
+                                group=group,
+                                number=number,
+                            )
+                            for number in range(1, len(group_data["players"]))
+                        ]
+                        for player_index, result_row in enumerate(group_data["results"]):
+                            for other_player_index, result in enumerate(result_row):
+                                if (
+                                    player_index <= other_player_index
+                                    or not players[player_index]
+                                    or not players[other_player_index]
+                                ):
+                                    continue
+                                Game.objects.create(
+                                    group=group,
+                                    round=rounds[
+                                        paring_system[
+                                            frozenset(
+                                                {player_index + 1, other_player_index + 1}
+                                            )
+                                        ]
+                                        - 1
+                                    ],
+                                    black=players[player_index],
+                                    white=players[other_player_index],
+                                    winner=players[player_index]
+                                    if result == 1
+                                    else players[other_player_index],
+                                    server=GameServer.KGS,
+                                    win_type=WinType.POINTS,
+                                    date=datetime.datetime.combine(
+                                        season.start_date, datetime.datetime.min.time()
+                                    ),
+                                    link=None,
+                                )
 
         self.stdout.write(
             self.style.SUCCESS(f"Successfully loaded {loaded_seasons} seasons")

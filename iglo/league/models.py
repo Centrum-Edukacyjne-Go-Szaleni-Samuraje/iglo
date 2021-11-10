@@ -120,7 +120,11 @@ class Season(models.Model):
 
     def add_group(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
-        Group.objects.create(season=self, name=chr(ord("A") + self.groups.count()), type=GroupType.MCMAHON)
+        Group.objects.create(
+            season=self,
+            name=chr(ord("A") + self.groups.count()),
+            type=GroupType.MCMAHON,
+        )
 
     def start(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
@@ -223,7 +227,9 @@ class Group(models.Model):
     def get_members_qualification(self) -> list["Member"]:
         return sorted(
             [member for member in self.members.all()],
-            key=lambda member: (-member.score, -member.sodos),
+            key=lambda member: (-member.points, -member.sodos)
+            if self.type == GroupType.ROUND_ROBIN
+            else (-member.points, -member.score, -member.sos, -member.sosos),
         )
 
     def delete_member(self, member_id: int) -> None:
@@ -337,14 +343,37 @@ class Member(models.Model):
         return self.player.nick
 
     @property
-    def score(self) -> int:
+    def points(self) -> int:
         return self.won_games.count()
+
+    @property
+    def score(self) -> float:
+        return self.won_games.exclude(win_type=WinType.NOT_PLAYED).count() + (
+            0.5
+            * Game.objects.get_for_member(self)
+            .filter(win_type=WinType.NOT_PLAYED, winner__isnull=True)
+            .count()
+        )
 
     @property
     def sodos(self) -> int:
         result = 0
         for game in self.won_games.all():
-            result += game.loser.score
+            result += game.loser.points
+        return result
+
+    @property
+    def sos(self) -> float:
+        result = 0
+        for game in Game.objects.get_for_member(member=self):
+            result += game.get_opponent(self).score
+        return result
+
+    @property
+    def sosos(self) -> float:
+        result = 0
+        for game in Game.objects.get_for_member(member=self):
+            result += game.get_opponent(self).sos
         return result
 
     @property
@@ -413,7 +442,9 @@ class Game(models.Model):
     win_type = models.CharField(
         choices=WinType.choices, max_length=16, null=True, blank=True
     )
-    points_difference = models.DecimalField(null=True, blank=True, max_digits=4, decimal_places=1)
+    points_difference = models.DecimalField(
+        null=True, blank=True, max_digits=4, decimal_places=1
+    )
 
     date = models.DateTimeField(null=True, blank=True)
     server = models.CharField(max_length=3, choices=GameServer.choices)
@@ -466,3 +497,6 @@ class Game(models.Model):
         if not self.winner:
             return None
         return self.white if self.winner == self.black else self.black
+
+    def get_opponent(self, member: Member) -> Member:
+        return self.white if member == self.black else self.black

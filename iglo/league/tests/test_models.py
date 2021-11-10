@@ -24,7 +24,7 @@ from league.tests.factories import (
 
 
 class MemberTestCase(TestCase):
-    def test_score(self):
+    def test_points(self):
         group = GroupFactory()
         member_1 = MemberFactory(group=group)
         member_2 = MemberFactory(group=group)
@@ -34,7 +34,7 @@ class MemberTestCase(TestCase):
         GameFactory(group=group, white=member_3, black=member_1, winner=member_1)
         GameFactory(group=group, white=member_1, black=member_4, winner=member_4)
 
-        self.assertEqual(member_1.score, 2)
+        self.assertEqual(member_1.points, 2)
 
     def test_sodos(self):
         group = GroupFactory()

@@ -92,6 +92,18 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "django-debug-toolbar"
+version = "3.2.2"
+description = "A configurable set of panels that display various debug information about the current request/response."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+Django = ">=2.2"
+sqlparse = ">=0.2.0"
+
+[[package]]
 name = "factory-boy"
 version = "3.2.0"
 description = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby."
@@ -265,7 +277,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "99a4c008d796b2b85247f14b15889584f54f8e99bd63b7f049d34faec1d3252a"
+content-hash = "3a5cac9e2dec291fef49687b60c56173c952c02275a864b12f3084ef37160c35"
 
 [metadata.files]
 asgiref = [
@@ -299,6 +311,10 @@ django = [
 django-crispy-forms = [
     {file = "django-crispy-forms-1.13.0.tar.gz", hash = "sha256:4dc9e5263c91c5f51766806a050ca2ec5c349d34c5cd91fcca3a1a0363b5e29e"},
     {file = "django_crispy_forms-1.13.0-py3-none-any.whl", hash = "sha256:9c49d29dd9e98dc2e6e3a8b02670d72deb6edf7bc616986ca412d72c306b36a0"},
+]
+django-debug-toolbar = [
+    {file = "django-debug-toolbar-3.2.2.tar.gz", hash = "sha256:8c5b13795d4040008ee69ba82dcdd259c49db346cf7d0de6e561a49d191f0860"},
+    {file = "django_debug_toolbar-3.2.2-py3-none-any.whl", hash = "sha256:d7bab7573fab35b0fd029163371b7182f5826c13da69734beb675c761d06a4d3"},
 ]
 factory-boy = [
     {file = "factory_boy-3.2.0-py2.py3-none-any.whl", hash = "sha256:1d3db4b44b8c8c54cdd8b83ae4bdb9aeb121e464400035f1f03ae0e1eade56a4"},

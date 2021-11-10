@@ -167,7 +167,7 @@ if "SENTRY_DSN" in os.environ:
         send_default_pii=True
     )
 
-DEFAULT_GAME_TIME = datetime.time(18, 0)
+DEFAULT_GAME_TIME = datetime.time(16, 0)
 
 DEFAULT_FROM_EMAIL = "IGLO <no-reply@szalenisamuraje.org>"
 

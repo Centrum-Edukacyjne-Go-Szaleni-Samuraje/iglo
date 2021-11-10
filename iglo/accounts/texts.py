@@ -8,6 +8,8 @@ OLD_PASSWORD_LABEL = "Stare hasło"
 NEW_PASSWORD_LABEL = "Nowe hasło"
 NEW_EMAIL_LABEL = "Nowy email"
 CONFIRM_NEW_PASSWORD_LABEL = "Powtórz nowe hasło"
+PASSWORD_MISMATCH_ERROR = "Nowe hasło nie zostało powtórzone poprawnie"
+PASSWORD_INCORRECT_ERROR = "Hasło jest niepoprawne"
 NICK_HELP_TEXT = "Pod tą nazwą będziesz widoczny jako gracz w lidze."
 RANK_HELP_TEXT = mark_safe('Twoja aktualna siła w <a href="#" data-bs-toggle="modal" data-bs-target="#gor-modal">punktach GoR</a>. Jeżeli dopiero zaczynasz przygodę z Go wpisz 100.')
 EMAIL_ERROR = "Ten e-mail jest już zajęty."

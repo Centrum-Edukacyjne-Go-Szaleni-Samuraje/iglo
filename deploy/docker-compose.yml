@@ -25,6 +25,7 @@ services:
     volumes:
       - "${DATA_PATH}/static:/data/static"
       - "${DATA_PATH}/media:/data/media"
+      - "${DATA_PATH}/fixtures:/data/fixtures"
   db:
     image: postgres:14.0-alpine
     environment:

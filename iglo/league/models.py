@@ -1,5 +1,6 @@
 import datetime
 import math
+import random
 import string
 from enum import Enum
 from typing import Optional
@@ -139,11 +140,13 @@ class Season(models.Model):
                 )
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
                 for pair in round_pairs:
+                    game_members = [members[pair[0]], members[pair[1]]]
+                    random.shuffle(game_members)
                     Game.objects.create(
                         group=group,
                         round=round,
-                        black=members[pair[0]],
-                        white=members[pair[1]],
+                        black=game_members[0],
+                        white=game_members[1],
                         date=datetime.datetime.combine(
                             round.end_date, settings.DEFAULT_GAME_TIME
                         ),

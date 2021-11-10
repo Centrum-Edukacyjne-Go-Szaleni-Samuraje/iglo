@@ -69,7 +69,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for member in object.get_members_qualification %}
+                                {% for member in object.members_qualification %}
                                     <tr class="group-table__row--result-{{ member.result.value.lower }}">
                                         <td>{{ forloop.counter }}</td>
                                         <td>

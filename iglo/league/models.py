@@ -7,7 +7,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.db import models
-from django.db.models import F, Q, TextChoices, QuerySet
+from django.db.models import F, Q, TextChoices, QuerySet, Avg
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 
@@ -120,7 +120,7 @@ class Season(models.Model):
 
     def add_group(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
-        Group.objects.create(season=self, name=chr(ord("A") + self.groups.count()))
+        Group.objects.create(season=self, name=chr(ord("A") + self.groups.count()), type=GroupType.MCMAHON)
 
     def start(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
@@ -274,6 +274,10 @@ class Group(models.Model):
             order=self.members.count() + 1,
         )
 
+    def avg_rank(self) -> int:
+        result = self.members.aggregate(avg_rank=Avg("rank"))["avg_rank"]
+        return int(result or 0)
+
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
@@ -409,7 +413,7 @@ class Game(models.Model):
     win_type = models.CharField(
         choices=WinType.choices, max_length=16, null=True, blank=True
     )
-    points_difference = models.SmallIntegerField(null=True, blank=True)
+    points_difference = models.DecimalField(null=True, blank=True, max_digits=4, decimal_places=1)
 
     date = models.DateTimeField(null=True, blank=True)
     server = models.CharField(max_length=3, choices=GameServer.choices)
@@ -434,7 +438,7 @@ class Game(models.Model):
         winner_color = "B" if self.winner == self.black else "W"
         if self.win_type:
             win_type = (
-                self.points_difference
+                self.points_difference or 0.5
                 if self.win_type == WinType.POINTS
                 else WinType(self.win_type).label
             )

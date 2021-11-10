@@ -1,9 +1,9 @@
 <span class="{% if game.winner == game.black %}fw-bold{% endif %}">
     <i class="fas fa-circle"></i>
-    <a href="{{ game.black.player.get_absolute_url }}">{{ game.black.player.nick }}</a>
+    <a href="{{ game.black.player.get_absolute_url }}">{{ game.black.player.nick }}</a> <span class="text-muted">[{{ game.black.rank }}]</span>
 </span>
 <span class="text-muted">-</span>
 <span class="{% if game.winner == game.white %}fw-bold{% endif %}">
     <i class="far fa-circle"></i>
-    <a href="{{ game.white.player.get_absolute_url }}">{{ game.white.player.nick }}</a>
+    <a href="{{ game.white.player.get_absolute_url }}">{{ game.white.player.nick }}</a> <span class="text-muted">[{{ game.white.rank }}]</span>
 </span>

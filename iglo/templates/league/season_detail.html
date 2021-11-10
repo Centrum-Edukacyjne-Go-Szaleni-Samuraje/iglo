@@ -44,10 +44,19 @@
                         <strong>Grupa {{ group.name }}</strong>
                         <span class="badge bg-secondary">{{ group.get_type_display | upper }}</span>
                     </div>
-                    <div class="card-body d-flex justify-content-between align-items-baseline">
-                        <p>Gracze:
-                            {% for member in group.members.all %}{{ member.player.nick }}{% if not forloop.last %},
-                            {% endif %}{% endfor %}</p>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Gracze ({{ group.members.count }})</h5>
+                            <p>
+                                {% for member in group.members.all %}
+                                    <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                    <span class="text-muted">[{{ member.rank }}]</span>{% if not forloop.last %},
+                                {% endif %}{% endfor %}
+                            </p>
+                            <p>
+                                Średni ranking: {{ group.avg_rank }}
+                            </p>
+                        </div>
                         <div>
                             {% if user.is_admin and season.state == "draft" %}
                                 <form method="post" class="d-inline">{% csrf_token %}

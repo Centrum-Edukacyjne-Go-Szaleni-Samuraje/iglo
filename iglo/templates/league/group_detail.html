@@ -37,8 +37,11 @@
                             <tbody>
                                 {% for member, results in object.results_as_table %}
                                     <tr class="group-table__row--result-{{ member.result.value.lower }}">
-                                        <td class="group-table__header"><strong><a
-                                                href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></strong>
+                                        <td class="group-table__header">
+                                            <strong>
+                                                <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                            </strong>
+                                            <span class="text-muted">[{{ member.rank }}]</span>
                                         </td>
                                         {% for other_member, result in results %}
                                             <td class="group-table__result d-none d-lg-table-cell {% if member ==  other_member %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
@@ -63,13 +66,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for member in object.get_members_qualification %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a></td>
-                                    <td>{{ member.score }}</td>
-                                </tr>
-                            {% endfor %}
+                                {% for member in object.get_members_qualification %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                        </td>
+                                        <td>{{ member.score }}</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         {% endif %}
                     </table>
@@ -89,7 +94,8 @@
                                         {% include "league/includes/game_players.html" with game=game %}
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-baseline">
-                                        <p>{% if game.is_played %}{{ game.result }}{% else %}Gra jeszcze się nieodbyła.{% endif %}</p>
+                                        <p>{% if game.is_played %}{{ game.result }}{% else %}Gra jeszcze się
+                                            nieodbyła.{% endif %}</p>
                                         <a href="{% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
                                            class="btn btn-primary"><i class="fas fa-arrow-right"></i></a>
                                     </div>
@@ -113,10 +119,10 @@
                         <div class="card-header">
                             <small class="text-muted">#{{ member.order }}</small>
                             <strong>{{ member.player.nick }}</strong>
-                            {% if member.rank %}[{{ member.rank }}]{% endif %}
+                            <span class="text-muted">[{{ member.rank }}]</span>
                         </div>
+                        {% if user.is_admin %}
                         <div class="card-body">
-                            {% if user.is_admin %}
                                 <form method="post">{% csrf_token %}
                                     <input type="hidden" value="{{ member.id }}" name="member_id">
                                     <button type="submit" class="btn btn-primary" name="action-up"
@@ -127,8 +133,8 @@
                                     </button>
                                     <button type="submit" class="btn btn-danger" name="action-delete">Usuń</button>
                                 </form>
-                            {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             {% endif %}

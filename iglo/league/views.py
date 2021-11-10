@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib import messages
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
 from league import texts
@@ -59,8 +60,10 @@ class GroupDetailView(AdminPermissionForModifyRequired, DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
-        return queryset.get(
-            season__number=self.kwargs["season_number"], name=self.kwargs["group_name"]
+        return get_object_or_404(
+            queryset,
+            season__number=self.kwargs["season_number"],
+            name=self.kwargs["group_name"],
         )
 
     def post(self, request, *args, **kwargs):
@@ -90,7 +93,8 @@ class GameDetailView(DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
-        return queryset.get(
+        return get_object_or_404(
+            queryset,
             group__season__number=self.kwargs["season_number"],
             group__name=self.kwargs["group_name"],
             black__player__nick=self.kwargs["black_player"],

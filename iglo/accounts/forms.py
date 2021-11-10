@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import PasswordResetForm as ContribPasswordResetForm
+from django.core.exceptions import ValidationError
 
 from accounts import texts
 from accounts.models import User
@@ -36,6 +37,78 @@ class RegistrationForm(forms.Form):
         if Player.objects.filter(nick__iexact=nick).exists():
             raise forms.ValidationError(texts.NICK_ERROR)
         return nick
+
+
+class PasswordAndEmailChangeForm(forms.Form):
+    old_password = forms.CharField(
+        label=texts.OLD_PASSWORD_LABEL,
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'autofocus': True}),
+    )
+    new_password1 = forms.CharField(
+        required=False,
+        label=texts.NEW_PASSWORD_LABEL,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        strip=False,
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        required=False,
+        label=texts.CONFIRM_NEW_PASSWORD_LABEL,
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+    )
+    email = forms.EmailField(
+        required=False,
+        label=texts.NEW_EMAIL_LABEL
+    )
+
+    field_order = ['old_password', 'new_password1', 'new_password2', 'email']
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        """
+        Validate that the old_password field is correct.
+        """
+        old_password = self.cleaned_data["old_password"]
+        if not self.user.check_password(old_password):
+            raise ValidationError(
+                texts.PASSWORD_INCORRECT_ERROR,
+                code='password_incorrect',
+            )
+        return old_password
+
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError(
+                    texts.PASSWORD_MISMATCH_ERROR,
+                    code='password_mismatch',
+                )
+            password_validation.validate_password(password2, self.user)
+        return password2
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(texts.EMAIL_ERROR)
+        return email
+
+    def save(self, commit=True):
+        password = self.cleaned_data['new_password1']
+        email = self.cleaned_data['email']
+        if password:
+            self.user.set_password(password)
+        if email:
+            self.user.email = email
+        if commit:
+            self.user.save()
+        return self.user
 
 
 class PasswordResetForm(ContribPasswordResetForm):

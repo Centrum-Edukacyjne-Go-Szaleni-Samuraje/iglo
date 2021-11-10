@@ -60,7 +60,7 @@ class SeasonManager(models.Manager):
             group_players = season_players[
                 group_order * players_per_group : (group_order + 1) * players_per_group
             ]
-            if len(group_players) < players_per_group and last_group:
+            if len(group_players) < max((players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
                 group.save()

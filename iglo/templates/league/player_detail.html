@@ -62,8 +62,13 @@
                                                                         aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                {% if user.player == game.black.player %}{{ game.white.player.first_name}} {{ game.white.player.last_name}}{% else %}{{ game.black.player.first_name}} {{ game.black.player.last_name}}{% endif %}<br>
-                                                                {% if user.player == game.black.player %}<a href="mailto:{{ game.white.player.user.email }}">{{ game.white.player.user.email }}</a>{% else %}<a href="mailto:{{ game.white.black.user.email }}">{{ game.black.player.user.email }}</a>{% endif %}
+                                                                {% if user.player == game.black.player %}
+                                                                    {{ game.white.player.first_name }}
+                                                                    {{ game.white.player.last_name }}{% else %}{{ game.black.player.first_name }}
+                                                                    {{ game.black.player.last_name }}{% endif %}<br>
+                                                                {% if user.player == game.black.player %}
+                                                                    <a href="mailto:{{ game.white.player.user.email }}">{{ game.white.player.user.email }}</a>{% else %}
+                                                                    <a href="mailto:{{ game.white.black.user.email }}">{{ game.black.player.user.email }}</a>{% endif %}
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-success"
@@ -85,6 +90,10 @@
                                     </div>
                                 </div>
                             {% endfor %}
+                        {% elif current_membership.group.season.state == "draft" %}
+                            <div class="alert alert-primary" role="alert">
+                                Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego rozpoczęciu.
+                            </div>
                         {% else %}
                             Brak nadchodzących gier.
                         {% endif %}

@@ -11,6 +11,6 @@ urlpatterns = [
          name="game-detail"),
     path('seasons/<season_number>/<group_name>/<black_player>-<white_player>/edit', GameUpdateView.as_view(),
          name="game-update"),
-    path('player/<slug>', PlayerDetailView.as_view(), name="player-detail"),
-    path('player/<slug>/settings', PlayerUpdateView.as_view(), name="player-settings")
+    path('players/<slug>', PlayerDetailView.as_view(), name="player-detail"),
+    path('players/<slug>/settings', PlayerUpdateView.as_view(), name="player-settings")
 ]

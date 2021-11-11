@@ -88,12 +88,15 @@
                 <h3 class="mb-4">Gry</h3>
                 {% for round in object.rounds.all %}
                     <div class="card mb-3">
-                        <div class="card-header d-flex justify-content-between">
+                        <div class="card-header d-flex justify-content-between clickable" onClick="toggle_collapse(event)" data-target="round-{{forloop.counter}}">
                             <strong>Runda #{{ round.number }}</strong>
+                            <div>
                             {% if round.start_date and round.end_date %}{{ round.start_date }} -
                                 {{ round.end_date }}{% endif %}
+                            </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body collapse {% if round.is_current %}show{% endif %}"
+                             id="round-{{forloop.counter}}">
                             {% for game in round.games.all %}
                                 <div class="card mb-3">
                                     <div class="card-header">
@@ -146,4 +149,10 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        function toggle_collapse(event){
+            element_id = event.target.getAttribute('data-target');
+            element = document.getElementById(element_id).classList.toggle('show');
+        }
+    </script>
 {% endblock %}

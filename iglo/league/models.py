@@ -411,6 +411,9 @@ class Round(models.Model):
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
 
+    def is_current(self):
+        return self.start_date <= datetime.date.today() <= self.end_date
+
 
 class WinType(models.TextChoices):
     POINTS = "points", texts.WIN_TYPE_POINTS

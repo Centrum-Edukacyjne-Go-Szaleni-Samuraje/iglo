@@ -54,3 +54,7 @@
 .season-state--finished {
     background-color: #6c757d;
 }
+
+.clickable {
+    cursor: pointer;
+}

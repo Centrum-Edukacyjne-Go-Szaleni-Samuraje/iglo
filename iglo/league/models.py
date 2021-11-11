@@ -414,7 +414,9 @@ class Round(models.Model):
     def is_current(self) -> bool:
         if not self.start_date or not self.end_date:
             return False
-        return self.start_date <= datetime.date.today() <= self.end_date
+        if self.start_date and self.end_date:
+            return self.start_date <= datetime.date.today() <= self.end_date
+        return False
 
 
 class WinType(models.TextChoices):

@@ -8,14 +8,15 @@
             <div class="card text-center mb-3">
                 <div class="card-body">
                     <h1 class="card-title">Internetowa Go Liga O!</h1>
-                    <p class="card-text">IGLO jest koleżeńską ligą dla entuzjastów Go. Ma na celu budowanie relacji z
-                        innymi graczami i
-                        zwiększeniu poziomu gry. To okazja do regularnego grania dłuższych gier oraz do uzyskania
-                        komentarza od
-                        silnych graczy.</p>
-                    <p class="card-text">Każdy gracz znajdzie dla siebie grupe odpowiedającą jego poziomowi, zatem nie
-                        czekaj tylko dołącz do nas!</p>
-                    <a href="{% url "accounts:registration" %}" class="btn btn-success">Zapisz się!</a>
+                    <p class="card-text">IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie
+                        pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja do regularnego
+                        grania dłuższych gier oraz uzyskiwania komentarzy od silnych graczy. Dzięki czemu motywuje do
+                        rozwoju i pogłębianiu wiedzy o Go.</p>
+                    {% if not user.is_authenticated %}
+                        <p class="card-text">Każdy gracz może znaleźć grupę odpowiadającą jego poziomowi, dlatego nie
+                            czekaj tylko dołącz do nas!</p>
+                        <a href="{% url "accounts:registration" %}" class="btn btn-success">Zapisz się!</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -25,13 +26,16 @@
             <div class="card h-100">
                 <div class="card-header">Zasady</div>
                 <div class="card-body">
+                    <p>Skrócone zasady IGLO:</p>
                     <ul>
+                        <li>Grupy grają na zasadach "Każdy z każdym" lub "McMahon"</li>
+                        <li>Dwie osoby z górnych miejsc w grupie awansują do grupy wyżej, dwie osoby z ostatnich miejsc w grupie spadają do grupy niżej.</li>
                         <li>Jedna gra tygodniowo z domyślnym terminem gry.</li>
-                        <li>Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć.</li>
                         <li>Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia czasu.</li>
-                        <li>Gramy na OGS.</li>
+                        <li>Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć.</li>
+                        <li>Gramy na OGS (preferowany serwer) lub KGS.</li>
                     </ul>
-                    <p>Więcej informacji znajdziesz w <a href="">regulaminie</a>.</p>
+                    <p>Więcej informacji znajdziesz w <a href="{% url "rules" %}">regulaminie</a>.</p>
                 </div>
             </div>
         </div>
@@ -39,12 +43,22 @@
             <div class="card h-100">
                 <div class="card-header">Wykłady i komentarze</div>
                 <div class="card-body">
+                    <p>Wszystkie nasze archiwalne i bieżące wykłady możesz znaleźć na <a
+                            href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ">YouTube</a>.
+                        Jeśl z jakiś przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją wiedzę
+                        zachęcamy do obejrzenia materiałów i subskrypcji naszego kanału.
+                    </p>
                     <ul>
-                        <li>Do każdej gry można dostać komentarz gracza ze stopniem mistrzowskim. W dniach domyślnych, dwie godziny po standardowej godzinie gry odbywają się komentarze.</li>
-                        <li>Grupy A i B komentują Stanisław Frejlak 7 dan oraz Lukáš Podpěra 7 dan.</li>
-                        <li>Grupy alfabetycznie później komentują Cezary Czernecki 4 dan oraz gracze z grupy A i B.</li>
-                        <li>W każdym sezonie odbywają się co najmniej dwa wykłady tematyczne.</li>
+                        <li>Grupa A i B - Stanisław Frejlak 1 pro</li>
+                        <li>Grupa C i D - Sasha Yeroshkin 4 dan</li>
+                        <li>Grupa E i F - Maksym Wałaszewski 3 dan</li>
+                        <li>Grupa G i H - Paweł Kozioł 4 kyu</li>
                     </ul>
+                    <p>Archiwalne wykłady i komentarze dla grup A i B prowadził Stanisław Frejlak i Lukáš Podpěra i są
+                        do obejrzenia na <a href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ">kanale IGLO</a>.
+                    </p>
+                    <p>Archiwalne wykłady i komentarze dla grup C oraz dalszych prowadzone były przez Cezarego
+                        Czerneckiego i innych uczestników Ligi i są do obejrzenia na kanale <a href="https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg">IGLO Plus</a>.</p>
                 </div>
             </div>
         </div>

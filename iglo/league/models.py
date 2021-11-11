@@ -411,7 +411,9 @@ class Round(models.Model):
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
 
-    def is_current(self):
+    def is_current(self) -> bool:
+        if not self.start_date or not self.end_date:
+            return False
         return self.start_date <= datetime.date.today() <= self.end_date
 
 

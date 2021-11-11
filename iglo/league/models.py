@@ -26,7 +26,7 @@ class SeasonState(TextChoices):
 
 class SeasonManager(models.Manager):
     def prepare_season(
-            self, start_date: datetime.date, players_per_group: int, promotion_count: int
+        self, start_date: datetime.date, players_per_group: int, promotion_count: int
     ) -> "Season":
         previous_season = Season.objects.first()
         if previous_season.state != SeasonState.FINISHED:
@@ -36,31 +36,33 @@ class SeasonManager(models.Manager):
             number=previous_season.number + 1,
             start_date=start_date,
             end_date=start_date
-                     + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+            + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
         season_players = []
         for group in previous_season.groups.order_by("name"):
             group_players = [
-                member.player for member in group.members_qualification if member.player.auto_join
+                member.player
+                for member in group.members_qualification
+                if member.player.auto_join
             ]
             season_players = (
-                    season_players[: -previous_season.promotion_count]
-                    + group_players[: previous_season.promotion_count]
-                    + season_players[-previous_season.promotion_count:]
-                    + group_players[previous_season.promotion_count:]
+                season_players[: -previous_season.promotion_count]
+                + group_players[: previous_season.promotion_count]
+                + season_players[-previous_season.promotion_count :]
+                + group_players[previous_season.promotion_count :]
             )
         season_players.extend(
             Player.objects.filter(auto_join=True)
-                .order_by("-rank")
-                .exclude(id__in=[p.id for p in season_players])
+            .order_by("-rank")
+            .exclude(id__in=[p.id for p in season_players])
         )
         last_group = None
         for group_order in range(math.ceil(len(season_players) / players_per_group)):
             group_players = season_players[
-                            group_order * players_per_group: (group_order + 1) * players_per_group
-                            ]
+                group_order * players_per_group : (group_order + 1) * players_per_group
+            ]
             if len(group_players) < max((players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
@@ -73,7 +75,7 @@ class SeasonManager(models.Manager):
                 )
                 last_group = group
             for player_order, player in enumerate(
-                    group_players, start=group.members.count() + 1
+                group_players, start=group.members.count() + 1
             ):
                 Member.objects.create(
                     group=group,
@@ -134,7 +136,7 @@ class Season(models.Model):
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             for round_number, round_pairs in enumerate(
-                    round_robin(n=len(members)), start=1
+                round_robin(n=len(members)), start=1
             ):
                 round = Round.objects.create(
                     number=round_number,
@@ -187,7 +189,7 @@ class Group(models.Model):
         return f"{self.name} - season: {self.season}"
 
     def results_as_table(
-            self,
+        self,
     ) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
         table = []
         players_to_game = {
@@ -392,11 +394,15 @@ class Member(models.Model):
     @cached_property
     def result(self) -> MemberResult:
         if (
-                self in self.group.members_qualification[: self.group.season.promotion_count]
-                and not self.group.is_first
+            self
+            in self.group.members_qualification[: self.group.season.promotion_count]
+            and not self.group.is_first
         ):
             return MemberResult.PROMOTION
-        if self in self.group.members_qualification[-self.group.season.promotion_count:]:
+        if (
+            self
+            in self.group.members_qualification[-self.group.season.promotion_count :]
+        ):
             return MemberResult.RELEGATION
         return MemberResult.STAY
 
@@ -429,14 +435,24 @@ class GameManager(models.Manager):
         try:
             return (
                 self.get_for_member(member=member)
-                    .filter(win_type__isnull=True)
-                    .earliest("round__number")
+                .filter(win_type__isnull=True)
+                .earliest("round__number")
             )
         except Game.DoesNotExist:
             return None
 
     def get_for_member(self, member: Member) -> QuerySet:
-        return self.filter(Q(white=member) | Q(black=member)).order_by("round__number")
+        return (
+            self.filter(Q(white=member) | Q(black=member))
+            .order_by("round__number")
+            .select_related(
+                "white__player__user",
+                "black__player__user",
+                "winner",
+                "group__season",
+                "round",
+            )
+        )
 
 
 class Game(models.Model):

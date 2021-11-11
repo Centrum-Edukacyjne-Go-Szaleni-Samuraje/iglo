@@ -36,7 +36,7 @@
                 <div class="fs-2 mb-3">
                     {% include "league/includes/game_players.html" with game=object %}
                 </div>
-                {% if user.is_admin or user.player == object.black.player or user.player == object.white.player %}
+                {% if user.is_admin %}
                     <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
                        class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edytuj

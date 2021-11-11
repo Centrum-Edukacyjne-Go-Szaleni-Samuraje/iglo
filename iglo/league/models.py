@@ -371,7 +371,7 @@ class Round(models.Model):
     end_date = models.DateField(null=True)
 
     def is_current(self):
-        return self.start_date < datetime.date.today() < self.end_date
+        return self.start_date <= datetime.date.today() <= self.end_date
 
 
 class WinType(models.TextChoices):

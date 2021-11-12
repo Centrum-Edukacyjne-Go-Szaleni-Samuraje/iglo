@@ -9,10 +9,10 @@ from league.models import Player
 
 
 class RegistrationForm(forms.Form):
-    nick = forms.SlugField(help_text=texts.NICK_HELP_TEXT)
+    nick = forms.SlugField(help_text=texts.NICK_HELP_TEXT, min_length=3)
     first_name = forms.CharField(label=texts.FIRST_NAME_LABEL, help_text=texts.FIRST_NAME_HELP_TEXT)
     last_name = forms.CharField(label=texts.LAST_NAME_LABEL, help_text=texts.LAST_NAME_HELP_TEXT)
-    rank = forms.IntegerField(help_text=texts.RANK_HELP_TEXT)
+    rank = forms.IntegerField(help_text=texts.RANK_HELP_TEXT, min_value=100)
     email = forms.EmailField(help_text=texts.EMAIL_HELP_TEXT)
     password = forms.CharField(
         widget=forms.PasswordInput,
@@ -28,7 +28,7 @@ class RegistrationForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError(texts.EMAIL_ERROR)
         return email
 

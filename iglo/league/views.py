@@ -31,8 +31,9 @@ class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
-        return queryset.prefetch_related("groups__members__player").get(
-            number=self.kwargs["number"]
+        return get_object_or_404(
+            queryset.prefetch_related("groups__members__player"),
+            number=self.kwargs["number"],
         )
 
     def post(self, request, *args, **kwargs):
@@ -69,7 +70,7 @@ class GroupDetailView(AdminPermissionForModifyRequired, DetailView):
                 "rounds__games__winner__player",
             ),
             season__number=self.kwargs["season_number"],
-            name=self.kwargs["group_name"],
+            name__iexact=self.kwargs["group_name"],
         )
 
     def post(self, request, *args, **kwargs):
@@ -102,9 +103,9 @@ class GameDetailView(DetailView):
         return get_object_or_404(
             queryset,
             group__season__number=self.kwargs["season_number"],
-            group__name=self.kwargs["group_name"],
-            black__player__nick=self.kwargs["black_player"],
-            white__player__nick=self.kwargs["white_player"],
+            group__name__iexact=self.kwargs["group_name"],
+            black__player__nick__iexact=self.kwargs["black_player"],
+            white__player__nick__iexact=self.kwargs["white_player"],
         )
 
 
@@ -134,7 +135,7 @@ class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
 
 class PlayerDetailView(DetailView):
     model = Player
-    slug_field = "nick"
+    slug_field = "nick__iexact"
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)

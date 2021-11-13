@@ -132,9 +132,9 @@ class Season(models.Model):
         self.validate_state(state=SeasonState.DRAFT)
         self.state = SeasonState.IN_PROGRESS
         self.save()
-        current_date = self.start_date
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
+            current_date = self.start_date
             for round_number, round_pairs in enumerate(
                 round_robin(n=len(members)), start=1
             ):
@@ -483,6 +483,7 @@ class Game(models.Model):
     server = models.CharField(max_length=3, choices=GameServer.choices)
     link = models.URLField(null=True, blank=True)
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
+    updated = models.DateTimeField(auto_now=True)
 
     objects = GameManager()
 

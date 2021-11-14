@@ -21,6 +21,20 @@ class RoundRobinTestCase(SimpleTestCase):
             ],
         )
 
+    def test_make_pairs_for_five(self):
+        result = round_robin(n=5)
+
+        self.assertEqual(
+            result,
+            [
+                [(0, 4), (1, 3)],
+                [(3, 4), (0, 2)],
+                [(2, 3), (1, 4)],
+                [(1, 2), (0, 3)],
+                [(0, 1), (2, 4)]]
+            ,
+        )
+
     def test_make_pairs_for_six(self):
         result = round_robin(n=6)
 

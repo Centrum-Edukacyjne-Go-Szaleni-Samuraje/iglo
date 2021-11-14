@@ -4,7 +4,7 @@ from league.models import Season, Group, Player, Game, Round
 
 
 class PlayerModelAdmin(admin.ModelAdmin):
-    list_display = ["nick", "first_name", "last_name", "rank", "user"]
+    list_display = ["nick", "first_name", "last_name", "rank", "auto_join", "user"]
     search_fields = ["nick", "first_name", "last_name", "user__email"]
 
     def get_queryset(self, request):

@@ -31,8 +31,8 @@ class RoundRobinTestCase(SimpleTestCase):
                 [(3, 4), (0, 2)],
                 [(2, 3), (1, 4)],
                 [(1, 2), (0, 3)],
-                [(0, 1), (2, 4)]]
-            ,
+                [(0, 1), (2, 4)],
+            ],
         )
 
     def test_make_pairs_for_six(self):

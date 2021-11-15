@@ -375,7 +375,7 @@ class Member(models.Model):
 
     @cached_property
     def sos(self) -> float:
-        result = 0
+        result = 0.0
         for game in self.games_as_white.all():
             result += game.get_opponent(self).score
         for game in self.games_as_black.all():
@@ -384,7 +384,7 @@ class Member(models.Model):
 
     @cached_property
     def sosos(self) -> float:
-        result = 0
+        result = 0.0
         for game in self.games_as_white.all():
             result += game.get_opponent(self).sos
         for game in self.games_as_black.all():

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bootstrap_pagination %}
 
 {% block page_title %}Sezony{% endblock %}
 
@@ -16,7 +17,8 @@
                 <a href="{% url "seasons-prepare" %}" class="btn btn-warning{% if not can_prepare_season %} disabled{% endif %}">Stwórz Sezon</a>
                 {% endif %}
             </div>
-            {% for season in object_list %}
+            {% bootstrap_paginate page_obj %}
+            {% for season in page_obj %}
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between">
                         <strong>
@@ -32,6 +34,7 @@
                     <a href="{% url "season-detail" season.id %}"></a>
                 </div>
             {% endfor %}
+            {% bootstrap_paginate page_obj %}
         </div>
     </div>
 {% endblock %}

@@ -454,6 +454,16 @@ class GameManager(models.Manager):
             )
         )
 
+    def get_for_member_in_round(self, member: Member, round: Round) -> Optional['Game']:
+        try:
+            return (
+                self.select_related('round')
+                    .filter(Q(white=member) | Q(black=member))
+                    .filter(round=round).get()
+            )
+        except Game.DoesNotExist:
+            return None
+
 
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")

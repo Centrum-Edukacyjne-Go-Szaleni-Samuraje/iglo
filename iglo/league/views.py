@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView, FormView, UpdateView
 from league import texts
 from league.forms import GameResultUpdateForm, PlayerUpdateForm
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError
+from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError, Round
 from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -139,12 +139,13 @@ class PlayerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
-        if current_membership:
-            current_games = Game.objects.get_for_member(member=current_membership)
-            upcoming_game = Game.objects.get_upcoming_game(member=current_membership)
-        else:
-            current_games = None
-            upcoming_game = None
+
+        rounds = Round.objects.filter(group=current_membership.group)
+        current_games = []
+        for round in rounds:
+            game = Game.objects.get_for_member_in_round(member=current_membership, round=round)
+            current_games.append(game)
+
         memberships = self.object.memberships.order_by(
             "-group__season__number"
         ).select_related("group__season")
@@ -154,7 +155,6 @@ class PlayerDetailView(DetailView):
             "current_membership": current_membership,
             "memberships": memberships,
             "current_games": current_games,
-            "upcoming_game": upcoming_game,
         }
 
 

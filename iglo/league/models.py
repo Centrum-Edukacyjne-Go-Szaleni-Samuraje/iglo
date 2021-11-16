@@ -427,6 +427,7 @@ class WinType(models.TextChoices):
     POINTS = "points", texts.WIN_TYPE_POINTS
     RESIGN = "resign", texts.WIN_TYPE_RESIGN
     TIME = "time", texts.WIN_TYPE_TIME
+    BYE = "bye", texts.WIN_TYPE_BYE
     NOT_PLAYED = "not_played", texts.WIN_TYPE_NOT_PLAYED
 
 
@@ -443,7 +444,7 @@ class GameManager(models.Manager):
 
     def get_for_member(self, member: Member) -> QuerySet:
         return (
-            self.filter(Q(white=member) | Q(black=member))
+            self.filter(Q(white=member) | Q(black=member) | Q(winner=member))
             .order_by("round__number")
             .select_related(
                 "white__player__user",
@@ -454,25 +455,26 @@ class GameManager(models.Manager):
             )
         )
 
-    def get_for_member_in_round(self, member: Member, round: Round) -> Optional['Game']:
-        try:
-            return (
-                self.select_related('round')
-                    .filter(Q(white=member) | Q(black=member))
-                    .filter(round=round).get()
+    def create_bye_game(self, group: Group, round: Round, member: Member):
+        self.create(
+            group=group,
+            round=round,
+            winner=member,
+            win_type=WinType.BYE,
+            date=datetime.datetime.combine(
+                round.end_date, settings.DEFAULT_GAME_TIME
             )
-        except Game.DoesNotExist:
-            return None
+        )
 
 
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
     black = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_black"
+        Member, on_delete=models.CASCADE, related_name="games_as_black", null=True
     )
     white = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_white"
+        Member, on_delete=models.CASCADE, related_name="games_as_white", null=True
     )
 
     winner = models.ForeignKey(
@@ -498,6 +500,8 @@ class Game(models.Model):
     objects = GameManager()
 
     def __str__(self) -> str:
+        if self.is_bye:
+            return f"Bye - {self.winner} "
         return f"B: {self.black} - W: {self.white} - winner: {self.winner}"
 
     @property
@@ -505,10 +509,14 @@ class Game(models.Model):
         return bool(self.win_type)
 
     @property
+    def is_bye(self):
+        return self.win_type == WinType.BYE
+
+    @property
     def result(self) -> Optional[str]:
         if not self.is_played:
             return None
-        if not self.winner:
+        if not self.winner or self.is_bye:
             return WinType(self.win_type).label
         winner_color = "B" if self.winner == self.black else "W"
         if self.win_type:
@@ -521,6 +529,15 @@ class Game(models.Model):
         return winner_color
 
     def get_absolute_url(self):
+        if self.is_bye:
+            return reverse(
+                "bye-game-detail",
+                kwargs={
+                    "season_number": self.group.season.number,
+                    "group_name": self.group.name,
+                    "bye_player": self.winner
+                }
+            )
         return reverse(
             "game-detail",
             kwargs={
@@ -538,9 +555,11 @@ class Game(models.Model):
 
     @property
     def loser(self) -> Optional["Member"]:
-        if not self.winner:
+        if not self.winner or self.is_bye:
             return None
         return self.white if self.winner == self.black else self.black
 
-    def get_opponent(self, member: Member) -> Member:
+    def get_opponent(self, member: Member) -> Optional["Member"]:
+        if self.is_bye:
+            return None
         return self.white if member == self.black else self.black

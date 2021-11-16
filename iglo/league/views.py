@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView, FormView, UpdateView
 from league import texts
 from league.forms import GameResultUpdateForm, PlayerUpdateForm
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError, Round
+from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError, Round, WinType
 from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -100,6 +100,14 @@ class GameDetailView(DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
+        if "bye_player" in self.kwargs:
+            return get_object_or_404(
+                queryset,
+                group__season__number=self.kwargs["season_number"],
+                group__name__iexact=self.kwargs["group_name"],
+                winner__player__nick__iexact=self.kwargs["bye_player"],
+                win_type=WinType.BYE
+            )
         return get_object_or_404(
             queryset,
             group__season__number=self.kwargs["season_number"],
@@ -139,13 +147,7 @@ class PlayerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
-
-        rounds = Round.objects.filter(group=current_membership.group)
-        current_games = []
-        for round in rounds:
-            game = Game.objects.get_for_member_in_round(member=current_membership, round=round)
-            current_games.append(game)
-
+        current_games = Game.objects.get_for_member(current_membership)
         memberships = self.object.memberships.order_by(
             "-group__season__number"
         ).select_related("group__season")

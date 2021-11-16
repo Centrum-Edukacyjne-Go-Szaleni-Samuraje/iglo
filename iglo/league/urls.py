@@ -9,6 +9,7 @@ urlpatterns = [
     path('seasons/<int:season_number>/<group_name>', GroupDetailView.as_view(), name="group-detail"),
     path('seasons/<int:season_number>/<group_name>/<black_player>-<white_player>', GameDetailView.as_view(),
          name="game-detail"),
+    path('seasons/<int:season_number>/<group_name>/<bye_player>', GameDetailView.as_view(), name='bye-game-detail'),
     path('seasons/<int:season_number>/<group_name>/<black_player>-<white_player>/edit', GameUpdateView.as_view(),
          name="game-update"),
     path('players/<slug>', PlayerDetailView.as_view(), name="player-detail"),

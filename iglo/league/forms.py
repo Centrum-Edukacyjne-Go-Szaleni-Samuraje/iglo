@@ -33,6 +33,7 @@ class GameResultUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["winner"].queryset = Member.objects.filter(id__in=[self.instance.black.id, self.instance.white.id])
+        self.fields["win_type"].choices = (wt for wt in WinType.choices if wt[0] != WinType.BYE.value)
 
     def clean(self):
         cleaned_data = super().clean()

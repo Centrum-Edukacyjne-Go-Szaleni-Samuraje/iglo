@@ -169,10 +169,6 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    @property
-    def number_of_players(self):
-        return Member.objects.select_related('group__season').filter(group__season__number=self.number).count()  # 31 queries 33ms
-
 
 class GameResult(Enum):
     WIN = "W"

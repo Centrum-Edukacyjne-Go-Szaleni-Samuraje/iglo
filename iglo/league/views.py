@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
@@ -19,6 +19,7 @@ class SeasonsListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
+        context['object_list'] = context['object_list'].annotate(number_of_players=Count('groups__members'))
         return context | {
             "can_prepare_season": not Season.objects.exclude(
                 state=SeasonState.FINISHED

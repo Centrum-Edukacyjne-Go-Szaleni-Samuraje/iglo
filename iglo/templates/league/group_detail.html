@@ -100,12 +100,20 @@
                             {% for game in round.games.all %}
                                 <div class="card mb-3">
                                     <div class="card-header">
-                                        {% include "league/includes/game_players.html" with game=game %}
+                                        {% if game.is_bye %}
+                                            BYE: {% include "league/includes/player_badge.html" with member=game.winner %}
+                                        {% else %}
+                                            {% include "league/includes/game_players.html" with game=game %}
+                                        {% endif %}
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-baseline">
                                         <p>{% if game.is_played %}{{ game.result }}{% else %}Gra jeszcze się
                                             nie odbyła.{% endif %}</p>
-                                        <a href="{% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
+                                        <a href="{% if game.is_bye %}
+                                                    {% url "bye-game-detail" season_number=object.season.number group_name=object.name bye_player=game.winner.player.nick %}
+                                                {% else %}
+                                                    {% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}
+                                                {% endif %}"
                                            class="btn btn-primary"><i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>

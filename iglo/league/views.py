@@ -147,16 +147,21 @@ class PlayerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
-        current_games = Game.objects.get_for_member(current_membership)
         memberships = self.object.memberships.order_by(
             "-group__season__number"
         ).select_related("group__season")
         if current_membership:
+            current_games = Game.objects.get_for_member(member=current_membership)
+            upcoming_game = Game.objects.get_upcoming_game(member=current_membership)
             memberships = memberships.exclude(id=current_membership.id)
+        else:
+            current_games = None
+            upcoming_game = None
         return super().get_context_data(**kwargs) | {
             "current_membership": current_membership,
             "memberships": memberships,
             "current_games": current_games,
+            "upcoming_game": upcoming_game,
         }
 
 

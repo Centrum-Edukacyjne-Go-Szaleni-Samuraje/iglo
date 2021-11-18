@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import BLANK_CHOICE_DASH
 
 from league import texts
 from league.models import Game, Member, Player, WinType
@@ -33,7 +34,8 @@ class GameResultUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["winner"].queryset = Member.objects.filter(id__in=[self.instance.black.id, self.instance.white.id])
-        self.fields["win_type"].choices = (wt for wt in WinType.choices if wt[0] != WinType.BYE.value)
+        win_type_choices = [wt for wt in WinType.choices if wt[0] != WinType.BYE.value]
+        self.fields["win_type"].choices = BLANK_CHOICE_DASH + win_type_choices
 
     def clean(self):
         cleaned_data = super().clean()

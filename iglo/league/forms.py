@@ -1,8 +1,10 @@
+import re
+
 from django import forms
 from django.db.models import BLANK_CHOICE_DASH
 
 from league import texts
-from league.models import Game, Member, Player, WinType
+from league.models import Game, Member, Player, WinType, OGS_GAME_LINK_REGEX
 
 
 class PrepareSeasonForm(forms.Form):
@@ -10,6 +12,10 @@ class PrepareSeasonForm(forms.Form):
     players_per_group = forms.IntegerField(label=texts.PLAYERS_PER_GROUP_LABEL)
     promotion_count = forms.IntegerField(label=texts.PROMOTION_COUNT_LABEL)
 
+
+def ogs_game_link_validator(value: str) -> None:
+    if not re.match(OGS_GAME_LINK_REGEX, value):
+        raise forms.ValidationError(texts.OGS_GAME_LINK_ERROR)
 
 class GameResultUpdateForm(forms.ModelForm):
     class Meta:
@@ -30,12 +36,16 @@ class GameResultUpdateForm(forms.ModelForm):
             "sgf": texts.SGF_LABEL,
             "link": texts.LINK_LABEL,
         }
+        help_texts = {
+            "sgf": texts.SGF_HELP_TEXT,
+        }
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["winner"].queryset = Member.objects.filter(id__in=[self.instance.black.id, self.instance.white.id])
         win_type_choices = [wt for wt in WinType.choices if wt[0] != WinType.BYE.value]
         self.fields["win_type"].choices = BLANK_CHOICE_DASH + win_type_choices
+        self.fields["link"].validators = [ogs_game_link_validator]
 
     def clean(self):
         cleaned_data = super().clean()

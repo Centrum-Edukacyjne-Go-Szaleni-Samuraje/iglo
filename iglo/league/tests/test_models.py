@@ -411,3 +411,11 @@ class GroupTestCase(TestCase):
         self.assertEqual(new_member.group, group_1)
         self.assertEqual(new_member.order, 2)
         self.assertEqual(group_2.members.count(), 0)
+
+
+class GameTestCase(TestCase):
+
+    def test_external_sgf_link(self):
+        game = GameFactory(link='https://online-go.com/game/33759361')
+
+        self.assertEqual(game.external_sgf_link, "https://online-go.com/api/v1/games/33759361/sgf")

@@ -56,7 +56,8 @@
                                                             data-bs-target="#contact-modal-{{ game.id }}">
                                                         <i class="fas fa-envelope"></i> Kontakt
                                                     </button>
-                                                    <div class="modal fade" id="contact-modal-{{ game.id }}" tabindex="-1"
+                                                    <div class="modal fade" id="contact-modal-{{ game.id }}"
+                                                         tabindex="-1"
                                                          aria-labelledby="contactModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
@@ -87,6 +88,17 @@
                                                         <i class="fas fa-edit"></i> Edytuj
                                                     </a>
                                                 {% endif %}
+                                            {% endif %}
+                                            {% if game.link %}
+                                                <a href="{{ game.link }}" target="_blank"
+                                                   class="btn btn-primary">
+                                                    <i class="fa fa-external-link-alt"></i> OGS
+                                                </a>
+                                            {% endif %}
+                                            {% if game.sgf_link %}
+                                                <a href="{{ game.sgf_link }}" class="btn btn-primary">
+                                                    <i class="fa fa-download"></i> SGF
+                                                </a>
                                             {% endif %}
                                             <a href="{{ game.get_absolute_url }}" class="btn btn-primary">
                                                 <i class="fas fa-arrow-right"></i>

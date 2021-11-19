@@ -1,6 +1,7 @@
 import datetime
 import math
 import random
+import re
 import string
 from enum import Enum
 from typing import Optional
@@ -14,6 +15,8 @@ from django.utils.functional import cached_property
 
 from league import texts
 from league.utils import round_robin
+
+OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
 DAYS_PER_GAME = 7
 
@@ -461,9 +464,7 @@ class GameManager(models.Manager):
             round=round,
             winner=member,
             win_type=WinType.BYE,
-            date=datetime.datetime.combine(
-                round.end_date, settings.DEFAULT_GAME_TIME
-            )
+            date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
         )
 
 
@@ -535,8 +536,8 @@ class Game(models.Model):
                 kwargs={
                     "season_number": self.group.season.number,
                     "group_name": self.group.name,
-                    "bye_player": self.winner
-                }
+                    "bye_player": self.winner,
+                },
             )
         return reverse(
             "game-detail",
@@ -563,3 +564,20 @@ class Game(models.Model):
         if self.is_bye:
             return None
         return self.white if member == self.black else self.black
+
+    @cached_property
+    def external_sgf_link(self) -> Optional[str]:
+        if not self.link:
+            return None
+        match = re.match(OGS_GAME_LINK_REGEX, self.link)
+        if not match:
+            return None
+        return f"https://online-go.com/api/v1/games/{match.group(1)}/sgf"
+
+    @property
+    def sgf_link(self) -> Optional[str]:
+        if self.sgf:
+            return self.sgf.url
+        elif self.external_sgf_link:
+            return self.external_sgf_link
+        return None

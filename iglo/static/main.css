@@ -58,3 +58,7 @@
 .clickable {
     cursor: pointer;
 }
+
+.sgf-container {
+    margin: 20px;
+}

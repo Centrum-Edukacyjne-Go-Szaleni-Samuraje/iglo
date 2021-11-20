@@ -297,6 +297,22 @@ class Group(models.Model):
         result = self.members.aggregate(avg_rank=Avg("rank"))["avg_rank"]
         return int(result or 0)
 
+    def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
+        member_to_remove = self.members.get(player__nick=player_nick_to_remove)
+        self.members.filter(order__gt=member_to_remove.order).update(
+            order=F("order") - 1
+        )
+        player_to_add = Player.objects.get(nick=player_nick_to_add)
+        new_member = Member.objects.create(
+            group=self,
+            player=player_to_add,
+            rank=player_to_add.rank,
+            order=self.members.count(),
+        )
+        member_to_remove.games_as_white.update(white=new_member)
+        member_to_remove.games_as_black.update(black=new_member)
+        member_to_remove.delete()
+
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)

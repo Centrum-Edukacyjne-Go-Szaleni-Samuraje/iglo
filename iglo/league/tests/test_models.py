@@ -350,10 +350,10 @@ class SeasonTestCase(TestCase):
                     round.end_date, settings.DEFAULT_GAME_TIME
                 ),
             )
-            .filter(
+                .filter(
                 Q(black=member_1, white=member_2) | Q(black=member_2, white=member_1)
             )
-            .exists()
+                .exists()
         )
 
 
@@ -411,6 +411,30 @@ class GroupTestCase(TestCase):
         self.assertEqual(new_member.group, group_1)
         self.assertEqual(new_member.order, 2)
         self.assertEqual(group_2.members.count(), 0)
+
+    def test_swap_member(self):
+        group = GroupFactory(season__state=SeasonState.IN_PROGRESS)
+        member_1 = MemberFactory(group=group, order=1)
+        member_2 = MemberFactory(group=group, order=2)
+        member_3 = MemberFactory(group=group, order=2)
+        game_1 = GameFactory(white=member_1, black=member_2, group=group)
+        game_2 = GameFactory(white=member_2, black=member_3, group=group)
+        new_player = PlayerFactory()
+
+        group.swap_member(player_nick_to_remove=member_2.player.nick, player_nick_to_add=new_player.nick)
+
+        self.assertEqual(group.members.count(), 3)
+        self.assertFalse(group.members.filter(id=member_2.id).exists())
+        member_1.refresh_from_db()
+        member_3.refresh_from_db()
+        new_member = group.members.get(player=new_player)
+        self.assertEqual(member_1.order, 1)
+        self.assertEqual(member_3.order, 2)
+        self.assertEqual(new_member.order, 3)
+        game_1.refresh_from_db()
+        game_2.refresh_from_db()
+        self.assertEqual(game_1.black, new_member)
+        self.assertEqual(game_2.white, new_member)
 
 
 class GameTestCase(TestCase):

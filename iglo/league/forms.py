@@ -54,8 +54,15 @@ class GameResultUpdateForm(forms.ModelForm):
         cleaned_data = super().clean()
         win_type = cleaned_data["win_type"]
         winner = cleaned_data["winner"]
+        points_difference = cleaned_data["points_difference"]
         if win_type and win_type != WinType.NOT_PLAYED and not winner:
             self.add_error(field="winner", error=texts.WINNER_REQUIRED_ERROR)
+        if winner and not win_type:
+            self.add_error(field="win_type", error=texts.WIN_TYPE_REQUIRED_ERROR)
+        if win_type == WinType.POINTS and not points_difference:
+            self.add_error(
+                field="points_difference", error=texts.POINTS_DIFFERENCE_REQUIRED_ERROR
+            )
         return cleaned_data
 
 

@@ -56,22 +56,13 @@
                         {% include "league/includes/game_players.html" with game=object %}
                     </div>
                     <div>
-                        {% if game.link %}
-                            <a href="{{ game.link }}" target="_blank" class="btn btn-primary">
-                                <i class="fa fa-external-link-alt"></i> OGS
-                            </a>
-                        {% endif %}
-                        {% if object.sgf_link %}
-                            <a href="{{ object.sgf_link }}" class="btn btn-primary">
-                                <i class="fa fa-download"></i> SGF
-                            </a>
-                        {% endif %}
                         {% if user.is_admin %}
                             <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
                                class="btn btn-primary">
-                                <i class="fas fa-edit"></i> Edytuj
+                                <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edytuj</span>
                             </a>
                         {% endif %}
+                        {% include "league/includes/game_actions.html" with show_link=False %}
                     </div>
                 </div>
                 <h5>

@@ -514,6 +514,9 @@ class Game(models.Model):
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
     updated = models.DateTimeField(auto_now=True)
 
+    review_video_link = models.URLField(null=True, blank=True)
+    ai_analyse_link = models.URLField(null=True, blank=True)
+
     objects = GameManager()
 
     def __str__(self) -> str:

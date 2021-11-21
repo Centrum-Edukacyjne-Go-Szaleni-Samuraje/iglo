@@ -54,7 +54,7 @@
                                                 {% if user.is_admin or user.player == game.black.player or user.player == game.white.player %}
                                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                                             data-bs-target="#contact-modal-{{ game.id }}">
-                                                        <i class="fas fa-envelope"></i> Kontakt
+                                                        <i class="fas fa-envelope"></i> <span class="d-none d-md-inline">Kontakt</span>
                                                     </button>
                                                     <div class="modal fade" id="contact-modal-{{ game.id }}"
                                                          tabindex="-1"
@@ -85,24 +85,11 @@
                                                     </div>
                                                     <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
                                                        class="btn btn-primary">
-                                                        <i class="fas fa-edit"></i> Edytuj
+                                                        <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edytuj</span>
                                                     </a>
                                                 {% endif %}
                                             {% endif %}
-                                            {% if game.link %}
-                                                <a href="{{ game.link }}" target="_blank"
-                                                   class="btn btn-primary">
-                                                    <i class="fa fa-external-link-alt"></i> OGS
-                                                </a>
-                                            {% endif %}
-                                            {% if game.sgf_link %}
-                                                <a href="{{ game.sgf_link }}" class="btn btn-primary">
-                                                    <i class="fa fa-download"></i> SGF
-                                                </a>
-                                            {% endif %}
-                                            <a href="{{ game.get_absolute_url }}" class="btn btn-primary">
-                                                <i class="fas fa-arrow-right"></i>
-                                            </a>
+                                            {% include "league/includes/game_actions.html" with show_link=True %}
                                         </div>
                                     </div>
                                 </div>

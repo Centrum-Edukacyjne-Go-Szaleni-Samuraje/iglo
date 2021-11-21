@@ -1,14 +1,25 @@
 import datetime
 
 from django.contrib import messages
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
 from league import texts
-from league.forms import GameResultUpdateForm, PlayerUpdateForm
+from league.forms import (
+    GameResultUpdateForm,
+    PlayerUpdateForm,
+    GameResultUpdateAdminForm,
+)
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError, Round, WinType
+from league.models import (
+    Season,
+    Group,
+    Game,
+    Player,
+    Member,
+    GamesWithoutResultError,
+    WinType,
+)
 from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -106,7 +117,7 @@ class GameDetailView(DetailView):
                 group__season__number=self.kwargs["season_number"],
                 group__name__iexact=self.kwargs["group_name"],
                 winner__player__nick__iexact=self.kwargs["bye_player"],
-                win_type=WinType.BYE
+                win_type=WinType.BYE,
             )
         return get_object_or_404(
             queryset,
@@ -119,7 +130,6 @@ class GameDetailView(DetailView):
 
 class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
     model = Game
-    form_class = GameResultUpdateForm
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -139,6 +149,11 @@ class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
             and self.request.user.player in [game.black.player, game.white.player]
             and game.group.season.state == SeasonState.IN_PROGRESS
         )
+
+    def get_form_class(self):
+        if self.request.user.is_admin:
+            return GameResultUpdateAdminForm
+        return GameResultUpdateForm
 
 
 class PlayerDetailView(DetailView):

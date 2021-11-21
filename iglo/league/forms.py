@@ -17,6 +17,7 @@ def ogs_game_link_validator(value: str) -> None:
     if not re.match(OGS_GAME_LINK_REGEX, value):
         raise forms.ValidationError(texts.OGS_GAME_LINK_ERROR)
 
+
 class GameResultUpdateForm(forms.ModelForm):
     class Meta:
         model = Game
@@ -42,7 +43,9 @@ class GameResultUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["winner"].queryset = Member.objects.filter(id__in=[self.instance.black.id, self.instance.white.id])
+        self.fields["winner"].queryset = Member.objects.filter(
+            id__in=[self.instance.black.id, self.instance.white.id]
+        )
         win_type_choices = [wt for wt in WinType.choices if wt[0] != WinType.BYE.value]
         self.fields["win_type"].choices = BLANK_CHOICE_DASH + win_type_choices
         self.fields["link"].validators = [ogs_game_link_validator]
@@ -54,6 +57,19 @@ class GameResultUpdateForm(forms.ModelForm):
         if win_type and win_type != WinType.NOT_PLAYED and not winner:
             self.add_error(field="winner", error=texts.WINNER_REQUIRED_ERROR)
         return cleaned_data
+
+
+class GameResultUpdateAdminForm(GameResultUpdateForm):
+    class Meta(GameResultUpdateForm.Meta):
+        model = Game
+        fields = GameResultUpdateForm.Meta.fields + [
+            "review_video_link",
+            "ai_analyse_link",
+        ]
+        labels = GameResultUpdateForm.Meta.labels | {
+            "review_video_link": "Komentarz na YouTube",
+            "ai_analyse_link": "Analiza AI Sensei",
+        }
 
 
 class PlayerUpdateForm(forms.ModelForm):
@@ -82,6 +98,10 @@ class PlayerUpdateForm(forms.ModelForm):
 
     def clean_nick(self):
         nick = self.cleaned_data["nick"]
-        if Player.objects.exclude(id=self.instance.id).filter(nick__iexact=nick).exists():
+        if (
+            Player.objects.exclude(id=self.instance.id)
+            .filter(nick__iexact=nick)
+            .exists()
+        ):
             raise forms.ValidationError(texts.NICK_ERROR)
         return nick

@@ -97,6 +97,13 @@
                             <div>
                                 {% if round.start_date and round.end_date %}{{ round.start_date }} -
                                     {{ round.end_date }}{% endif %}
+                                <i id="collapse-round-{{ forloop.counter }}"
+                                   class="fas
+                                   {% if round.is_current %}
+                                       fa-chevron-up
+                                   {% else %}
+                                       fa-chevron-down
+                                   {% endif %}"></i>
                             </div>
                         </div>
                         <div class="card-body collapse {% if round.is_current %}show{% endif %}"
@@ -164,8 +171,11 @@
     </div>
     <script>
         function toggle_collapse(event) {
-            element_id = event.target.getAttribute('data-target');
-            element = document.getElementById(element_id).classList.toggle('show');
+            element_id = event.target.getAttribute("data-target");
+            document.getElementById(element_id).classList.toggle("show");
+            icon_id = "collapse-"+element_id;
+            document.getElementById(icon_id).classList.toggle("fa-chevron-down");
+            document.getElementById(icon_id).classList.toggle("fa-chevron-up");
         }
     </script>
 {% endblock %}

@@ -28,6 +28,7 @@
                 {% url "accounts:registration" as registration_url %}
                 {% url "player-detail" user.player.nick as profile_url %}
                 {% url "contact" as contact_url %}
+                {% url "reviews" as reviews_url %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == home_url %}active{% endif %}" aria-current="page"
                        href="{{ home_url }}">Home</a>
@@ -37,11 +38,17 @@
                        aria-current="page" href="{{ seasons_url }}">Sezony</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {% if request.get_full_path == reviews_url %}active{% endif %}"
+                       aria-current="page"
+                       href="{{ reviews_url }}">Komentarze</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == rules_url %}active{% endif %}" aria-current="page"
                        href="{{ rules_url }}">Regulamin</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.get_full_path == contact_url %}active{% endif %}" aria-current="page"
+                    <a class="nav-link {% if request.get_full_path == contact_url %}active{% endif %}"
+                       aria-current="page"
                        href="{{ contact_url }}">Kontakt</a>
                 </li>
             </ul>

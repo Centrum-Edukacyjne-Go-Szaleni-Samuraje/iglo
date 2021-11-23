@@ -19,20 +19,25 @@
                     <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                 </div>
                 {% if user.is_admin %}
-                    <form method="post" class="d-inline">{% csrf_token %}
-                        {% if season.state == "draft" %}
-                            <button type="submit" class="btn btn-success" name="action-add-group">
-                                Dodaj Grupę
-                            </button>
-                            <button type="submit" class="btn btn-warning" name="action-start-season">
-                                Wystartuj Sezon
-                            </button>
-                        {% elif season.state == "in_progress" %}
-                            <button type="submit" class="btn btn-warning" name="action-finish-season">
-                                Zakończ Sezon
-                            </button>
-                        {% endif %}
-                    </form>
+                    <div>
+                        <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
+                            <i class="fa fa-file-export"></i> Eksport CSV
+                        </a>
+                        <form method="post" class="d-inline">{% csrf_token %}
+                            {% if season.state == "draft" %}
+                                <button type="submit" class="btn btn-success" name="action-add-group">
+                                    Dodaj Grupę
+                                </button>
+                                <button type="submit" class="btn btn-warning" name="action-start-season">
+                                    Wystartuj Sezon
+                                </button>
+                            {% elif season.state == "in_progress" %}
+                                <button type="submit" class="btn btn-danger" name="action-finish-season">
+                                    Zakończ Sezon
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
                 {% endif %}
             </div>
             <h5 class="text-muted mb-4">

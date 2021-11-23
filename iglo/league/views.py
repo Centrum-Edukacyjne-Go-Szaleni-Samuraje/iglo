@@ -1,9 +1,12 @@
+import csv
 import datetime
 
 from django.contrib import messages
 
 from django.db.models import Q, Count
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
 from league import texts
@@ -77,6 +80,32 @@ class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
                     message=texts.GAMES_WITHOUT_RESULT_ERROR,
                 )
         return self.render_to_response(context)
+
+
+class SeasonExportCSVView(AdminPermissionRequired, View):
+    def get(self, request, number):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={
+                "Content-Disposition": f'attachment; filename="season-{number}.csv"'
+            },
+        )
+        writer = csv.DictWriter(response, fieldnames=["nick", "name", "group", "email"])
+        writer.writeheader()
+        for member in (
+            Member.objects.filter(group__season__number=number)
+            .order_by("group__name", "order")
+            .select_related("player__user", "group")
+        ):
+            writer.writerow(
+                {
+                    "nick": member.player.nick,
+                    "name": f"{member.player.first_name} {member.player.last_name}",
+                    "group": member.group.name,
+                    "email": member.player.user.email if member.player.user else "",
+                }
+            )
+        return response
 
 
 class GroupDetailView(AdminPermissionForModifyRequired, DetailView):

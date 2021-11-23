@@ -28,16 +28,23 @@ from league.permissions import AdminPermissionRequired, AdminPermissionForModify
 
 class SeasonsListView(ListView):
     model = Season
-    paginate_by = 5
+    paginate_by = 10
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
-        context['object_list'] = context['object_list'].annotate(number_of_players=Count('groups__members'))
         return context | {
             "can_prepare_season": not Season.objects.exclude(
                 state=SeasonState.FINISHED
             ).exists()
         }
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(number_of_players=Count("groups__members"))
+            .order_by("-number")
+        )
 
 
 class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):

@@ -488,10 +488,18 @@ class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
     black = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_black", null=True
+        Member,
+        on_delete=models.CASCADE,
+        related_name="games_as_black",
+        null=True,
+        blank=True,
     )
     white = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_white", null=True
+        Member,
+        on_delete=models.CASCADE,
+        related_name="games_as_white",
+        null=True,
+        blank=True,
     )
 
     winner = models.ForeignKey(
@@ -509,7 +517,7 @@ class Game(models.Model):
     )
 
     date = models.DateTimeField(null=True, blank=True)
-    server = models.CharField(max_length=3, choices=GameServer.choices)
+    server = models.CharField(max_length=3, choices=GameServer.choices, blank=True)
     link = models.URLField(null=True, blank=True)
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
     updated = models.DateTimeField(auto_now=True)

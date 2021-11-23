@@ -7,3 +7,7 @@ class HomeView(TemplateView):
 
 class RulesView(TemplateView):
     template_name = 'misc/rules.html'
+
+
+class ContactView(TemplateView):
+    template_name = 'misc/contact.html'

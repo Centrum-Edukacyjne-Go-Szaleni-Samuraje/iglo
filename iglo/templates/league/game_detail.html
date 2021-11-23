@@ -2,7 +2,13 @@
 
 {% load static crispy_forms_filters %}
 
-{% block page_title %}{{ object.black.player.nick }} vs {{ object.white.player.nick }}{% endblock %}
+{% block page_title %}
+    {% if object.is_bye %}
+        Bye: {{ object.winner.player.nick }}
+    {% else %}
+        {{ object.black.player.nick }} vs {{ object.white.player.nick }}
+    {% endif %}
+{% endblock %}
 
 {% block head %}
     {{ block.super }}
@@ -28,36 +34,48 @@
                     </a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}</li>
+                    {% if object.is_bye %}
+                        Bye: {{ object.winner.player.nick }}
+                    {% else %}
+                        Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}
+                    {% endif %}
+                </li>
             </ol>
         </nav>
-        <div>
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="fs-2 mb-3">
-                    {% include "league/includes/game_players.html" with game=object %}
-                </div>
-                <div>
-                    {% if object.sgf %}
-                        <a href="{{ object.sgf.url }}" class="btn btn-primary">
-                            <i class="fa fa-download"></i> Pobierz SGF
-                        </a>
-                    {% endif %}
-                    {% if user.is_admin %}
-                        <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
-                           class="btn btn-primary">
-                            <i class="fas fa-edit"></i> Edytuj
-                        </a>
-                    {% endif %}
+        {% if object.is_bye %}
+            <div>
+                <div class="d-flex flex-column justify-content-between align-items-start">
+                    <div class="fs-2 mb-3">BYE</div>
+                    <div><small class="text-muted">Brak przeciwnika w tej rundzie.</small></div>
                 </div>
             </div>
-            <h5>
-                {% if object.is_played %}{{ object.result }}{% else %}Gra jeszcze się nie odbyła.{% endif %}
-            </h5>
-            <i class="fas fa-calendar-day"></i> {{ object.date }}
-            {% if object.sgf %}
-                <div data-wgo="{{ object.sgf.url }}" data-wgo-layout="bottom: ['Control']" data-wgo-enablewheel="false"
-                     style="width: 100%; height: 700px"></div>
-            {% endif %}
-        </div>
+        {% else %}
+            <div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                    <div class="fs-2 mb-2">
+                        {% include "league/includes/game_players.html" with game=object %}
+                    </div>
+                    <div>
+                        {% if user.is_admin %}
+                            <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
+                               class="btn btn-primary">
+                                <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edytuj</span>
+                            </a>
+                        {% endif %}
+                        {% include "league/includes/game_actions.html" with show_link=False %}
+                    </div>
+                </div>
+                <h5>
+                    {% if object.is_played %}{{ object.result }}{% else %}Gra jeszcze się nie odbyła.{% endif %}
+                </h5>
+                <i class="fas fa-calendar-day"></i> {{ object.date }}
+                {% if object.sgf_link %}
+                    <div class="sgf-container">
+                        <div data-wgo="{{ object.sgf_link }}"
+                             data-wgo-enablewheel="false" data-wgo-move="1000"></div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

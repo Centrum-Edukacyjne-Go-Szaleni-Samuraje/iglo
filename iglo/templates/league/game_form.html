@@ -38,9 +38,9 @@
             </ol>
         </nav>
         <div>
-            <h2>
-                {{ object.black.player.nick }} (B) vs {{ object.white.player.nick }} (W)
-            </h2>
+            <div class="fs-2 mb-3">
+                {% include "league/includes/game_players.html" with game=object %}
+            </div>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}

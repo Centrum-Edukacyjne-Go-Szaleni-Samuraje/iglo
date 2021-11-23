@@ -1,6 +1,7 @@
 import datetime
 import math
 import random
+import re
 import string
 from enum import Enum
 from typing import Optional
@@ -14,6 +15,8 @@ from django.utils.functional import cached_property
 
 from league import texts
 from league.utils import round_robin
+
+OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
 DAYS_PER_GAME = 7
 
@@ -294,6 +297,22 @@ class Group(models.Model):
         result = self.members.aggregate(avg_rank=Avg("rank"))["avg_rank"]
         return int(result or 0)
 
+    def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
+        member_to_remove = self.members.get(player__nick=player_nick_to_remove)
+        self.members.filter(order__gt=member_to_remove.order).update(
+            order=F("order") - 1
+        )
+        player_to_add = Player.objects.get(nick=player_nick_to_add)
+        new_member = Member.objects.create(
+            group=self,
+            player=player_to_add,
+            rank=player_to_add.rank,
+            order=self.members.count(),
+        )
+        member_to_remove.games_as_white.update(white=new_member)
+        member_to_remove.games_as_black.update(black=new_member)
+        member_to_remove.delete()
+
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
@@ -375,7 +394,7 @@ class Member(models.Model):
 
     @cached_property
     def sos(self) -> float:
-        result = 0
+        result = 0.0
         for game in self.games_as_white.all():
             result += game.get_opponent(self).score
         for game in self.games_as_black.all():
@@ -384,7 +403,7 @@ class Member(models.Model):
 
     @cached_property
     def sosos(self) -> float:
-        result = 0
+        result = 0.0
         for game in self.games_as_white.all():
             result += game.get_opponent(self).sos
         for game in self.games_as_black.all():
@@ -427,6 +446,7 @@ class WinType(models.TextChoices):
     POINTS = "points", texts.WIN_TYPE_POINTS
     RESIGN = "resign", texts.WIN_TYPE_RESIGN
     TIME = "time", texts.WIN_TYPE_TIME
+    BYE = "bye", texts.WIN_TYPE_BYE
     NOT_PLAYED = "not_played", texts.WIN_TYPE_NOT_PLAYED
 
 
@@ -443,7 +463,7 @@ class GameManager(models.Manager):
 
     def get_for_member(self, member: Member) -> QuerySet:
         return (
-            self.filter(Q(white=member) | Q(black=member))
+            self.filter(Q(white=member) | Q(black=member) | Q(winner=member))
             .order_by("round__number")
             .select_related(
                 "white__player__user",
@@ -454,15 +474,24 @@ class GameManager(models.Manager):
             )
         )
 
+    def create_bye_game(self, group: Group, round: Round, member: Member):
+        self.create(
+            group=group,
+            round=round,
+            winner=member,
+            win_type=WinType.BYE,
+            date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
+        )
+
 
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
     black = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_black"
+        Member, on_delete=models.CASCADE, related_name="games_as_black", null=True
     )
     white = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_white"
+        Member, on_delete=models.CASCADE, related_name="games_as_white", null=True
     )
 
     winner = models.ForeignKey(
@@ -485,9 +514,14 @@ class Game(models.Model):
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
     updated = models.DateTimeField(auto_now=True)
 
+    review_video_link = models.URLField(null=True, blank=True)
+    ai_analyse_link = models.URLField(null=True, blank=True)
+
     objects = GameManager()
 
     def __str__(self) -> str:
+        if self.is_bye:
+            return f"Bye - {self.winner} "
         return f"B: {self.black} - W: {self.white} - winner: {self.winner}"
 
     @property
@@ -495,10 +529,14 @@ class Game(models.Model):
         return bool(self.win_type)
 
     @property
+    def is_bye(self):
+        return self.win_type == WinType.BYE
+
+    @property
     def result(self) -> Optional[str]:
         if not self.is_played:
             return None
-        if not self.winner:
+        if not self.winner or self.is_bye:
             return WinType(self.win_type).label
         winner_color = "B" if self.winner == self.black else "W"
         if self.win_type:
@@ -511,6 +549,15 @@ class Game(models.Model):
         return winner_color
 
     def get_absolute_url(self):
+        if self.is_bye:
+            return reverse(
+                "bye-game-detail",
+                kwargs={
+                    "season_number": self.group.season.number,
+                    "group_name": self.group.name,
+                    "bye_player": self.winner,
+                },
+            )
         return reverse(
             "game-detail",
             kwargs={
@@ -528,9 +575,28 @@ class Game(models.Model):
 
     @property
     def loser(self) -> Optional["Member"]:
-        if not self.winner:
+        if not self.winner or self.is_bye:
             return None
         return self.white if self.winner == self.black else self.black
 
-    def get_opponent(self, member: Member) -> Member:
+    def get_opponent(self, member: Member) -> Optional["Member"]:
+        if self.is_bye:
+            return None
         return self.white if member == self.black else self.black
+
+    @cached_property
+    def external_sgf_link(self) -> Optional[str]:
+        if not self.link:
+            return None
+        match = re.match(OGS_GAME_LINK_REGEX, self.link)
+        if not match:
+            return None
+        return f"https://online-go.com/api/v1/games/{match.group(1)}/sgf"
+
+    @property
+    def sgf_link(self) -> Optional[str]:
+        if self.sgf:
+            return self.sgf.url
+        elif self.external_sgf_link:
+            return self.external_sgf_link
+        return None

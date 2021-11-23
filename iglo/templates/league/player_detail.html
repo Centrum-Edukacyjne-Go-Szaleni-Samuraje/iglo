@@ -29,61 +29,67 @@
                                             <span class="badge bg-warning text-dark">NASTĘPNA GRA</span>
                                         {% elif game.winner == current_membership %}
                                             <span class="badge bg-success">WYGRANA</span>
-                                        {% elif game.win_type %}
+                                        {% elif game.is_played %}
                                             <span class="badge bg-danger">PRZEGRANA</span>
                                         {% endif %}
                                     </div>
-                                    <div class="card-body d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fs-5 mb-2">
-                                                {% include "league/includes/game_players.html" with game=game %}
-                                            </div>
-                                            {% if game.is_played %}
-                                                <h6>{{ game.result }}</h6>
+                                    <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+                                        <div class="mb-2">
+                                            {% if game.is_bye %}
+                                                <div class="fs-5 mb-2">BYE</div>
+                                                <small class="text-muted">Brak przeciwnika w tej rundzie.</small>
                                             {% else %}
-                                                <div><i class="fas fa-calendar-day"></i> {{ game.date }}</div>
+                                                <div class="fs-5 mb-2">
+                                                    {% include "league/includes/game_players.html" with game=game %}
+                                                </div>
+                                                {% if game.is_played %}
+                                                    <h6>{{ game.result }}</h6>
+                                                {% else %}
+                                                    <div><i class="fas fa-calendar-day"></i> {{ game.date }}</div>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         <div>
-                                            {% if user.is_admin or user.player == game.black.player or user.player == game.white.player %}
-                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                        data-bs-target="#contact-modal-{{ game.id }}">
-                                                    <i class="fas fa-envelope"></i> Kontakt
-                                                </button>
-                                                <div class="modal fade" id="contact-modal-{{ game.id }}" tabindex="-1"
-                                                     aria-labelledby="contactModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="contactModalLabel">Dane
-                                                                    kontaktowe</h5>
-                                                                <button type="button" class="btn-close"
-                                                                        data-bs-dismiss="modal"
-                                                                        aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                {% if user.player == game.black.player %}
-                                                                    {% include "league/includes/player_contact.html" with player=game.white.player %}
-                                                                {% else %}
-                                                                    {% include "league/includes/player_contact.html" with player=game.black.player %}
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-success"
-                                                                        data-bs-dismiss="modal">Zamknij
-                                                                </button>
+                                            {% if not game.is_bye %}
+                                                {% if user.is_admin or user.player == game.black.player or user.player == game.white.player %}
+                                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                            data-bs-target="#contact-modal-{{ game.id }}">
+                                                        <i class="fas fa-envelope"></i> <span class="d-none d-md-inline">Kontakt</span>
+                                                    </button>
+                                                    <div class="modal fade" id="contact-modal-{{ game.id }}"
+                                                         tabindex="-1"
+                                                         aria-labelledby="contactModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="contactModalLabel">Dane
+                                                                        kontaktowe</h5>
+                                                                    <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal"
+                                                                            aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    {% if user.player == game.black.player %}
+                                                                        {% include "league/includes/player_contact.html" with player=game.white.player %}
+                                                                    {% else %}
+                                                                        {% include "league/includes/player_contact.html" with player=game.black.player %}
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-success"
+                                                                            data-bs-dismiss="modal">Zamknij
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
-                                                   class="btn btn-primary">
-                                                    <i class="fas fa-edit"></i> Edytuj
-                                                </a>
+                                                    <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
+                                                       class="btn btn-primary">
+                                                        <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edytuj</span>
+                                                    </a>
+                                                {% endif %}
                                             {% endif %}
-                                            <a href="{{ game.get_absolute_url }}" class="btn btn-primary">
-                                                <i class="fas fa-arrow-right"></i>
-                                            </a>
+                                            {% include "league/includes/game_actions.html" with show_link=True %}
                                         </div>
                                     </div>
                                 </div>

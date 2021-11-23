@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block page_title %}Strona Główna{% endblock %}
 
 {% block content %}
@@ -22,6 +24,70 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-12 mb-3">
+            <div class="card h-100">
+                <div class="card-header">Wykłady i komentarze</div>
+                <div class="card-body">
+                    <p>Wszystkie nasze archiwalne i bieżące wykłady możesz znaleźć na <a
+                            href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ" target="_blank">YouTube</a>.
+                        Jeśl z jakiś przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją wiedzę
+                        zachęcamy do obejrzenia materiałów i subskrypcji naszego kanału.
+                    </p>
+                    <p>W aktualnym sezonie gry komentują:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Grupa</th>
+                                <th>Nauczyciel</th>
+                                <th >Termin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A i B</td>
+                                <td>Stanisław Frejlak, 1 pro</td>
+                                <td>niedziela, 18:00</td>
+                            </tr>
+                            <tr>
+                                <td>C i D</td>
+                                <td>Oleksandr Yeroshkin, 4 dan</td>
+                                <td>sobota lub niedziela</td>
+                            </tr>
+                            <tr>
+                                <td>E i F</td>
+                                <td>Maksym Wałaszewski, 3 dan</td>
+                                <td>sobota, 19:00</td>
+                            </tr>
+                            <tr>
+                                <td>G i H</td>
+                                <td>Paweł Frączak, 1 dan</td>
+                                <td>niedziela lub wtorek, 19:00</td>
+                            </tr>
+                            <tr>
+                                <td>I i J</td>
+                                <td>Paweł Kozioł, 4 kyu</td>
+                                <td>publikacja omówień na YT w poniedziałek, około 19:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Precyzyjne daty i godziny komentarzy gier będą aktualizowane w wydarzeniach na <a
+                            href="https://www.facebook.com/SzaleniSamuraje/events" target="_blank">profilu FB Szalonych
+                        Samurajów</a>. Komentarze "na żywo" odbywają się na <a href="https://discord.gg/ECSdsuNgkf"
+                                                                               target="_blank">serwerze Discord
+                        Szalonych Samurajów.</a></p>
+                    <p>Archiwalne wykłady i komentarze dla grup A i B prowadził Stanisław Frejlak i Lukáš Podpěra i są
+                        do obejrzenia na <a href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ"
+                                            target="_blank">kanale IGLO</a>.
+                    </p>
+                    <p>Archiwalne wykłady i komentarze dla grup C oraz dalszych prowadzone były przez Cezarego
+                        Czerneckiego i innych uczestników Ligi i są do obejrzenia na kanale <a
+                                href="https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg" target="_blank">IGLO
+                            Plus</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-12 col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-header">Zasady</div>
@@ -29,7 +95,9 @@
                     <p>Skrócone zasady IGLO:</p>
                     <ul>
                         <li>Grupy grają na zasadach "Każdy z każdym" lub "McMahon"</li>
-                        <li>Dwie osoby z górnych miejsc w grupie awansują do grupy wyżej, dwie osoby z ostatnich miejsc w grupie spadają do grupy niżej.</li>
+                        <li>Dwie osoby z górnych miejsc w grupie awansują do grupy wyżej, dwie osoby z ostatnich miejsc
+                            w grupie spadają do grupy niżej.
+                        </li>
                         <li>Jedna gra tygodniowo z domyślnym terminem gry.</li>
                         <li>Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia czasu.</li>
                         <li>Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć.</li>
@@ -41,25 +109,29 @@
         </div>
         <div class="col-12 col-md-6 mb-3">
             <div class="card h-100">
-                <div class="card-header">Wykłady i komentarze</div>
+                <div class="card-header">Wsparcie</div>
                 <div class="card-body">
-                    <p>Wszystkie nasze archiwalne i bieżące wykłady możesz znaleźć na <a
-                            href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ" target="_blank">YouTube</a>.
-                        Jeśl z jakiś przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją wiedzę
-                        zachęcamy do obejrzenia materiałów i subskrypcji naszego kanału.
-                    </p>
-                    <p>W aktualnym sezonie gry komentują:</p>
+                    <p>Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić wykłady i komentarze
+                        korzystamy ze wsparcia naszych patronów. Jeśli również chcesz brać udział w rozwoju Ligi i
+                        wspierać jej dalszą rozbudowę zachęcamy do dołączenia!</p>
+                    <p>Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:</p>
                     <ul>
-                        <li>Grupa A i B - Stanisław Frejlak 1 pro</li>
-                        <li>Grupa C i D - Oleksandr Yeroshkin 4 dan</li>
-                        <li>Grupa E i F - Maksym Wałaszewski 3 dan</li>
-                        <li>Grupa G i H - Paweł Kozioł 4 kyu</li>
+                        <li>Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z profesjonalnych wykładów
+                            i komentarzy dostosowanych do każdej z grup (więcej w sekcji wykłady).
+                        </li>
+                        <li>Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada własne konto,
+                            dzięki któremu może w łatwy sposób obsługiwać swoje gry.
+                        </li>
+                        <li>Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową.</li>
                     </ul>
-                    <p>Archiwalne wykłady i komentarze dla grup A i B prowadził Stanisław Frejlak i Lukáš Podpěra i są
-                        do obejrzenia na <a href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ" target="_blank">kanale IGLO</a>.
-                    </p>
-                    <p>Archiwalne wykłady i komentarze dla grup C oraz dalszych prowadzone były przez Cezarego
-                        Czerneckiego i innych uczestników Ligi i są do obejrzenia na kanale <a href="https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg" target="_blank">IGLO Plus</a>.</p>
+                    <p>Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i sprawniej.</p>
+                    <p> Wpłat można dokonywać na:</p>
+                    <div class="d-flex justify-content-center">
+                        <a href="https://patronite.pl/iglo" target="_blank" class="btn btn-primary me-2">Patronite
+                            (PLN)</a>
+                        <a href="https://www.patreon.com/igloooo" target="_blank" class="btn btn-primary">Patreon
+                            (EUR)</a>
+                    </div>
                 </div>
             </div>
         </div>

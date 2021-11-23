@@ -1,14 +1,27 @@
 import datetime
 
 from django.contrib import messages
+
 from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
 from league import texts
-from league.forms import GameResultUpdateForm, PlayerUpdateForm
+from league.forms import (
+    GameResultUpdateForm,
+    PlayerUpdateForm,
+    GameResultUpdateAdminForm,
+)
 from league.forms import PrepareSeasonForm
-from league.models import Season, Group, Game, Player, Member, GamesWithoutResultError
+from league.models import (
+    Season,
+    Group,
+    Game,
+    Player,
+    Member,
+    GamesWithoutResultError,
+    WinType,
+)
 from league.models import SeasonState
 from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
 
@@ -102,6 +115,14 @@ class GameDetailView(DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
+        if "bye_player" in self.kwargs:
+            return get_object_or_404(
+                queryset,
+                group__season__number=self.kwargs["season_number"],
+                group__name__iexact=self.kwargs["group_name"],
+                winner__player__nick__iexact=self.kwargs["bye_player"],
+                win_type=WinType.BYE,
+            )
         return get_object_or_404(
             queryset,
             group__season__number=self.kwargs["season_number"],
@@ -113,7 +134,6 @@ class GameDetailView(DetailView):
 
 class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
     model = Game
-    form_class = GameResultUpdateForm
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -134,6 +154,11 @@ class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
             and game.group.season.state == SeasonState.IN_PROGRESS
         )
 
+    def get_form_class(self):
+        if self.request.user.is_admin:
+            return GameResultUpdateAdminForm
+        return GameResultUpdateForm
+
 
 class PlayerDetailView(DetailView):
     model = Player
@@ -141,17 +166,16 @@ class PlayerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
-        if current_membership:
-            current_games = Game.objects.get_for_member(member=current_membership)
-            upcoming_game = Game.objects.get_upcoming_game(member=current_membership)
-        else:
-            current_games = None
-            upcoming_game = None
         memberships = self.object.memberships.order_by(
             "-group__season__number"
         ).select_related("group__season")
         if current_membership:
+            current_games = Game.objects.get_for_member(member=current_membership)
+            upcoming_game = Game.objects.get_upcoming_game(member=current_membership)
             memberships = memberships.exclude(id=current_membership.id)
+        else:
+            current_games = None
+            upcoming_game = None
         return super().get_context_data(**kwargs) | {
             "current_membership": current_membership,
             "memberships": memberships,

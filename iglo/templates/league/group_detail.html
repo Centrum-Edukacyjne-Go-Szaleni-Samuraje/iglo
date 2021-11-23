@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block page_title %}Grupa {{ object.name }}{% endblock %}
 
 {% block content %}
@@ -73,7 +75,8 @@
                                     <tr class="group-table__row--result-{{ member.result.value.lower }}">
                                         <td>{{ forloop.counter }}</td>
                                         <td>
-                                            <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a> <span class="text-muted">[{{ member.rank }}]</span>
+                                            <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                            <span class="text-muted">[{{ member.rank }}]</span>
                                         </td>
                                         <td>{{ member.points }}</td>
                                         <td>{{ member.score }}</td>
@@ -88,25 +91,39 @@
                 <h3 class="mb-4">Gry</h3>
                 {% for round in object.rounds.all %}
                     <div class="card mb-3">
-                        <div class="card-header d-flex justify-content-between clickable" onClick="toggle_collapse(event)" data-target="round-{{forloop.counter}}">
+                        <div class="card-header d-flex justify-content-between clickable"
+                             onClick="toggle_collapse(event)" data-target="round-{{ forloop.counter }}">
                             <strong>Runda #{{ round.number }}</strong>
                             <div>
-                            {% if round.start_date and round.end_date %}{{ round.start_date }} -
-                                {{ round.end_date }}{% endif %}
+                                {% if round.start_date and round.end_date %}{{ round.start_date }} -
+                                    {{ round.end_date }}{% endif %}
+                                <button class="btn" onClick="toggle_collapse(event)" data-target="round-{{ forloop.counter }}">
+                                    <i id="collapse-round-{{ forloop.counter }}" style="pointer-events: none;" class="fas
+                                       {% if round.is_current %} fa-chevron-up {% else %} fa-chevron-down {% endif %}"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="card-body collapse {% if round.is_current %}show{% endif %}"
-                             id="round-{{forloop.counter}}">
+                             id="round-{{ forloop.counter }}">
                             {% for game in round.games.all %}
                                 <div class="card mb-3">
-                                    <div class="card-header">
-                                        {% include "league/includes/game_players.html" with game=game %}
+                                    <div class="card-header d-flex justify-content-between">
+                                    <span>
+                                        {% if game.is_bye %}
+                                            BYE:
+                                            {% include "league/includes/player_badge.html" with member=game.winner %}
+                                        {% else %}
+                                            {% include "league/includes/game_players.html" with game=game %}
+                                        {% endif %}
+                                    </span>
+                                        <span>{{ game.date }}</span>
                                     </div>
-                                    <div class="card-body d-flex justify-content-between align-items-baseline">
+                                    <div class="card-body d-flex justify-content-between align-items-baseline flex-wrap">
                                         <p>{% if game.is_played %}{{ game.result }}{% else %}Gra jeszcze się
-                                            nieodbyła.{% endif %}</p>
-                                        <a href="{% url "game-detail" season_number=object.season.number group_name=object.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
-                                           class="btn btn-primary"><i class="fas fa-arrow-right"></i></a>
+                                            nie odbyła.{% endif %}</p>
+                                        <div>
+                                            {% include "league/includes/game_actions.html" with show_link=True %}
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -131,7 +148,7 @@
                             <span class="text-muted">[{{ member.rank }}]</span>
                         </div>
                         {% if user.is_admin %}
-                        <div class="card-body">
+                            <div class="card-body">
                                 <form method="post">{% csrf_token %}
                                     <input type="hidden" value="{{ member.id }}" name="member_id">
                                     <button type="submit" class="btn btn-primary" name="action-up"
@@ -142,7 +159,7 @@
                                     </button>
                                     <button type="submit" class="btn btn-danger" name="action-delete">Usuń</button>
                                 </form>
-                        </div>
+                            </div>
                         {% endif %}
                     </div>
                 {% endfor %}
@@ -150,9 +167,13 @@
         </div>
     </div>
     <script>
-        function toggle_collapse(event){
-            element_id = event.target.getAttribute('data-target');
-            element = document.getElementById(element_id).classList.toggle('show');
+        function toggle_collapse(event) {
+            event.stopPropagation();
+            element_id = event.target.getAttribute("data-target");
+            document.getElementById(element_id).classList.toggle("show");
+            icon_id = "collapse-"+element_id;
+            document.getElementById(icon_id).classList.toggle("fa-chevron-down");
+            document.getElementById(icon_id).classList.toggle("fa-chevron-up");
         }
     </script>
 {% endblock %}

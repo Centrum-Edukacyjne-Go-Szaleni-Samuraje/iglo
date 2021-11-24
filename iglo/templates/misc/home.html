@@ -24,16 +24,43 @@
         </div>
     </div>
     <div class="row">
+        {% if latest_season %}
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Aktualny sezon</span>
+                        <span class="badge season-state--{{ latest_season.state }} ms-2">{{ latest_season.get_state_display | upper }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h2><a href="{{ latest_season.get_absolute_url }}">Sezon #{{ latest_season.number }}</a>
+                        </h2>
+                        <p class="text-muted">{{ latest_season.start_date }} - {{ latest_season.end_date }}</p>
+                        <h5>Grupy</h5>
+                        <div>
+                            {% for group in latest_season.groups.all %}
+                                <a href="{{ group.get_absolute_url }}"
+                                   class="btn btn-primary mb-3" style="min-width: 40px">{{ group.name }}</a>
+                            {% endfor %}
+                        </div>
+                        <p>Rozegranych gier: {{ latest_season.played_games }} / {{ latest_season.all_games }}</p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: {{ latest_season.games_progress }}%"
+                                 aria-valuenow="{{ latest_season.games_progress }}"
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {% if latest_season.games_progress %}{{ latest_season.games_progress }}%{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="col-12 col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-header">Zasady</div>
                 <div class="card-body">
                     <p>Skrócone zasady IGLO:</p>
                     <ul>
-                        <li>Grupy grają na zasadach "Każdy z każdym" lub "McMahon"</li>
-                        <li>Dwie osoby z górnych miejsc w grupie awansują do grupy wyżej, dwie osoby z ostatnich miejsc
-                            w grupie spadają do grupy niżej.
-                        </li>
                         <li>Jedna gra tygodniowo z domyślnym terminem gry.</li>
                         <li>Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia czasu.</li>
                         <li>Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć.</li>
@@ -43,7 +70,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 mb-3">
+    </div>
+    <div class="row">
+        <div class="col-12 mb-3">
             <div class="card h-100">
                 <div class="card-header">Wsparcie</div>
                 <div class="card-body">

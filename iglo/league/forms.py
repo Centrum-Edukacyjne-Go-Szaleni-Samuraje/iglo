@@ -66,7 +66,7 @@ class GameResultUpdateForm(forms.ModelForm):
         return cleaned_data
 
 
-class GameResultUpdateAdminForm(GameResultUpdateForm):
+class GameResultUpdateRefereeForm(GameResultUpdateForm):
     class Meta(GameResultUpdateForm.Meta):
         model = Game
         fields = GameResultUpdateForm.Meta.fields + [
@@ -77,6 +77,19 @@ class GameResultUpdateAdminForm(GameResultUpdateForm):
             "review_video_link": "Komentarz na YouTube",
             "ai_analyse_link": "Analiza AI Sensei",
         }
+
+
+class GameResultUpdateTeacherForm(GameResultUpdateRefereeForm):
+    enabled_fields = [
+        "review_video_link",
+        "ai_analyse_link",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name not in self.enabled_fields:
+                field.disabled = True
 
 
 class PlayerUpdateForm(forms.ModelForm):
@@ -106,9 +119,9 @@ class PlayerUpdateForm(forms.ModelForm):
     def clean_nick(self):
         nick = self.cleaned_data["nick"]
         if (
-            Player.objects.exclude(id=self.instance.id)
-            .filter(nick__iexact=nick)
-            .exists()
+                Player.objects.exclude(id=self.instance.id)
+                        .filter(nick__iexact=nick)
+                        .exists()
         ):
             raise forms.ValidationError(texts.NICK_ERROR)
         return nick

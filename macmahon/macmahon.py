@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Iterable, Optional, Iterator, Tuple
@@ -51,6 +52,34 @@ class ColorPreference:
     can_play_as_white: bool
     should_play_as_black: bool
     should_play_as_white: bool
+
+
+class BasicInitialOrdering:
+    def __init__(self, number_of_bars: int):
+        self.number_of_bars = number_of_bars
+
+    def order(self, players_list: List[Tuple[str, int]]) -> List[Player]:
+        players = []
+        bars_sizes = self.get_bars_sizes(len(players_list), self.number_of_bars)
+        players_left = players_list[:]
+        initial_score = 0
+        for bar_size in bars_sizes:
+            current_bar, players_left = players_left[:bar_size], players_left[bar_size:]
+            for name, rating in current_bar:
+                players.append(Player(name, rating, initial_score))
+            initial_score = initial_score - 1
+        return players
+
+    def get_bars_sizes(self, number_of_players: int, number_of_bars: int) -> List[int]:
+        bars_sizes = []
+        players_left = number_of_players
+        bars_left = number_of_bars
+        while bars_left:
+            bar_size = math.ceil(players_left / bars_left)
+            bars_sizes.append(bar_size)
+            players_left = players_left - bar_size
+            bars_left = bars_left - 1
+        return bars_sizes
 
 
 class Scoring:

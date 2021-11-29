@@ -43,3 +43,15 @@ def players():
 def sorted_players(players):
     s = Scoring()
     return [score.player for score in s.get_scores(players)]
+
+
+@pytest.fixture
+def registered_players():
+    return [
+        ('Alice', 400),
+        ('Bob', 300),
+        ('Cindy', 300),
+        ('Dean', 200),
+        ('Eve', 100),
+        ('Floyd', 50)
+    ]

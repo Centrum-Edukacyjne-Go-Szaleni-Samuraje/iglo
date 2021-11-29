@@ -8,7 +8,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.db import models
-from django.db.models import F, Q, TextChoices, QuerySet, Avg
+from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -88,6 +88,19 @@ class SeasonManager(models.Manager):
                 )
 
         return season
+
+    def get_latest(self) -> Optional["Season"]:
+        return (
+            Season.objects.prefetch_related("groups")
+            .annotate(
+                all_games=Count("groups__games"),
+                played_games=Count(
+                    "groups__games", filter=Q(groups__games__winner__isnull=False)
+                ),
+            )
+            .annotate(games_progress=(F("played_games") * 100) / F("all_games"))
+            .latest("number")
+        )
 
 
 class WrongSeasonStateError(Exception):
@@ -190,6 +203,12 @@ class Group(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"
+
+    def get_absolute_url(self):
+        return reverse(
+            "group-detail",
+            kwargs={"season_number": self.season.number, "group_name": self.name},
+        )
 
     def results_as_table(
         self,
@@ -488,10 +507,18 @@ class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
     black = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_black", null=True
+        Member,
+        on_delete=models.CASCADE,
+        related_name="games_as_black",
+        null=True,
+        blank=True,
     )
     white = models.ForeignKey(
-        Member, on_delete=models.CASCADE, related_name="games_as_white", null=True
+        Member,
+        on_delete=models.CASCADE,
+        related_name="games_as_white",
+        null=True,
+        blank=True,
     )
 
     winner = models.ForeignKey(
@@ -509,7 +536,7 @@ class Game(models.Model):
     )
 
     date = models.DateTimeField(null=True, blank=True)
-    server = models.CharField(max_length=3, choices=GameServer.choices)
+    server = models.CharField(max_length=3, choices=GameServer.choices, blank=True)
     link = models.URLField(null=True, blank=True)
     sgf = models.FileField(null=True, upload_to=game_upload_to, blank=True)
     updated = models.DateTimeField(auto_now=True)

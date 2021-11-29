@@ -24,16 +24,43 @@
         </div>
     </div>
     <div class="row">
+        {% if latest_season %}
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Aktualny sezon</span>
+                        <span class="badge season-state--{{ latest_season.state }} ms-2">{{ latest_season.get_state_display | upper }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h2><a href="{{ latest_season.get_absolute_url }}">Sezon #{{ latest_season.number }}</a>
+                        </h2>
+                        <p class="text-muted">{{ latest_season.start_date }} - {{ latest_season.end_date }}</p>
+                        <h5>Grupy</h5>
+                        <div>
+                            {% for group in latest_season.groups.all %}
+                                <a href="{{ group.get_absolute_url }}"
+                                   class="btn btn-primary mb-3" style="min-width: 40px">{{ group.name }}</a>
+                            {% endfor %}
+                        </div>
+                        <p>Rozegranych gier: {{ latest_season.played_games }} / {{ latest_season.all_games }}</p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: {{ latest_season.games_progress }}%"
+                                 aria-valuenow="{{ latest_season.games_progress }}"
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {% if latest_season.games_progress %}{{ latest_season.games_progress }}%{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="col-12 col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-header">Zasady</div>
                 <div class="card-body">
                     <p>Skrócone zasady IGLO:</p>
                     <ul>
-                        <li>Grupy grają na zasadach "Każdy z każdym" lub "McMahon"</li>
-                        <li>Dwie osoby z górnych miejsc w grupie awansują do grupy wyżej, dwie osoby z ostatnich miejsc
-                            w grupie spadają do grupy niżej.
-                        </li>
                         <li>Jedna gra tygodniowo z domyślnym terminem gry.</li>
                         <li>Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia czasu.</li>
                         <li>Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć.</li>
@@ -43,70 +70,10 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 mb-3">
-            <div class="card h-100">
-                <div class="card-header">Wykłady i komentarze</div>
-                <div class="card-body">
-                    <p>Wszystkie nasze archiwalne i bieżące wykłady możesz znaleźć na <a
-                            href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ" target="_blank">YouTube</a>.
-                        Jeśl z jakiś przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją wiedzę
-                        zachęcamy do obejrzenia materiałów i subskrypcji naszego kanału.
-                    </p>
-                    <p>W aktualnym sezonie gry komentują:</p>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Grupa</th>
-                                <th>Nauczyciel</th>
-                                <th>Termin</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>A i B</td>
-                                <td>Stanisław&nbsp;Frejlak<br>1 pro</td>
-                                <td>niedziela, 18:00 - 20:00</td>
-                            </tr>
-                            <tr>
-                                <td>C i D</td>
-                                <td>Oleksandr&nbsp;Yeroshkin<br>4 dan</td>
-                                <td>sobota/niedziela</td>
-                            </tr>
-                            <tr>
-                                <td>E i F</td>
-                                <td>Maksym&nbsp;Wałaszewski<br>3 dan</td>
-                                <td>sobota, 19:00</td>
-                            </tr>
-                            <tr>
-                                <td>G i H</td>
-                                <td>Paweł&nbsp;Frączak<br>1 dan</td>
-                                <td>niedziela/wtorek, 19:00</td>
-                            </tr>
-                            <tr>
-                                <td>I i J</td>
-                                <td>Paweł&nbsp;Kozioł<br>4 kyu</td>
-                                <td>poniedziałek, 19:00 (publikacja na YT)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <ul>
-
-                    </ul>
-                    <p>Archiwalne wykłady i komentarze dla grup A i B prowadził Stanisław Frejlak i Lukáš Podpěra i są
-                        do obejrzenia na <a href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ"
-                                            target="_blank">kanale IGLO</a>.
-                    </p>
-                    <p>Archiwalne wykłady i komentarze dla grup C oraz dalszych prowadzone były przez Cezarego
-                        Czerneckiego i innych uczestników Ligi i są do obejrzenia na kanale <a
-                                href="https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg" target="_blank">IGLO
-                            Plus</a>.</p>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="row">
-        <div class="col">
-            <div class="card">
+        <div class="col-12 mb-3">
+            <div class="card h-100">
                 <div class="card-header">Wsparcie</div>
                 <div class="card-body">
                     <p>Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić wykłady i komentarze

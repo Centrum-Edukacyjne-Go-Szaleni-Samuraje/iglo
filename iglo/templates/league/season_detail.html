@@ -21,7 +21,7 @@
                 {% if user.is_admin %}
                     <div>
                         <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
-                            <i class="fa fa-file-export"></i> Eksport CSV
+                            <i class="fa fa-file-export"></i> <span class="d-none d-md-inline">Eksport CSV</span>
                         </a>
                         <form method="post" class="d-inline">{% csrf_token %}
                             {% if season.state == "draft" %}
@@ -33,7 +33,7 @@
                                 </button>
                             {% elif season.state == "in_progress" %}
                                 <button type="submit" class="btn btn-danger" name="action-finish-season">
-                                    Zakończ Sezon
+                                    <i class="fa fa-flag-checkered"></i> <span class="d-none d-md-inline">Zakończ Sezon</span>
                                 </button>
                             {% endif %}
                         </form>

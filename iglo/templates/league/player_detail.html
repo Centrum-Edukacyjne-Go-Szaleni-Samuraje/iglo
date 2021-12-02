@@ -44,7 +44,7 @@
                                                 </div>
                                                 {% if game.is_played %}
                                                     <h6>{{ game.result }}</h6>
-                                                {% else %}
+                                                {% elif game.date %}
                                                     <div><i class="fas fa-calendar-day"></i> {{ game.date }}</div>
                                                 {% endif %}
                                             {% endif %}

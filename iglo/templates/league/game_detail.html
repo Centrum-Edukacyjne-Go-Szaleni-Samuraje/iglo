@@ -68,7 +68,7 @@
                 <h5>
                     {% if object.is_played %}{{ object.result }}{% else %}Gra jeszcze się nie odbyła.{% endif %}
                 </h5>
-                <i class="fas fa-calendar-day"></i> {{ object.date }}
+                {% if object.date %}<i class="fas fa-calendar-day"></i> {{ object.date }}{% endif %}
                 {% if object.sgf_link %}
                     <div class="sgf-container">
                         <div data-wgo="{{ object.sgf_link }}"

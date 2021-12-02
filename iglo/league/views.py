@@ -53,7 +53,7 @@ class SeasonsListView(ListView):
 
 class SeasonDetailView(UserRoleRequiredForModify, DetailView):
     model = Season
-    granted_roles = [UserRole.REFEREE]
+    required_roles = [UserRole.REFEREE]
 
     def get_object(self, queryset=None):
         if queryset is None:
@@ -112,7 +112,7 @@ class SeasonExportCSVView(AdminPermissionRequired, View):
 
 class GroupDetailView(UserRoleRequiredForModify, DetailView):
     model = Group
-    granted_roles = [UserRole.REFEREE]
+    required_roles = [UserRole.REFEREE]
 
     def get_object(self, queryset=None):
         if queryset is None:
@@ -173,7 +173,7 @@ class GameDetailView(DetailView):
 
 class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
     model = Game
-    granted_roles = [UserRole.REFEREE, UserRole.TEACHER]
+    required_roles = [UserRole.REFEREE, UserRole.TEACHER]
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -253,7 +253,7 @@ class PlayerUpdateView(AdminPermissionRequired, UpdateView):
 class PrepareSeasonView(UserRoleRequired, FormView):
     template_name = "league/season_prepare.html"
     form_class = PrepareSeasonForm
-    granted_roles = [UserRole.REFEREE]
+    required_roles = [UserRole.REFEREE]
 
     DEFAULT_PROMOTION_COUNT = 2
     DEFAULT_PLAYERS_PER_GROUP = 6

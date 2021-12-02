@@ -16,11 +16,11 @@ class AdminPermissionForModifyRequired(AdminPermissionRequired):
 
 
 class UserRoleRequired(UserPassesTestMixin):
-    granted_roles = []
+    required_roles = []
 
     def test_func(self):
         user = self.request.user
-        return user.is_authenticated and (user.is_admin or user.has_role(*self.granted_roles))
+        return user.is_authenticated and user.has_role(*self.required_roles)
 
 
 class UserRoleRequiredForModify(UserRoleRequired):

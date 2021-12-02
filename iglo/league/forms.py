@@ -63,6 +63,8 @@ class GameResultUpdateForm(forms.ModelForm):
             self.add_error(
                 field="points_difference", error=texts.POINTS_DIFFERENCE_REQUIRED_ERROR
             )
+        if win_type and win_type != WinType.NOT_PLAYED and not (cleaned_data["sgf"] or cleaned_data["link"]):
+            self.add_error(field=None, error=texts.SGF_OR_LINK_REQUIRED_ERROR)
         return cleaned_data
 
 

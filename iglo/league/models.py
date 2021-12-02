@@ -352,7 +352,7 @@ class Group(models.Model):
             ordered_player = next(player for player in initial_ordering if player.name == member.player.nick)
             initial_score = ordered_player.initial_score
             member.initial_score = initial_score
-            member.save()
+        Member.objects.bulk_update(members, ['initial_score'])
 
 
 class Player(models.Model):

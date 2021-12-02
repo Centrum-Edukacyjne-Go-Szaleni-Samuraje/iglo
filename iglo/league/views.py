@@ -190,7 +190,7 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
         game = self.get_object()  # TODO: this is not prefect
         return super().test_func() or (
             self.request.user.is_authenticated
-            and self.request.user.player in [game.black.player, game.white.player]
+            and game.is_participant(self.request.user.player)
             and game.group.season.state == SeasonState.IN_PROGRESS
         )
 
@@ -198,6 +198,9 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
         if self.request.user.has_role(UserRole.REFEREE):
             return GameResultUpdateRefereeForm
         if self.request.user.has_role(UserRole.TEACHER):
+            game = self.get_object()
+            if game.is_participant(self.request.user.player):
+                return GameResultUpdateForm
             return GameResultUpdateTeacherForm
         return GameResultUpdateForm
 

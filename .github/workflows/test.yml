@@ -7,9 +7,9 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Build docker image
-        run: docker build -f deploy/Dockerfile . -t web
       - name: Setup database
         run: docker run --name db -d postgres
+      - name: Build docker image
+        run: docker build -f deploy/Dockerfile . -t web
       - name: Run tests
         run: docker run --link db:db --env DATABASE_URL="postgres://postgres:postgres@db:5432" web python manage.py test

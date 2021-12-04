@@ -8,7 +8,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Setup database
-        run: docker run --name db -d postgres
+        run: docker run --name db --env POSTGRES_PASSWORD=postgres -d postgres
       - name: Build docker image
         run: docker build -f deploy/Dockerfile . -t web
       - name: Run tests

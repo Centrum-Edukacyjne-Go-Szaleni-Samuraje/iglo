@@ -14,7 +14,8 @@ from league import texts
 from league.forms import (
     GameResultUpdateForm,
     PlayerUpdateForm,
-    GameResultUpdateRefereeForm, GameResultUpdateTeacherForm,
+    GameResultUpdateRefereeForm,
+    GameResultUpdateTeacherForm,
 )
 from league.forms import PrepareSeasonForm
 from league.models import (
@@ -27,7 +28,11 @@ from league.models import (
     WinType,
 )
 from league.models import SeasonState
-from league.permissions import AdminPermissionRequired, UserRoleRequiredForModify, UserRoleRequired
+from league.permissions import (
+    AdminPermissionRequired,
+    UserRoleRequiredForModify,
+    UserRoleRequired,
+)
 
 
 class SeasonsListView(ListView):
@@ -190,6 +195,7 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
         game = self.get_object()  # TODO: this is not prefect
         return super().test_func() or (
             self.request.user.is_authenticated
+            and self.request.user.player
             and game.is_participant(self.request.user.player)
             and game.group.season.state == SeasonState.IN_PROGRESS
         )
@@ -199,7 +205,9 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
             return GameResultUpdateRefereeForm
         if self.request.user.has_role(UserRole.TEACHER):
             game = self.get_object()
-            if game.is_participant(self.request.user.player):
+            if self.request.user.player and game.is_participant(
+                self.request.user.player
+            ):
                 return GameResultUpdateForm
             return GameResultUpdateTeacherForm
         return GameResultUpdateForm

@@ -33,7 +33,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     is_admin = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
-    roles = ArrayField(models.CharField(max_length=32, choices=UserRole.choices), default=list)
+    roles = ArrayField(models.CharField(max_length=32, choices=UserRole.choices), default=list, blank=True)
 
     objects = UserManager()
 

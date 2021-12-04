@@ -19,12 +19,10 @@
                     <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                 </div>
                 <div>
-                    {% if user.is_admin %}
+                    {% if user|has_role:'referee' %}
                         <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
                             <i class="fa fa-file-export"></i> <span class="d-none d-md-inline">Eksport CSV</span>
                         </a>
-                    {% endif %}
-                    {% if user|has_role:'referee' %}
                         <form method="post" class="d-inline">{% csrf_token %}
                             {% if season.state == "draft" %}
                                 <button type="submit" class="btn btn-success" name="action-add-group">

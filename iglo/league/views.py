@@ -89,7 +89,9 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
         return self.render_to_response(context)
 
 
-class SeasonExportCSVView(AdminPermissionRequired, View):
+class SeasonExportCSVView(UserRoleRequired, View):
+    required_roles = [UserRole.REFEREE]
+
     def get(self, request, number):
         response = HttpResponse(
             content_type="text/csv",

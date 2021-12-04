@@ -20,3 +20,5 @@ FIRST_NAME_LABEL = "Imie"
 LAST_NAME_LABEL = "Nazwisko"
 AGREEMENT_HELP_LABEL = mark_safe("Zapoznałem się i zgadzam się z <a href='/rules'>regulaminem ligi</a>")
 PASSWORD_AND_OR_EMAIL_CHANGE_SUCCESS = "Hasło i/lub email zostały zmienione"
+ROLE_REFEREE = "Sędzia"
+ROLE_TEACHER = "Nauczyciel"

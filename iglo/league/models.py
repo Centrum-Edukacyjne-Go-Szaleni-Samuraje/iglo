@@ -627,3 +627,6 @@ class Game(models.Model):
         elif self.external_sgf_link:
             return self.external_sgf_link
         return None
+
+    def is_participant(self, player: Player):
+        return player in [self.black.player, self.white.player]

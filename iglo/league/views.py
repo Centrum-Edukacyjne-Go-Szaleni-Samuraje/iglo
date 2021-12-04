@@ -3,17 +3,18 @@ import datetime
 
 from django.contrib import messages
 
-from django.db.models import Q, Count
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 
+from accounts.models import UserRole
 from league import texts
 from league.forms import (
     GameResultUpdateForm,
     PlayerUpdateForm,
-    GameResultUpdateAdminForm,
+    GameResultUpdateRefereeForm, GameResultUpdateTeacherForm,
 )
 from league.forms import PrepareSeasonForm
 from league.models import (
@@ -26,7 +27,7 @@ from league.models import (
     WinType,
 )
 from league.models import SeasonState
-from league.permissions import AdminPermissionRequired, AdminPermissionForModifyRequired
+from league.permissions import AdminPermissionRequired, UserRoleRequiredForModify, UserRoleRequired
 
 
 class SeasonsListView(ListView):
@@ -50,8 +51,9 @@ class SeasonsListView(ListView):
         )
 
 
-class SeasonDetailView(AdminPermissionForModifyRequired, DetailView):
+class SeasonDetailView(UserRoleRequiredForModify, DetailView):
     model = Season
+    required_roles = [UserRole.REFEREE]
 
     def get_object(self, queryset=None):
         if queryset is None:
@@ -108,8 +110,9 @@ class SeasonExportCSVView(AdminPermissionRequired, View):
         return response
 
 
-class GroupDetailView(AdminPermissionForModifyRequired, DetailView):
+class GroupDetailView(UserRoleRequiredForModify, DetailView):
     model = Group
+    required_roles = [UserRole.REFEREE]
 
     def get_object(self, queryset=None):
         if queryset is None:
@@ -168,8 +171,9 @@ class GameDetailView(DetailView):
         )
 
 
-class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
+class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
     model = Game
+    required_roles = [UserRole.REFEREE, UserRole.TEACHER]
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -186,13 +190,18 @@ class GameUpdateView(AdminPermissionRequired, GameDetailView, UpdateView):
         game = self.get_object()  # TODO: this is not prefect
         return super().test_func() or (
             self.request.user.is_authenticated
-            and self.request.user.player in [game.black.player, game.white.player]
+            and game.is_participant(self.request.user.player)
             and game.group.season.state == SeasonState.IN_PROGRESS
         )
 
     def get_form_class(self):
-        if self.request.user.is_admin:
-            return GameResultUpdateAdminForm
+        if self.request.user.has_role(UserRole.REFEREE):
+            return GameResultUpdateRefereeForm
+        if self.request.user.has_role(UserRole.TEACHER):
+            game = self.get_object()
+            if game.is_participant(self.request.user.player):
+                return GameResultUpdateForm
+            return GameResultUpdateTeacherForm
         return GameResultUpdateForm
 
 
@@ -244,9 +253,10 @@ class PlayerUpdateView(AdminPermissionRequired, UpdateView):
         )
 
 
-class PrepareSeasonView(AdminPermissionRequired, FormView):
+class PrepareSeasonView(UserRoleRequired, FormView):
     template_name = "league/season_prepare.html"
     form_class = PrepareSeasonForm
+    required_roles = [UserRole.REFEREE]
 
     DEFAULT_PROMOTION_COUNT = 2
     DEFAULT_PLAYERS_PER_GROUP = 6

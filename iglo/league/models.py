@@ -1,4 +1,5 @@
 import datetime
+import decimal
 import math
 import random
 import re
@@ -7,6 +8,7 @@ from enum import Enum
 from typing import Optional
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count
 from django.db.models.functions import Ord, Chr
@@ -502,6 +504,14 @@ class GameManager(models.Manager):
         )
 
 
+def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
+    if value is not None:
+        if value < 0:
+            raise ValidationError(texts.POINTS_DIFFERENCE_NEGATIVE_ERROR)
+        if value % 1 != decimal.Decimal("0.5"):
+            raise ValidationError(texts.POINTS_DIFFERENCE_HALF_POINT_ERROR)
+
+
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
@@ -531,7 +541,11 @@ class Game(models.Model):
         choices=WinType.choices, max_length=16, null=True, blank=True
     )
     points_difference = models.DecimalField(
-        null=True, blank=True, max_digits=4, decimal_places=1
+        null=True,
+        blank=True,
+        max_digits=4,
+        decimal_places=1,
+        validators=[points_difference_validator],
     )
 
     date = models.DateTimeField(null=True, blank=True)

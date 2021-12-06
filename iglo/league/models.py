@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 
 from league import texts
-from league.utils import round_robin
+from league.utils import round_robin, shuffle_colors
 
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
@@ -152,7 +152,7 @@ class Season(models.Model):
             members = list(group.members.all())
             current_date = self.start_date
             for round_number, round_pairs in enumerate(
-                round_robin(n=len(members)), start=1
+                shuffle_colors(paring=round_robin(n=len(members))), start=1
             ):
                 round = Round.objects.create(
                     number=round_number,
@@ -163,7 +163,6 @@ class Season(models.Model):
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
                 for pair in round_pairs:
                     game_members = [members[pair[0]], members[pair[1]]]
-                    random.shuffle(game_members)
                     Game.objects.create(
                         group=group,
                         round=round,

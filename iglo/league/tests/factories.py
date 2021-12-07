@@ -29,7 +29,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Group
 
-    name = factory.Sequence(lambda n: string.ascii_uppercase[n])
+    name = factory.Sequence(lambda n: string.ascii_uppercase[n % len(string.ascii_uppercase)])
     season = factory.SubFactory(SeasonFactory)
 
 

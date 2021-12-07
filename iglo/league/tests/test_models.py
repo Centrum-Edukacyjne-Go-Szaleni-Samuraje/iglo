@@ -88,50 +88,8 @@ class MemberTestCase(TestCase):
 class SeasonTestCase(TestCase):
     def test_prepare_season_from_previous(self):
         season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
-        group_a = GroupFactory(season=season, name="A")
-        group_a_member_1 = MemberFactory(group=group_a, order=1)
-        group_a_member_2 = MemberFactory(group=group_a, order=2)
-        group_a_member_3 = MemberFactory(group=group_a, order=3)
-        GameFactory(
-            group=group_a,
-            white=group_a_member_1,
-            black=group_a_member_2,
-            winner=group_a_member_1,
-        )
-        GameFactory(
-            group=group_a,
-            white=group_a_member_1,
-            black=group_a_member_3,
-            winner=group_a_member_1,
-        )
-        GameFactory(
-            group=group_a,
-            white=group_a_member_2,
-            black=group_a_member_3,
-            winner=group_a_member_2,
-        )
-        group_b = GroupFactory(season=season, name="B")
-        group_b_member_1 = MemberFactory(group=group_b, order=1)
-        group_b_member_2 = MemberFactory(group=group_b, order=2)
-        group_b_member_3 = MemberFactory(group=group_b, order=3)
-        GameFactory(
-            group=group_b,
-            white=group_b_member_1,
-            black=group_b_member_2,
-            winner=group_a_member_1,
-        )
-        GameFactory(
-            group=group_b,
-            white=group_b_member_1,
-            black=group_b_member_3,
-            winner=group_a_member_1,
-        )
-        GameFactory(
-            group=group_b,
-            white=group_b_member_2,
-            black=group_b_member_3,
-            winner=group_a_member_2,
-        )
+        group_a_member_1, group_a_member_2, group_a_member_3 = self._create_group(season=season, name="A")
+        group_b_member_1, group_b_member_2, group_b_member_3 = self._create_group(season=season, name="B")
 
         new_season = Season.objects.prepare_season(
             start_date=datetime.date(2021, 1, 1), players_per_group=3, promotion_count=1
@@ -147,41 +105,98 @@ class SeasonTestCase(TestCase):
         new_group_a = new_season.groups.get(name="A")
         self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
         self.assertEqual(new_group_a.members.count(), 3)
-        self.assertTrue(new_group_a.members.filter(player=group_a_member_1.player, order=1).exists())
-        self.assertTrue(new_group_a.members.filter(player=group_a_member_2.player, order=2).exists())
-        self.assertTrue(new_group_a.members.filter(player=group_b_member_1.player, order=3).exists())
+        self._check_players_order(
+            group=new_group_a,
+            players=[
+                group_a_member_1.player,
+                group_a_member_2.player,
+                group_b_member_1.player,
+            ],
+        )
         new_group_b = new_season.groups.get(name="B")
         self.assertEqual(new_group_b.type, GroupType.ROUND_ROBIN)
         self.assertEqual(new_group_b.members.count(), 3)
-        self.assertTrue(new_group_b.members.filter(player=group_a_member_3.player, order=1).exists())
-        self.assertTrue(new_group_b.members.filter(player=group_b_member_2.player, order=2).exists())
-        self.assertTrue(new_group_b.members.filter(player=group_b_member_3.player, order=3).exists())
+        self._check_players_order(
+            group=new_group_b,
+            players=[
+                group_a_member_3.player,
+                group_b_member_2.player,
+                group_b_member_3.player,
+            ],
+        )
 
     def test_prepare_season_with_new_players(self):
         season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
-        group_a = GroupFactory(season=season, name="A")
-        group_a_member_1 = MemberFactory(group=group_a, order=1)
-        group_a_member_2 = MemberFactory(group=group_a, order=2)
-        GameFactory(
-            group=group_a,
-            white=group_a_member_1,
-            black=group_a_member_2,
-            winner=group_a_member_2,
-        )
-        new_player_1 = PlayerFactory(rank=100)
-        new_player_2 = PlayerFactory(rank=200)
+        group_a_member_1, group_a_member_2, group_a_member_3 = self._create_group(season=season, name="A", rank=1000)
+        group_b_member_1, group_b_member_2, group_b_member_3 = self._create_group(season=season, name="B", rank=500)
+        group_c_member_1, group_c_member_2, group_c_member_3 = self._create_group(season=season, name="C", rank=100)
+        new_player_1 = PlayerFactory(auto_join=True, rank=1200)
+        new_player_2 = PlayerFactory(auto_join=True, rank=200)
 
         new_season = Season.objects.prepare_season(
-            start_date=datetime.date(2021, 1, 1), players_per_group=2, promotion_count=1
+            start_date=datetime.date(2021, 1, 1), players_per_group=3, promotion_count=1
         )
 
-        self.assertEqual(new_season.groups.count(), 2)
+        self.assertEqual(new_season.groups.count(), 4)
         new_group_a = new_season.groups.get(name="A")
-        self.assertTrue(new_group_a.members.filter(player=group_a_member_2.player, order=1).exists())
-        self.assertTrue(new_group_a.members.filter(player=group_a_member_1.player, order=2).exists())
+        self._check_players_order(
+            group=new_group_a,
+            players=[
+                group_a_member_1.player,
+                group_a_member_2.player,
+                group_b_member_1.player,
+            ],
+        )
         new_group_b = new_season.groups.get(name="B")
-        self.assertTrue(new_group_b.members.filter(player=new_player_2, order=1).exists())
-        self.assertTrue(new_group_b.members.filter(player=new_player_1, order=2).exists())
+        self._check_players_order(
+            group=new_group_b,
+            players=[group_a_member_3.player, group_b_member_2.player, new_player_1],
+        )
+
+        new_group_c = new_season.groups.get(name="C")
+        self._check_players_order(
+            group=new_group_c,
+            players=[
+                group_c_member_1.player,
+                group_b_member_3.player,
+                group_c_member_2.player,
+            ],
+        )
+        new_group_c = new_season.groups.get(name="D")
+        self._check_players_order(group=new_group_c, players=[group_c_member_3.player, new_player_2])
+
+    def test_prepare_season_without_resigned_players(self):
+        season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
+        group_a_member_1, group_a_member_2, group_a_member_3 = self._create_group(season=season, name="A")
+        group_a_member_3.player.auto_join = False
+        group_a_member_3.player.save()
+        group_b_member_1, group_b_member_2, group_b_member_3 = self._create_group(season=season, name="B")
+
+        new_season = Season.objects.prepare_season(
+            start_date=datetime.date(2021, 1, 1), players_per_group=3, promotion_count=1
+        )
+
+        new_group_a = new_season.groups.get(name="A")
+        self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
+        self.assertEqual(new_group_a.members.count(), 3)
+        self._check_players_order(
+            group=new_group_a,
+            players=[
+                group_a_member_1.player,
+                group_a_member_2.player,
+                group_b_member_1.player,
+            ],
+        )
+        new_group_b = new_season.groups.get(name="B")
+        self.assertEqual(new_group_b.type, GroupType.ROUND_ROBIN)
+        self.assertEqual(new_group_b.members.count(), 2)
+        self._check_players_order(
+            group=new_group_b,
+            players=[
+                group_b_member_2.player,
+                group_b_member_3.player,
+            ],
+        )
 
     def test_prepare_season_with_mcmahon_group(self):
         season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
@@ -210,6 +225,27 @@ class SeasonTestCase(TestCase):
         self.assertTrue(new_group_b.members.filter(player=new_player_3, order=1).exists())
         self.assertTrue(new_group_b.members.filter(player=new_player_2, order=2).exists())
         self.assertTrue(new_group_b.members.filter(player=new_player_1, order=3).exists())
+
+    def test_prepare_season_without_previous_one(self):
+        new_player_1 = PlayerFactory(rank=100)
+        new_player_2 = PlayerFactory(rank=200)
+        new_player_3 = PlayerFactory(rank=300)
+
+        new_season = Season.objects.prepare_season(
+            start_date=datetime.date(2021, 1, 1), players_per_group=3, promotion_count=1
+        )
+
+        new_group_a = new_season.groups.get(name="A")
+        self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
+        self.assertEqual(new_group_a.members.count(), 3)
+        self._check_players_order(
+            group=new_group_a,
+            players=[
+                new_player_3,
+                new_player_2,
+                new_player_1,
+            ],
+        )
 
     def test_prepare_season_when_previous_is_in_draft(self):
         SeasonFactory(state=SeasonState.DRAFT)
@@ -323,6 +359,38 @@ class SeasonTestCase(TestCase):
             .filter(Q(black=member_1, white=member_2) | Q(black=member_2, white=member_1))
             .exists()
         )
+
+    def _create_group(self, season, name, rank=100):
+        group = GroupFactory(season=season, name=name)
+        member_1 = MemberFactory(group=group, order=1, player__rank=rank, rank=rank)
+        member_2 = MemberFactory(group=group, order=2, player__rank=rank, rank=rank)
+        member_3 = MemberFactory(group=group, order=3, player__rank=rank, rank=rank)
+        GameFactory(
+            group=group,
+            white=member_1,
+            black=member_2,
+            winner=member_1,
+        )
+        GameFactory(
+            group=group,
+            white=member_1,
+            black=member_3,
+            winner=member_1,
+        )
+        GameFactory(
+            group=group,
+            white=member_2,
+            black=member_3,
+            winner=member_2,
+        )
+        return member_1, member_2, member_3
+
+    def _check_players_order(self, group, players=None):
+        for order, player in enumerate(players, start=1):
+            self.assertTrue(
+                group.members.filter(player=player, order=order).exists(),
+                f"Player {player} is not on place {order} in group {group}",
+            )
 
 
 class GroupTestCase(TestCase):

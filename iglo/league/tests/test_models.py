@@ -147,27 +147,15 @@ class SeasonTestCase(TestCase):
         new_group_a = new_season.groups.get(name="A")
         self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
         self.assertEqual(new_group_a.members.count(), 3)
-        self.assertTrue(
-            new_group_a.members.filter(player=group_a_member_1.player, order=1).exists()
-        )
-        self.assertTrue(
-            new_group_a.members.filter(player=group_a_member_2.player, order=2).exists()
-        )
-        self.assertTrue(
-            new_group_a.members.filter(player=group_b_member_1.player, order=3).exists()
-        )
+        self.assertTrue(new_group_a.members.filter(player=group_a_member_1.player, order=1).exists())
+        self.assertTrue(new_group_a.members.filter(player=group_a_member_2.player, order=2).exists())
+        self.assertTrue(new_group_a.members.filter(player=group_b_member_1.player, order=3).exists())
         new_group_b = new_season.groups.get(name="B")
         self.assertEqual(new_group_b.type, GroupType.ROUND_ROBIN)
         self.assertEqual(new_group_b.members.count(), 3)
-        self.assertTrue(
-            new_group_b.members.filter(player=group_a_member_3.player, order=1).exists()
-        )
-        self.assertTrue(
-            new_group_b.members.filter(player=group_b_member_2.player, order=2).exists()
-        )
-        self.assertTrue(
-            new_group_b.members.filter(player=group_b_member_3.player, order=3).exists()
-        )
+        self.assertTrue(new_group_b.members.filter(player=group_a_member_3.player, order=1).exists())
+        self.assertTrue(new_group_b.members.filter(player=group_b_member_2.player, order=2).exists())
+        self.assertTrue(new_group_b.members.filter(player=group_b_member_3.player, order=3).exists())
 
     def test_prepare_season_with_new_players(self):
         season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
@@ -189,19 +177,11 @@ class SeasonTestCase(TestCase):
 
         self.assertEqual(new_season.groups.count(), 2)
         new_group_a = new_season.groups.get(name="A")
-        self.assertTrue(
-            new_group_a.members.filter(player=group_a_member_2.player, order=1).exists()
-        )
-        self.assertTrue(
-            new_group_a.members.filter(player=group_a_member_1.player, order=2).exists()
-        )
+        self.assertTrue(new_group_a.members.filter(player=group_a_member_2.player, order=1).exists())
+        self.assertTrue(new_group_a.members.filter(player=group_a_member_1.player, order=2).exists())
         new_group_b = new_season.groups.get(name="B")
-        self.assertTrue(
-            new_group_b.members.filter(player=new_player_2, order=1).exists()
-        )
-        self.assertTrue(
-            new_group_b.members.filter(player=new_player_1, order=2).exists()
-        )
+        self.assertTrue(new_group_b.members.filter(player=new_player_2, order=1).exists())
+        self.assertTrue(new_group_b.members.filter(player=new_player_1, order=2).exists())
 
     def test_prepare_season_with_mcmahon_group(self):
         season = SeasonFactory(promotion_count=1, state=SeasonState.FINISHED, number=1)
@@ -227,15 +207,9 @@ class SeasonTestCase(TestCase):
         self.assertEqual(new_group_a.type, GroupType.ROUND_ROBIN)
         new_group_b = new_season.groups.get(name="B")
         self.assertEqual(new_group_b.type, GroupType.MCMAHON)
-        self.assertTrue(
-            new_group_b.members.filter(player=new_player_3, order=1).exists()
-        )
-        self.assertTrue(
-            new_group_b.members.filter(player=new_player_2, order=2).exists()
-        )
-        self.assertTrue(
-            new_group_b.members.filter(player=new_player_1, order=3).exists()
-        )
+        self.assertTrue(new_group_b.members.filter(player=new_player_3, order=1).exists())
+        self.assertTrue(new_group_b.members.filter(player=new_player_2, order=2).exists())
+        self.assertTrue(new_group_b.members.filter(player=new_player_1, order=3).exists())
 
     def test_prepare_season_when_previous_is_in_draft(self):
         SeasonFactory(state=SeasonState.DRAFT)
@@ -330,9 +304,7 @@ class SeasonTestCase(TestCase):
             season.finish()
 
     def test_start_with_mcmahon_group(self):
-        season = SeasonFactory(
-            state=SeasonState.DRAFT, start_date=datetime.date(2021, 1, 1)
-        )
+        season = SeasonFactory(state=SeasonState.DRAFT, start_date=datetime.date(2021, 1, 1))
         group = GroupFactory(season=season, type=GroupType.MCMAHON)
         MemberFactory(group=group)
         MemberFactory(group=group)
@@ -346,14 +318,10 @@ class SeasonTestCase(TestCase):
             Game.objects.filter(
                 group=round.group,
                 round=round,
-                date=datetime.datetime.combine(
-                    round.end_date, settings.DEFAULT_GAME_TIME
-                ),
+                date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
             )
-                .filter(
-                Q(black=member_1, white=member_2) | Q(black=member_2, white=member_1)
-            )
-                .exists()
+            .filter(Q(black=member_1, white=member_2) | Q(black=member_2, white=member_1))
+            .exists()
         )
 
 
@@ -438,8 +406,7 @@ class GroupTestCase(TestCase):
 
 
 class GameTestCase(TestCase):
-
     def test_external_sgf_link(self):
-        game = GameFactory(link='https://online-go.com/game/33759361')
+        game = GameFactory(link="https://online-go.com/game/33759361")
 
         self.assertEqual(game.external_sgf_link, "https://online-go.com/api/v1/games/33759361/sgf")

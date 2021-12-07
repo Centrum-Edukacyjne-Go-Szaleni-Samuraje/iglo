@@ -30,9 +30,7 @@ class SeasonState(TextChoices):
 
 
 class SeasonManager(models.Manager):
-    def prepare_season(
-        self, start_date: datetime.date, players_per_group: int, promotion_count: int
-    ) -> "Season":
+    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int) -> "Season":
         previous_season = Season.objects.first()
         if previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
@@ -40,18 +38,13 @@ class SeasonManager(models.Manager):
             state=SeasonState.DRAFT,
             number=previous_season.number + 1,
             start_date=start_date,
-            end_date=start_date
-            + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+            end_date=start_date + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
         season_players = []
         for group in previous_season.groups.order_by("name"):
-            group_players = [
-                member.player
-                for member in group.members_qualification
-                if member.player.auto_join
-            ]
+            group_players = [member.player for member in group.members_qualification if member.player.auto_join]
             season_players = (
                 season_players[: -previous_season.promotion_count]
                 + group_players[: previous_season.promotion_count]
@@ -59,15 +52,11 @@ class SeasonManager(models.Manager):
                 + group_players[previous_season.promotion_count :]
             )
         season_players.extend(
-            Player.objects.filter(auto_join=True)
-            .order_by("-rank")
-            .exclude(id__in=[p.id for p in season_players])
+            Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in season_players])
         )
         last_group = None
         for group_order in range(math.ceil(len(season_players) / players_per_group)):
-            group_players = season_players[
-                group_order * players_per_group : (group_order + 1) * players_per_group
-            ]
+            group_players = season_players[group_order * players_per_group : (group_order + 1) * players_per_group]
             if len(group_players) < max((players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
@@ -79,9 +68,7 @@ class SeasonManager(models.Manager):
                     type=GroupType.ROUND_ROBIN,
                 )
                 last_group = group
-            for player_order, player in enumerate(
-                group_players, start=group.members.count() + 1
-            ):
+            for player_order, player in enumerate(group_players, start=group.members.count() + 1):
                 Member.objects.create(
                     group=group,
                     order=player_order,
@@ -96,9 +83,7 @@ class SeasonManager(models.Manager):
             Season.objects.prefetch_related("groups")
             .annotate(
                 all_games=Count("groups__games"),
-                played_games=Count(
-                    "groups__games", filter=Q(groups__games__winner__isnull=False)
-                ),
+                played_games=Count("groups__games", filter=Q(groups__games__winner__isnull=False)),
             )
             .annotate(games_progress=(F("played_games") * 100) / F("all_games"))
             .latest("number")
@@ -153,9 +138,7 @@ class Season(models.Model):
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             current_date = self.start_date
-            for round_number, round_pairs in enumerate(
-                shuffle_colors(paring=round_robin(n=len(members))), start=1
-            ):
+            for round_number, round_pairs in enumerate(shuffle_colors(paring=round_robin(n=len(members))), start=1):
                 round = Round.objects.create(
                     number=round_number,
                     group=group,
@@ -170,9 +153,7 @@ class Season(models.Model):
                         round=round,
                         black=game_members[0],
                         white=game_members[1],
-                        date=datetime.datetime.combine(
-                            round.end_date, settings.DEFAULT_GAME_TIME
-                        ),
+                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
                     )
 
     def finish(self) -> None:
@@ -217,9 +198,7 @@ class Group(models.Model):
         table = []
         players_to_game = {
             frozenset({game.black.player, game.white.player}): game
-            for game in self.games.select_related(
-                "black__player", "white__player", "winner"
-            ).all()
+            for game in self.games.select_related("black__player", "white__player", "winner").all()
         }
         for member in self.members.select_related("player").all():
             row = []
@@ -228,9 +207,7 @@ class Group(models.Model):
                     row.append((other_member, None))
                 else:
                     try:
-                        game = players_to_game[
-                            frozenset({member.player, other_member.player})
-                        ]
+                        game = players_to_game[frozenset({member.player, other_member.player})]
                         row.append((other_member, game.game_result_for(member)))
                     except KeyError:
                         row.append((other_member, None))
@@ -268,9 +245,7 @@ class Group(models.Model):
     def delete_member(self, member_id: int) -> None:
         self.season.validate_state(state=SeasonState.DRAFT)
         member_to_remove = self.members.get(id=member_id)
-        self.members.filter(order__gt=member_to_remove.order).update(
-            order=F("order") - 1
-        )
+        self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
         member_to_remove.delete()
 
     def move_member_up(self, member_id: int) -> None:
@@ -319,9 +294,7 @@ class Group(models.Model):
 
     def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
         member_to_remove = self.members.get(player__nick=player_nick_to_remove)
-        self.members.filter(order__gt=member_to_remove.order).update(
-            order=F("order") - 1
-        )
+        self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
         player_to_add = Player.objects.get(nick=player_nick_to_add)
         new_member = Member.objects.create(
             group=self,
@@ -338,9 +311,7 @@ class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
-    user = models.OneToOneField(
-        "accounts.User", null=True, on_delete=models.SET_NULL, blank=True
-    )
+    user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
@@ -376,9 +347,7 @@ class MemberManager(models.Manager):
 
 
 class Member(models.Model):
-    player = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name="memberships"
-    )
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
@@ -432,16 +401,9 @@ class Member(models.Model):
 
     @cached_property
     def result(self) -> MemberResult:
-        if (
-            self
-            in self.group.members_qualification[: self.group.season.promotion_count]
-            and not self.group.is_first
-        ):
+        if self in self.group.members_qualification[: self.group.season.promotion_count] and not self.group.is_first:
             return MemberResult.PROMOTION
-        if (
-            self
-            in self.group.members_qualification[-self.group.season.promotion_count :]
-        ):
+        if self in self.group.members_qualification[-self.group.season.promotion_count :]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
 
@@ -473,11 +435,7 @@ class WinType(models.TextChoices):
 class GameManager(models.Manager):
     def get_upcoming_game(self, member: Member) -> Optional["Game"]:
         try:
-            return (
-                self.get_for_member(member=member)
-                .filter(win_type__isnull=True)
-                .earliest("round__number")
-            )
+            return self.get_for_member(member=member).filter(win_type__isnull=True).earliest("round__number")
         except Game.DoesNotExist:
             return None
 
@@ -537,9 +495,7 @@ class Game(models.Model):
         related_name="won_games",
         blank=True,
     )
-    win_type = models.CharField(
-        choices=WinType.choices, max_length=16, null=True, blank=True
-    )
+    win_type = models.CharField(choices=WinType.choices, max_length=16, null=True, blank=True)
     points_difference = models.DecimalField(
         null=True,
         blank=True,
@@ -581,9 +537,7 @@ class Game(models.Model):
         winner_color = "B" if self.winner == self.black else "W"
         if self.win_type:
             win_type = (
-                self.points_difference or 0.5
-                if self.win_type == WinType.POINTS
-                else WinType(self.win_type).label
+                self.points_difference or 0.5 if self.win_type == WinType.POINTS else WinType(self.win_type).label
             )
             return f"{winner_color}+{win_type}"
         return winner_color

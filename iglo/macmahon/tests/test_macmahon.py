@@ -3,7 +3,7 @@ from operator import itemgetter
 import pytest
 
 from macmahon import MacMahon, Color, ColorPreference, Pair
-from tests.conftest import alice, bob, cindy, dean, eve, floyd
+from macmahon.tests.conftest import alice, bob, cindy, dean, eve, floyd
 
 
 def test_get_bye_odd_players(players):

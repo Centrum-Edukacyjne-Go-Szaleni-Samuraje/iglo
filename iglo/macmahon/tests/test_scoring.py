@@ -1,7 +1,7 @@
 import pytest
 
 from macmahon import Player, Scoring, Score
-from tests.conftest import alice, bob, dean, eve, cindy
+from macmahon.tests.conftest import alice, bob, dean, eve, cindy
 
 
 @pytest.mark.parametrize('player, expected_score', [

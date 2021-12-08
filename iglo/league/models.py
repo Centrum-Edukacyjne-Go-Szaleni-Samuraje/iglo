@@ -1,10 +1,10 @@
 import datetime
 import decimal
 import math
-import random
 import re
 import string
 from enum import Enum
+from statistics import mean
 from typing import Optional
 
 from django.conf import settings
@@ -32,32 +32,59 @@ class SeasonState(TextChoices):
 class SeasonManager(models.Manager):
     def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int) -> "Season":
         previous_season = Season.objects.first()
-        if previous_season.state != SeasonState.FINISHED:
+        if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
         season = self.create(
             state=SeasonState.DRAFT,
-            number=previous_season.number + 1,
+            number=previous_season.number + 1 if previous_season else 1,
             start_date=start_date,
             end_date=start_date + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season_players = []
-        for group in previous_season.groups.order_by("name"):
-            group_players = [member.player for member in group.members_qualification if member.player.auto_join]
-            season_players = (
-                season_players[: -previous_season.promotion_count]
-                + group_players[: previous_season.promotion_count]
-                + season_players[-previous_season.promotion_count :]
-                + group_players[previous_season.promotion_count :]
+        players = self._get_former_players(season=previous_season) if previous_season else []
+        players = self._redistribute_new_players(players=players, players_per_group=players_per_group)
+        self._create_groups(season=season, players=players)
+        return season
+
+    def _get_former_players(self, season: "Season") -> list["Player"]:
+        players = []
+        for group in season.groups.order_by("name"):
+            group_players = [member.player for member in group.members_qualification]
+            players = (
+                players[: -season.promotion_count]
+                + group_players[: season.promotion_count]
+                + players[-season.promotion_count :]
+                + group_players[season.promotion_count :]
             )
-        season_players.extend(
-            Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in season_players])
-        )
+        return [player for player in players if player.auto_join]
+
+    def _redistribute_new_players(self, players: list["Player"], players_per_group: int) -> list["Player"]:
+        result = players[:]
+        new_players = Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in result])
+        for new_player in new_players:
+            add_to_next = False
+            previous_avg_rank = None
+            for group_order in range(math.ceil(len(result) / players_per_group)):
+                group_players = result[group_order * players_per_group : (group_order + 1) * players_per_group]
+                avg_rank = mean(player.rank for player in group_players)
+                if add_to_next and previous_avg_rank > avg_rank:
+                    result.insert((group_order + 1) * players_per_group - 1, new_player)
+                    break
+                if avg_rank < new_player.rank:
+                    add_to_next = True
+                previous_avg_rank = avg_rank
+            else:
+                result.append(new_player)
+        return result
+
+    def _create_groups(self, season: "Season", players: list["Player"]) -> None:
         last_group = None
-        for group_order in range(math.ceil(len(season_players) / players_per_group)):
-            group_players = season_players[group_order * players_per_group : (group_order + 1) * players_per_group]
-            if len(group_players) < max((players_per_group - 1), 2) and last_group:
+        for group_order in range(math.ceil(len(players) / season.players_per_group)):
+            group_players = players[
+                group_order * season.players_per_group : (group_order + 1) * season.players_per_group
+            ]
+            if len(group_players) < max((season.players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
                 group.save()
@@ -75,8 +102,6 @@ class SeasonManager(models.Manager):
                     player=player,
                     rank=player.rank,
                 )
-
-        return season
 
     def get_latest(self) -> Optional["Season"]:
         return (

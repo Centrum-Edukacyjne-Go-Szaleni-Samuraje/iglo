@@ -1,12 +1,14 @@
 import datetime
+import decimal
 import math
-import random
 import re
 import string
 from enum import Enum
+from statistics import mean
 from typing import Optional
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count
 from django.db.models.functions import Ord, Chr
@@ -15,7 +17,7 @@ from django.utils.functional import cached_property
 
 import macmahon
 from league import texts
-from league.utils import round_robin
+from league.utils import round_robin, shuffle_colors
 
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
@@ -29,45 +31,61 @@ class SeasonState(TextChoices):
 
 
 class SeasonManager(models.Manager):
-    def prepare_season(
-        self, start_date: datetime.date, players_per_group: int, promotion_count: int
-    ) -> "Season":
+    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int) -> "Season":
         previous_season = Season.objects.first()
-        if previous_season.state != SeasonState.FINISHED:
+        if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
         season = self.create(
             state=SeasonState.DRAFT,
-            number=previous_season.number + 1,
+            number=previous_season.number + 1 if previous_season else 1,
             start_date=start_date,
-            end_date=start_date
-            + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
+            end_date=start_date + datetime.timedelta(days=(players_per_group - 1) * DAYS_PER_GAME - 1),
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season_players = []
-        for group in previous_season.groups.order_by("name"):
-            group_players = [
-                member.player
-                for member in group.members_qualification
-                if member.player.auto_join
-            ]
-            season_players = (
-                season_players[: -previous_season.promotion_count]
-                + group_players[: previous_season.promotion_count]
-                + season_players[-previous_season.promotion_count :]
-                + group_players[previous_season.promotion_count :]
+        players = self._get_former_players(season=previous_season) if previous_season else []
+        players = self._redistribute_new_players(players=players, players_per_group=players_per_group)
+        self._create_groups(season=season, players=players)
+        return season
+
+    def _get_former_players(self, season: "Season") -> list["Player"]:
+        players = []
+        for group in season.groups.order_by("name"):
+            group_players = [member.player for member in group.members_qualification]
+            players = (
+                players[: -season.promotion_count]
+                + group_players[: season.promotion_count]
+                + players[-season.promotion_count :]
+                + group_players[season.promotion_count :]
             )
-        season_players.extend(
-            Player.objects.filter(auto_join=True)
-            .order_by("-rank")
-            .exclude(id__in=[p.id for p in season_players])
-        )
+        return [player for player in players if player.auto_join]
+
+    def _redistribute_new_players(self, players: list["Player"], players_per_group: int) -> list["Player"]:
+        result = players[:]
+        new_players = Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in result])
+        for new_player in new_players:
+            add_to_next = False
+            previous_avg_rank = None
+            for group_order in range(math.ceil(len(result) / players_per_group)):
+                group_players = result[group_order * players_per_group : (group_order + 1) * players_per_group]
+                avg_rank = mean(player.rank for player in group_players)
+                if add_to_next and previous_avg_rank > avg_rank:
+                    result.insert((group_order + 1) * players_per_group - 1, new_player)
+                    break
+                if avg_rank < new_player.rank:
+                    add_to_next = True
+                previous_avg_rank = avg_rank
+            else:
+                result.append(new_player)
+        return result
+
+    def _create_groups(self, season: "Season", players: list["Player"]) -> None:
         last_group = None
-        for group_order in range(math.ceil(len(season_players) / players_per_group)):
-            group_players = season_players[
-                group_order * players_per_group : (group_order + 1) * players_per_group
+        for group_order in range(math.ceil(len(players) / season.players_per_group)):
+            group_players = players[
+                group_order * season.players_per_group : (group_order + 1) * season.players_per_group
             ]
-            if len(group_players) < max((players_per_group - 1), 2) and last_group:
+            if len(group_players) < max((season.players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
                 group.save()
@@ -78,9 +96,7 @@ class SeasonManager(models.Manager):
                     type=GroupType.ROUND_ROBIN,
                 )
                 last_group = group
-            for player_order, player in enumerate(
-                group_players, start=group.members.count() + 1
-            ):
+            for player_order, player in enumerate(group_players, start=group.members.count() + 1):
                 Member.objects.create(
                     group=group,
                     order=player_order,
@@ -89,16 +105,14 @@ class SeasonManager(models.Manager):
                 )
             if group.type == GroupType.MCMAHON:
                 group.set_initial_score()
-        return season
+
 
     def get_latest(self) -> Optional["Season"]:
         return (
             Season.objects.prefetch_related("groups")
             .annotate(
                 all_games=Count("groups__games"),
-                played_games=Count(
-                    "groups__games", filter=Q(groups__games__winner__isnull=False)
-                ),
+                played_games=Count("groups__games", filter=Q(groups__games__winner__isnull=False)),
             )
             .annotate(games_progress=(F("played_games") * 100) / F("all_games"))
             .latest("number")
@@ -153,9 +167,7 @@ class Season(models.Model):
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             current_date = self.start_date
-            for round_number, round_pairs in enumerate(
-                round_robin(n=len(members)), start=1
-            ):
+            for round_number, round_pairs in enumerate(shuffle_colors(paring=round_robin(n=len(members))), start=1):
                 round = Round.objects.create(
                     number=round_number,
                     group=group,
@@ -165,15 +177,12 @@ class Season(models.Model):
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
                 for pair in round_pairs:
                     game_members = [members[pair[0]], members[pair[1]]]
-                    random.shuffle(game_members)
                     Game.objects.create(
                         group=group,
                         round=round,
                         black=game_members[0],
                         white=game_members[1],
-                        date=datetime.datetime.combine(
-                            round.end_date, settings.DEFAULT_GAME_TIME
-                        ),
+                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
                     )
 
     def finish(self) -> None:
@@ -222,9 +231,7 @@ class Group(models.Model):
         table = []
         players_to_game = {
             frozenset({game.black.player, game.white.player}): game
-            for game in self.games.select_related(
-                "black__player", "white__player", "winner"
-            ).all()
+            for game in self.games.select_related("black__player", "white__player", "winner").all()
         }
         for member in self.members.select_related("player").all():
             row = []
@@ -233,9 +240,7 @@ class Group(models.Model):
                     row.append((other_member, None))
                 else:
                     try:
-                        game = players_to_game[
-                            frozenset({member.player, other_member.player})
-                        ]
+                        game = players_to_game[frozenset({member.player, other_member.player})]
                         row.append((other_member, game.game_result_for(member)))
                     except KeyError:
                         row.append((other_member, None))
@@ -273,9 +278,7 @@ class Group(models.Model):
     def delete_member(self, member_id: int) -> None:
         self.season.validate_state(state=SeasonState.DRAFT)
         member_to_remove = self.members.get(id=member_id)
-        self.members.filter(order__gt=member_to_remove.order).update(
-            order=F("order") - 1
-        )
+        self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
         member_to_remove.delete()
 
     def move_member_up(self, member_id: int) -> None:
@@ -324,9 +327,7 @@ class Group(models.Model):
 
     def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
         member_to_remove = self.members.get(player__nick=player_nick_to_remove)
-        self.members.filter(order__gt=member_to_remove.order).update(
-            order=F("order") - 1
-        )
+        self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
         player_to_add = Player.objects.get(nick=player_nick_to_add)
         new_member = Member.objects.create(
             group=self,
@@ -359,9 +360,7 @@ class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
-    user = models.OneToOneField(
-        "accounts.User", null=True, on_delete=models.SET_NULL, blank=True
-    )
+    user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
@@ -397,9 +396,7 @@ class MemberManager(models.Manager):
 
 
 class Member(models.Model):
-    player = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name="memberships"
-    )
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
@@ -454,16 +451,9 @@ class Member(models.Model):
 
     @cached_property
     def result(self) -> MemberResult:
-        if (
-            self
-            in self.group.members_qualification[: self.group.season.promotion_count]
-            and not self.group.is_first
-        ):
+        if self in self.group.members_qualification[: self.group.season.promotion_count] and not self.group.is_first:
             return MemberResult.PROMOTION
-        if (
-            self
-            in self.group.members_qualification[-self.group.season.promotion_count :]
-        ):
+        if self in self.group.members_qualification[-self.group.season.promotion_count :]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
 
@@ -495,11 +485,7 @@ class WinType(models.TextChoices):
 class GameManager(models.Manager):
     def get_upcoming_game(self, member: Member) -> Optional["Game"]:
         try:
-            return (
-                self.get_for_member(member=member)
-                .filter(win_type__isnull=True)
-                .earliest("round__number")
-            )
+            return self.get_for_member(member=member).filter(win_type__isnull=True).earliest("round__number")
         except Game.DoesNotExist:
             return None
 
@@ -524,6 +510,14 @@ class GameManager(models.Manager):
             win_type=WinType.BYE,
             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
         )
+
+
+def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
+    if value is not None:
+        if value < 0:
+            raise ValidationError(texts.POINTS_DIFFERENCE_NEGATIVE_ERROR)
+        if value % 1 != decimal.Decimal("0.5"):
+            raise ValidationError(texts.POINTS_DIFFERENCE_HALF_POINT_ERROR)
 
 
 class Game(models.Model):
@@ -551,11 +545,13 @@ class Game(models.Model):
         related_name="won_games",
         blank=True,
     )
-    win_type = models.CharField(
-        choices=WinType.choices, max_length=16, null=True, blank=True
-    )
+    win_type = models.CharField(choices=WinType.choices, max_length=16, null=True, blank=True)
     points_difference = models.DecimalField(
-        null=True, blank=True, max_digits=4, decimal_places=1
+        null=True,
+        blank=True,
+        max_digits=4,
+        decimal_places=1,
+        validators=[points_difference_validator],
     )
 
     date = models.DateTimeField(null=True, blank=True)
@@ -591,9 +587,7 @@ class Game(models.Model):
         winner_color = "B" if self.winner == self.black else "W"
         if self.win_type:
             win_type = (
-                self.points_difference or 0.5
-                if self.win_type == WinType.POINTS
-                else WinType(self.win_type).label
+                self.points_difference or 0.5 if self.win_type == WinType.POINTS else WinType(self.win_type).label
             )
             return f"{winner_color}+{win_type}"
         return winner_color
@@ -650,3 +644,6 @@ class Game(models.Model):
         elif self.external_sgf_link:
             return self.external_sgf_link
         return None
+
+    def is_participant(self, player: Player):
+        return player in [self.black.player, self.white.player]

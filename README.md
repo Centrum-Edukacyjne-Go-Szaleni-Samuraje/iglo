@@ -7,6 +7,7 @@ Local development (inside Python venv):
 ```
 $ pip install poetry
 $ poetry install
+$ docker run --name iglo-db -p 5432:5432 -d postgres
 $ python iglo/manage.py migrate
 $ python iglo/manage.py runserver
 ```

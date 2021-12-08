@@ -18,10 +18,10 @@
                     <h2>Sezon #{{ object.number }}</h2>
                     <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                 </div>
-                {% if user.is_admin %}
-                    <div>
+                <div>
+                    {% if user|has_role:'referee' %}
                         <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
-                            <i class="fa fa-file-export"></i> Eksport CSV
+                            <i class="fa fa-file-export"></i> <span class="d-none d-md-inline">Eksport CSV</span>
                         </a>
                         <form method="post" class="d-inline">{% csrf_token %}
                             {% if season.state == "draft" %}
@@ -33,12 +33,12 @@
                                 </button>
                             {% elif season.state == "in_progress" %}
                                 <button type="submit" class="btn btn-danger" name="action-finish-season">
-                                    Zakończ Sezon
+                                    <i class="fa fa-flag-checkered"></i> <span class="d-none d-md-inline">Zakończ Sezon</span>
                                 </button>
                             {% endif %}
                         </form>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
             <h5 class="text-muted mb-4">
                 {{ season.start_date }} - {{ season.end_date }}
@@ -65,7 +65,7 @@
                             </p>
                         </div>
                         <div>
-                            {% if user.is_admin and season.state == "draft" %}
+                            {% if user|has_role:'referee' and season.state == "draft" %}
                                 <form method="post" class="d-inline">{% csrf_token %}
                                     <input type="hidden" value="{{ group.id }}" name="group_id">
                                     <button type="submit" class="btn btn-danger" name="action-delete-group">Usuń

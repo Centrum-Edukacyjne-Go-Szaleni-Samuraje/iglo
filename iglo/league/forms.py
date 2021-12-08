@@ -40,6 +40,9 @@ class GameResultUpdateForm(forms.ModelForm):
         help_texts = {
             "sgf": texts.SGF_HELP_TEXT,
         }
+        widgets = {
+            "points_difference": forms.NumberInput(attrs={"step": 1, "min": 0.5}),
+        }
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -63,10 +66,16 @@ class GameResultUpdateForm(forms.ModelForm):
             self.add_error(
                 field="points_difference", error=texts.POINTS_DIFFERENCE_REQUIRED_ERROR
             )
+        if (
+            win_type
+            and win_type != WinType.NOT_PLAYED
+            and not (cleaned_data["sgf"] or cleaned_data["link"])
+        ):
+            self.add_error(field=None, error=texts.SGF_OR_LINK_REQUIRED_ERROR)
         return cleaned_data
 
 
-class GameResultUpdateAdminForm(GameResultUpdateForm):
+class GameResultUpdateRefereeForm(GameResultUpdateForm):
     class Meta(GameResultUpdateForm.Meta):
         model = Game
         fields = GameResultUpdateForm.Meta.fields + [
@@ -77,6 +86,19 @@ class GameResultUpdateAdminForm(GameResultUpdateForm):
             "review_video_link": "Komentarz na YouTube",
             "ai_analyse_link": "Analiza AI Sensei",
         }
+
+
+class GameResultUpdateTeacherForm(GameResultUpdateRefereeForm):
+    enabled_fields = [
+        "review_video_link",
+        "ai_analyse_link",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name not in self.enabled_fields:
+                field.disabled = True
 
 
 class PlayerUpdateForm(forms.ModelForm):

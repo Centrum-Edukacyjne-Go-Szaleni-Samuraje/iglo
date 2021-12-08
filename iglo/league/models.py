@@ -15,7 +15,7 @@ from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 from django.utils.functional import cached_property
 
-import macmahon
+import macmahon.macmahon as mm
 from league import texts
 from league.utils import round_robin, shuffle_colors
 
@@ -348,10 +348,9 @@ class Group(models.Model):
         self.validate_type(GroupType.MCMAHON)
         members = self.members.all()
         registered_players = [(member.player.nick, member.rank) for member in members]
-        initial_ordering = macmahon.BasicInitialOrdering(number_of_bars=2).order(registered_players)
+        initial_ordering = mm.BasicInitialOrdering(number_of_bars=2).order(registered_players)
         for member in members:
-            ordered_player = next(player for player in initial_ordering if player.name == member.player.nick)
-            initial_score = ordered_player.initial_score
+            initial_score = next(p.initial_score for p in initial_ordering if p.name == member.player.nick)
             member.initial_score = initial_score
         Member.objects.bulk_update(members, ['initial_score'])
 

@@ -1,6 +1,6 @@
 import pytest
 
-from macmahon import GameRecord, Player, ResultType, Color, Scoring
+from macmahon.macmahon import Player, GameRecord, Color, ResultType, Scoring
 
 alice = Player('Alice', 400, 0, games=[
     GameRecord('Bob', Color.BLACK, ResultType.WIN),

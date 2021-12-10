@@ -1,6 +1,6 @@
 import pytest
 
-from macmahon import BasicInitialOrdering
+from macmahon.macmahon import BasicInitialOrdering
 
 
 @pytest.mark.parametrize('players_number, bars_number, expected_bars_sizes', [

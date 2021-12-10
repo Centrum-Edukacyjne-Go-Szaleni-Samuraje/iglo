@@ -2,7 +2,7 @@ from operator import itemgetter
 
 import pytest
 
-from macmahon import MacMahon, Color, ColorPreference, Pair
+from macmahon.macmahon import MacMahon, Color, ColorPreference, Pair
 from macmahon.tests.conftest import alice, bob, cindy, dean, eve, floyd
 
 

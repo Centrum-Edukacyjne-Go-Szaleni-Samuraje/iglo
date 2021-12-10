@@ -1,6 +1,6 @@
 import pytest
 
-from macmahon import Player, Scoring, Score
+from macmahon.macmahon import Player, Scoring, Score
 from macmahon.tests.conftest import alice, bob, dean, eve, cindy
 
 

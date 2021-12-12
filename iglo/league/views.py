@@ -3,7 +3,7 @@ import datetime
 
 from django.contrib import messages
 
-from django.db.models import Count
+from django.db.models import Q, Count, Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -129,7 +129,11 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
                 "rounds__games__white__player",
                 "rounds__games__black__player",
                 "rounds__games__winner__player",
-            ),
+            ).annotate(
+                all_games_finished=~Exists(Game.objects.filter(
+                    group=OuterRef('id'),
+                    win_type__isnull=True
+                ))),
             season__number=self.kwargs["season_number"],
             name__iexact=self.kwargs["group_name"],
         )
@@ -139,10 +143,13 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
         context = self.get_context_data(object=self.object)
         if "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
+            self.object.set_initial_score()
         elif "action-up" in request.POST:
             self.object.move_member_up(member_id=int(request.POST["member_id"]))
+            self.object.set_initial_score()
         elif "action-down" in request.POST:
             self.object.move_member_down(member_id=int(request.POST["member_id"]))
+            self.object.set_initial_score()
         elif "action-add" in request.POST:
             try:
                 self.object.add_member(player_nick=request.POST["player_nick"])
@@ -152,7 +159,8 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
                     messages.WARNING,
                     texts.MISSING_PLAYER_ERROR,
                 )
-        self.object.set_initial_score()
+        elif "action-pairing" in request.POST:
+            self.object.start_macmahon_round()
         return self.render_to_response(context)
 
 

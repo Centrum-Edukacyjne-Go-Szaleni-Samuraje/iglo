@@ -15,9 +15,9 @@ from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 from django.utils.functional import cached_property
 
-from macmahon import macmahon as mm
 from league import texts
 from league.utils import round_robin, shuffle_colors
+from macmahon import macmahon as mm
 
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
@@ -262,6 +262,10 @@ class Group(models.Model):
         return chr(ord(self.name) + 1)
 
     @cached_property
+    def latest_round(self) -> 'Round':
+        return self.rounds.order_by('-number').first()
+
+    @cached_property
     def members_qualification(self) -> list["Member"]:
         return sorted(
             [
@@ -354,6 +358,64 @@ class Group(models.Model):
             initial_score = ordered_player.initial_score
             member.initial_score = initial_score
         Member.objects.bulk_update(members, ['initial_score'])
+
+    def start_macmahon_round(self):
+        self.validate_type(GroupType.MCMAHON)
+        if self.latest_round:
+            self.latest_round.validate_is_completed()
+            start_date = self.latest_round.end_date + datetime.timedelta(days=1)
+            end_date = start_date + datetime.timedelta(days=7)
+            number = self.latest_round.number + 1
+        else:
+            start_date = self.season.start_date
+            end_date = start_date + datetime.timedelta(days=7)
+            number = 1
+
+        new_round = Round.objects.create(
+            group=self,
+            number=number,
+            start_date=start_date,
+            end_date=end_date
+        )
+
+        players = self.get_macmahon_players()
+        pairs, bye = mm.prepare_next_round(players)
+
+        for pair in pairs:
+            print(f'Creating game for: {pair}')
+            black = Member.objects.get(player__nick=pair.black.name, group=self)
+            white = Member.objects.get(player__nick=pair.white.name, group=self)
+            Game.objects.create(
+                group=self,
+                round=new_round,
+                black=black,
+                white=white,
+                date=datetime.datetime.combine(
+                    new_round.end_date, settings.DEFAULT_GAME_TIME
+                )
+            )
+        Game.objects.create_bye_game(self, new_round, Member.objects.get(player__nick=bye.name, group=self))
+
+    def get_macmahon_players(self):
+        members = Member.objects.filter(group=self).prefetch_related('player').all()
+        players = []
+        for member in members:
+            player = mm.Player(
+                name=member.player.nick,
+                rating=member.rank,
+                initial_score=member.initial_score,
+            )
+            games = Game.objects.filter(Q(white=member) | Q(black=member) | Q(winner=member)).all()
+            for game in games:
+                if game.is_bye:
+                    player.games.append(mm.GameRecord('', mm.Color.BYE, mm.ResultType.BYE))
+                elif game.is_played:
+                    opponent = game.get_opponent(member).player.nick
+                    color = mm.Color.BLACK if game.black == member else mm.Color.WHITE
+                    result = mm.ResultType.WIN if game.winner == member else mm.ResultType.LOSE
+                    player.games.append(mm.GameRecord(opponent, color, result))
+            players.append(player)
+        return players
 
 
 class Player(models.Model):
@@ -462,6 +524,10 @@ def game_upload_to(instance, filename) -> str:
     return f"games/season-{instance.group.season.number}-group-{instance.group.name}-game-{instance.black.player.nick}-{instance.white.player.nick}.sgf"
 
 
+class RoundNotYetCompletedError(Exception):
+    pass
+
+
 class Round(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="rounds")
     number = models.SmallIntegerField()
@@ -472,6 +538,13 @@ class Round(models.Model):
         if not self.start_date or not self.end_date:
             return False
         return self.start_date <= datetime.date.today() <= self.end_date
+
+    def is_completed(self) -> bool:
+        return all(game.is_played for game in self.games.all())
+
+    def validate_is_completed(self):
+        if not self.is_completed():
+            raise RoundNotYetCompletedError(f'Round: {self} not yet completed')
 
 
 class WinType(models.TextChoices):

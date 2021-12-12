@@ -1,4 +1,6 @@
 import math
+import random
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Iterable, Optional, Iterator, Tuple
@@ -114,8 +116,11 @@ class Scoring:
         return sorted(scores.values(), reverse=True)
 
 
+Pairing = Tuple[List[Pair], Optional[Player]]
+
+
 class MacMahon:
-    def get_pairing(self, sorted_players: List[Player]) -> Tuple[List[Pair], Player]:
+    def get_pairing(self, sorted_players: List[Player]) -> Pairing:
         players = sorted_players[:]
         pairs = []
         bye = self.get_bye(players)
@@ -147,6 +152,8 @@ class MacMahon:
 
     def get_color_preference(self, player: Player) -> ColorPreference:
         color_history = [g.color for g in player.games if g.color != Color.BYE]
+        if not color_history:
+            return ColorPreference(True, True, True, True)
         games_as_black = sum(1 for c in color_history if c == Color.BLACK)
         games_as_white = sum(1 for c in color_history if c == Color.WHITE)
         can_play_black = games_as_black - games_as_white < 2
@@ -172,3 +179,14 @@ class MacMahon:
             return Color.BLACK, Color.WHITE
         if not p2.should_play_as_white:
             return Color.WHITE, Color.BLACK
+        colors = [Color.WHITE, Color.BLACK]
+        random.shuffle(colors)
+        return tuple(colors)
+
+
+def prepare_next_round(players: List[Player]) -> Pairing:
+    scoring = Scoring()
+    scores = scoring.get_scores(players)
+    sorted_players = [score.player for score in scores]
+    macmahon = MacMahon()
+    return macmahon.get_pairing(sorted_players)

@@ -365,7 +365,7 @@ class MemberManager(models.Manager):
         try:
             return self.filter(
                 player=player,
-                group__season__end_date__gte=datetime.date.today(),
+                group__season__state=SeasonState.IN_PROGRESS,
             ).latest("group__season__number")
         except Member.DoesNotExist:
             return None

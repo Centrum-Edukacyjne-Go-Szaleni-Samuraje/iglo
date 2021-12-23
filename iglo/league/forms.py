@@ -119,6 +119,7 @@ class PlayerUpdateForm(forms.ModelForm):
             "ogs_username": texts.OGS_USERNAME_LABEL,
             "kgs_username": texts.KGS_USERNAME_LABEL,
             "auto_join": texts.AUTO_JOIN_LABEL,
+            "rank": texts.RANK_LABEL,
         }
         help_texts = {
             "rank": texts.RANK_HELP_TEXT,

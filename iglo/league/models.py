@@ -22,6 +22,7 @@ from league.utils import round_robin, shuffle_colors
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
 DAYS_PER_GAME = 7
+NUMBER_OF_BARS = 2
 
 
 class SeasonState(TextChoices):
@@ -348,11 +349,11 @@ class Group(models.Model):
         self.validate_type(GroupType.MCMAHON)
         members = self.members.all()
         registered_players = [(member.player.nick, member.rank) for member in members]
-        initial_ordering = mm.BasicInitialOrdering(number_of_bars=2).order(registered_players)
+        initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
+        initial_ordering = {p.name: p for p in initial_ordering}
         for member in members:
-            ordered_player = next(player for player in initial_ordering if player.name == member.player.nick)
-            initial_score = ordered_player.initial_score
-            member.initial_score = initial_score
+            ordered_player = initial_ordering[member.player.nick]
+            member.initial_score = ordered_player.initial_score
         Member.objects.bulk_update(members, ['initial_score'])
 
 

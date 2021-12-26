@@ -364,11 +364,11 @@ class Group(models.Model):
         if self.latest_round:
             self.latest_round.validate_is_completed()
             start_date = self.latest_round.end_date + datetime.timedelta(days=1)
-            end_date = start_date + datetime.timedelta(days=7)
+            end_date = start_date + datetime.timedelta(days=DAYS_PER_GAME)
             number = self.latest_round.number + 1
         else:
             start_date = self.season.start_date
-            end_date = start_date + datetime.timedelta(days=7)
+            end_date = start_date + datetime.timedelta(days=DAYS_PER_GAME)
             number = 1
 
         new_round = Round.objects.create(
@@ -382,7 +382,6 @@ class Group(models.Model):
         pairs, bye = mm.prepare_next_round(players)
 
         for pair in pairs:
-            print(f'Creating game for: {pair}')
             black = Member.objects.get(player__nick=pair.black.name, group=self)
             white = Member.objects.get(player__nick=pair.white.name, group=self)
             Game.objects.create(

@@ -113,7 +113,7 @@ class SeasonManager(models.Manager):
             Season.objects.prefetch_related("groups")
             .annotate(
                 all_games=Count("groups__games"),
-                played_games=Count("groups__games", filter=Q(groups__games__winner__isnull=False)),
+                played_games=Count("groups__games", filter=Q(groups__games__win_type__isnull=False)),
             )
             .annotate(games_progress=(F("played_games") * 100) / F("all_games"))
             .latest("number")

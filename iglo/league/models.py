@@ -394,7 +394,8 @@ class Group(models.Model):
                     new_round.end_date, settings.DEFAULT_GAME_TIME
                 )
             )
-        Game.objects.create_bye_game(self, new_round, Member.objects.get(player__nick=bye.name, group=self))
+        if bye:
+            Game.objects.create_bye_game(self, new_round, Member.objects.get(player__nick=bye.name, group=self))
 
     def get_macmahon_players(self):
         members = Member.objects.filter(group=self).prefetch_related('player').all()

@@ -69,7 +69,7 @@ class GameResultUpdateForm(forms.ModelForm):
         if (
             win_type
             and win_type != WinType.NOT_PLAYED
-            and not (cleaned_data["sgf"] or cleaned_data["link"])
+            and not (cleaned_data.get("sgf") or cleaned_data["link"])
         ):
             self.add_error(field=None, error=texts.SGF_OR_LINK_REQUIRED_ERROR)
         return cleaned_data
@@ -119,6 +119,7 @@ class PlayerUpdateForm(forms.ModelForm):
             "ogs_username": texts.OGS_USERNAME_LABEL,
             "kgs_username": texts.KGS_USERNAME_LABEL,
             "auto_join": texts.AUTO_JOIN_LABEL,
+            "rank": texts.RANK_LABEL,
         }
         help_texts = {
             "rank": texts.RANK_HELP_TEXT,

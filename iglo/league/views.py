@@ -97,7 +97,7 @@ class SeasonExportCSVView(UserRoleRequired, View):
                 "Content-Disposition": f'attachment; filename="season-{number}.csv"'
             },
         )
-        writer = csv.DictWriter(response, fieldnames=["nick", "name", "group", "email"])
+        writer = csv.DictWriter(response, fieldnames=["nick", "name", "group", "email", "auto_join", "egd_approval"])
         writer.writeheader()
         for member in (
             Member.objects.filter(group__season__number=number)
@@ -110,6 +110,8 @@ class SeasonExportCSVView(UserRoleRequired, View):
                     "name": f"{member.player.first_name} {member.player.last_name}",
                     "group": member.group.name,
                     "email": member.player.user.email if member.player.user else "",
+                    "auto_join": member.player.auto_join,
+                    "egd_approval": member.player.egd_approval,
                 }
             )
         return response

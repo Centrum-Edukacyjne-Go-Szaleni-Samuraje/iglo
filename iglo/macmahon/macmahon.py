@@ -184,7 +184,7 @@ class MacMahon:
         return tuple(colors)
 
 
-def prepare_next_round(players: List[Player]) -> Pairing:
+def prepare_next_round(players: list[Player]) -> Pairing:
     scoring = Scoring()
     scores = scoring.get_scores(players)
     sorted_players = [score.player for score in scores]

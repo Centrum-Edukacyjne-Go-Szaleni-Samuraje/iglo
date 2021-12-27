@@ -44,69 +44,8 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        players = self._get_former_players(season=previous_season) if previous_season else []
-        players = self._redistribute_new_players(players=players, players_per_group=players_per_group)
-        self._create_groups(season=season, players=players)
+        season.create_groups()
         return season
-
-    def _get_former_players(self, season: "Season") -> list["Player"]:
-        players = []
-        for group in season.groups.order_by("name"):
-            group_players = [member.player for member in group.members_qualification]
-            players = (
-                players[: -season.promotion_count]
-                + group_players[: season.promotion_count]
-                + players[-season.promotion_count :]
-                + group_players[season.promotion_count :]
-            )
-        return [player for player in players if player.auto_join]
-
-    def _redistribute_new_players(self, players: list["Player"], players_per_group: int) -> list["Player"]:
-        result = players[:]
-        new_players = Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in result])
-        for new_player in new_players:
-            add_to_next = False
-            previous_avg_rank = None
-            for group_order in range(math.ceil(len(result) / players_per_group)):
-                group_players = result[group_order * players_per_group : (group_order + 1) * players_per_group]
-                avg_rank = mean(player.rank for player in group_players)
-                if add_to_next and previous_avg_rank > avg_rank:
-                    result.insert((group_order + 1) * players_per_group - 1, new_player)
-                    break
-                if avg_rank < new_player.rank:
-                    add_to_next = True
-                previous_avg_rank = avg_rank
-            else:
-                result.append(new_player)
-        return result
-
-    def _create_groups(self, season: "Season", players: list["Player"]) -> None:
-        last_group = None
-        for group_order in range(math.ceil(len(players) / season.players_per_group)):
-            group_players = players[
-                group_order * season.players_per_group : (group_order + 1) * season.players_per_group
-            ]
-            if len(group_players) < max((season.players_per_group - 1), 2) and last_group:
-                group = last_group
-                group.type = GroupType.MCMAHON
-                group.save()
-            else:
-                group = Group.objects.create(
-                    name=string.ascii_uppercase[group_order],
-                    season=season,
-                    type=GroupType.ROUND_ROBIN,
-                )
-                last_group = group
-            for player_order, player in enumerate(group_players, start=group.members.count() + 1):
-                Member.objects.create(
-                    group=group,
-                    order=player_order,
-                    player=player,
-                    rank=player.rank,
-                )
-            if group.type == GroupType.MCMAHON:
-                group.set_initial_score()
-
 
     def get_latest(self) -> Optional["Season"]:
         return (
@@ -151,20 +90,6 @@ class Season(models.Model):
     def get_absolute_url(self):
         return reverse("season-detail", kwargs={"number": self.number})
 
-    def delete_group(self, group_id: int) -> None:
-        self.validate_state(state=SeasonState.DRAFT)
-        group = self.groups.get(id=group_id)
-        self.groups.filter(name__gt=group.name).update(name=Chr(Ord("name") - 1))
-        group.delete()
-
-    def add_group(self) -> None:
-        self.validate_state(state=SeasonState.DRAFT)
-        Group.objects.create(
-            season=self,
-            name=chr(ord("A") + self.groups.count()),
-            type=GroupType.MCMAHON,
-        )
-
     def start(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.state = SeasonState.IN_PROGRESS
@@ -200,6 +125,80 @@ class Season(models.Model):
     def validate_state(self, state: SeasonState) -> None:
         if self.state != state:
             raise WrongSeasonStateError()
+
+    def reset_groups(self) -> None:
+        self.validate_state(state=SeasonState.DRAFT)
+        self.groups.all().delete()
+        self.create_groups()
+
+    def create_groups(self) -> None:
+        self.validate_state(state=SeasonState.DRAFT)
+        try:
+            previous_season = Season.objects.get(number=self.number - 1)
+            players = previous_season.get_leaderboard()
+            players = [player for player in players if player.auto_join]
+        except Season.DoesNotExist:
+            players = []
+        players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
+        self._assign_players_to_groups(players=players)
+
+    def get_leaderboard(self) -> list["Player"]:
+        players = []
+        for group in self.groups.order_by("name"):
+            group_players = [member.player for member in group.members_qualification]
+            players = (
+                players[: -self.promotion_count]
+                + group_players[: self.promotion_count]
+                + players[-self.promotion_count :]
+                + group_players[self.promotion_count :]
+            )
+        return players
+
+    def _redistribute_new_players(self, players: list["Player"], players_per_group: int) -> list["Player"]:
+        result = players[:]
+        new_players = Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in result])
+        for new_player in new_players:
+            add_to_next = False
+            previous_avg_rank = None
+            for group_order in range(math.ceil(len(result) / players_per_group)):
+                group_players = result[group_order * players_per_group : (group_order + 1) * players_per_group]
+                avg_rank = mean(player.rank for player in group_players)
+                if add_to_next and previous_avg_rank > avg_rank:
+                    result.insert((group_order + 1) * players_per_group - 1, new_player)
+                    break
+                if avg_rank < new_player.rank:
+                    add_to_next = True
+                previous_avg_rank = avg_rank
+            else:
+                result.append(new_player)
+        return result
+
+    def _assign_players_to_groups(self, players: list["Player"]) -> None:
+        last_group = None
+        for group_order in range(math.ceil(len(players) / self.players_per_group)):
+            group_players = players[
+                group_order * self.players_per_group : (group_order + 1) * self.players_per_group
+            ]
+            if len(group_players) < max((self.players_per_group - 1), 2) and last_group:
+                group = last_group
+                group.type = GroupType.MCMAHON
+                group.save()
+            else:
+                group = Group.objects.create(
+                    name=string.ascii_uppercase[group_order],
+                    season=self,
+                    type=GroupType.ROUND_ROBIN,
+                )
+                last_group = group
+            for player_order, player in enumerate(group_players, start=group.members.count() + 1):
+                Member.objects.create(
+                    group=group,
+                    order=player_order,
+                    player=player,
+                    rank=player.rank,
+                )
+            if group.type == GroupType.MCMAHON:
+                group.set_initial_score()
 
 
 class GameResult(Enum):

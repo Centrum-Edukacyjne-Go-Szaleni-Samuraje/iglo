@@ -25,11 +25,11 @@
                         </a>
                         <form method="post" class="d-inline">{% csrf_token %}
                             {% if season.state == "draft" %}
-                                <button type="submit" class="btn btn-success" name="action-add-group">
-                                    Dodaj Grupę
-                                </button>
                                 <button type="submit" class="btn btn-warning" name="action-start-season">
-                                    Wystartuj Sezon
+                                    <i class="fas fa-play"></i> <span class="d-none d-md-inline">Wystartuj Sezon</span>
+                                </button>
+                                <button type="submit" class="btn btn-warning" name="action-reset-groups">
+                                    <i class="fas fa-undo"></i> <span class="d-none d-md-inline">Resetuj Grupy</span>
                                 </button>
                             {% elif season.state == "in_progress" %}
                                 <button type="submit" class="btn btn-danger" name="action-finish-season">
@@ -65,13 +65,6 @@
                             </p>
                         </div>
                         <div>
-                            {% if user|has_role:'referee' and season.state == "draft" %}
-                                <form method="post" class="d-inline">{% csrf_token %}
-                                    <input type="hidden" value="{{ group.id }}" name="group_id">
-                                    <button type="submit" class="btn btn-danger" name="action-delete-group">Usuń
-                                    </button>
-                                </form>
-                            {% endif %}
                             <a href="{% url "group-detail" season_number=group.season.number group_name=group.name %}"
                                class="btn btn-primary"><i class="fas fa-arrow-right"></i></a>
                         </div>

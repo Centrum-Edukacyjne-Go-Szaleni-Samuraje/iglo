@@ -71,12 +71,10 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
-        if "action-delete-group" in request.POST:
-            self.object.delete_group(group_id=int(request.POST["group_id"]))
-        elif "action-add-group" in request.POST:
-            self.object.add_group()
-        elif "action-start-season" in request.POST:
+        if "action-start-season" in request.POST:
             self.object.start()
+        elif "action-reset-groups" in request.POST:
+            self.object.reset_groups()
         elif "action-finish-season" in request.POST:
             try:
                 self.object.finish()

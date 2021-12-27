@@ -267,26 +267,6 @@ class SeasonTestCase(TestCase):
                 promotion_count=1,
             )
 
-    def test_delete_group(self):
-        season = SeasonFactory(state=SeasonState.DRAFT)
-        group_1 = GroupFactory(season=season, name="A")
-        group_2 = GroupFactory(season=season, name="B")
-
-        season.delete_group(group_id=group_1.id)
-
-        group_2.refresh_from_db()
-        self.assertEqual(season.groups.count(), 1)
-        self.assertEqual(group_2.name, "A")
-
-    def test_add_group(self):
-        season = SeasonFactory(state=SeasonState.DRAFT)
-
-        season.add_group()
-
-        group = season.groups.get()
-        self.assertEqual(season.groups.count(), 1)
-        self.assertEqual(group.name, "A")
-
     def test_start(self):
         season = SeasonFactory(
             state=SeasonState.DRAFT,

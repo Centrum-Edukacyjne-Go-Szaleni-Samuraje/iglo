@@ -157,7 +157,7 @@
                     <div class="card mb-3">
                         <div class="card-header">
                             <small class="text-muted">#{{ member.order }}</small>
-                            <strong>{{ member.player.nick }}</strong>
+                            <strong><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
                             <span class="text-muted">[{{ member.rank }}]</span>
                             {% if group.type == "mcmahon" %}<span class="text-muted">Punkty początkowe: {{ member.initial_score }}</span>{% endif %}
                         </div>

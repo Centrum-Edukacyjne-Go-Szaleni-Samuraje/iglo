@@ -32,6 +32,10 @@ floyd = Player('Floyd', 50, -2, games=[
     GameRecord('', Color.BYE, ResultType.BYE),
     GameRecord('Cindy', Color.WHITE, ResultType.LOSE),
 ])
+player_with_no_games = Player('Gwen', 1050, 0, games=[])
+player_with_only_bye = Player('Hugh', 1050, 0, games=[
+    GameRecord('', Color.BYE, ResultType.BYE)
+])
 
 
 @pytest.fixture

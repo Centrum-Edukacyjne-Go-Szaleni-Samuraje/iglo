@@ -1,9 +1,11 @@
+import random
 from operator import itemgetter
+from unittest import mock
 
 import pytest
 
 from macmahon.macmahon import MacMahon, Color, ColorPreference, Pair
-from macmahon.tests.conftest import alice, bob, cindy, dean, eve, floyd
+from macmahon.tests.conftest import alice, bob, cindy, dean, eve, floyd, player_with_no_games, player_with_only_bye
 
 
 def test_get_bye_odd_players(players):
@@ -23,7 +25,9 @@ def test_get_bye_even_players(players):
     (alice, ColorPreference(True, True, True, False)),
     (bob, ColorPreference(True, True, False, True)),
     (dean, ColorPreference(False, True, False, True)),
-    (floyd, ColorPreference(True, False, True, False))
+    (floyd, ColorPreference(True, False, True, False)),
+    (player_with_no_games, ColorPreference(True, True, True, True)),
+    (player_with_only_bye, ColorPreference(True, True, True, True))
 ])
 def test_get_color_preference(player, expected):
     mm = MacMahon()
@@ -77,6 +81,15 @@ def test_determine_color_preference_second_player_should_not_play_one_colors():
     mm = MacMahon()
     colors = mm._determine_colors(p1_preference, p2_preference)
     assert colors == (Color.WHITE, Color.BLACK)
+
+
+def test_do_nigiri_if_players_played_no_game_yet():
+    p1_preference = ColorPreference(True, True, True, True)
+    p2_preference = ColorPreference(True, True, True, True)
+    mm = MacMahon()
+    with mock.patch.object(random, 'shuffle') as shuffle_mock:
+        mm.determine_colors(p1_preference, p2_preference)
+        shuffle_mock.assert_called_once_with([Color.WHITE, Color.BLACK])
 
 
 def test_possible_opponents(players):

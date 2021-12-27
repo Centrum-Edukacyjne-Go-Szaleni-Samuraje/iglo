@@ -152,6 +152,7 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
                     messages.WARNING,
                     texts.MISSING_PLAYER_ERROR,
                 )
+        self.object.set_initial_score()
         return self.render_to_response(context)
 
 

@@ -146,6 +146,7 @@
                             <small class="text-muted">#{{ member.order }}</small>
                             <strong>{{ member.player.nick }}</strong>
                             <span class="text-muted">[{{ member.rank }}]</span>
+                            {% if group.type == "mcmahon" %}<span class="text-muted">Punkty początkowe: {{ member.initial_score }}</span>{% endif %}
                         </div>
                         {% if user.is_admin %}
                             <div class="card-body">

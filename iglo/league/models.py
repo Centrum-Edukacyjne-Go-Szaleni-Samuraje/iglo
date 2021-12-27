@@ -15,12 +15,14 @@ from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 from django.utils.functional import cached_property
 
+from macmahon import macmahon as mm
 from league import texts
 from league.utils import round_robin, shuffle_colors
 
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
 DAYS_PER_GAME = 7
+NUMBER_OF_BARS = 2
 
 
 class SeasonState(TextChoices):
@@ -102,6 +104,9 @@ class SeasonManager(models.Manager):
                     player=player,
                     rank=player.rank,
                 )
+            if group.type == GroupType.MCMAHON:
+                group.set_initial_score()
+
 
     def get_latest(self) -> Optional["Season"]:
         return (
@@ -203,6 +208,10 @@ class GroupType(models.TextChoices):
     MCMAHON = "mcmahon", "McMahon"
 
 
+class NotMcmahonGroupError(Exception):
+    pass
+
+
 class Group(models.Model):
     name = models.CharField(max_length=1)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
@@ -218,7 +227,7 @@ class Group(models.Model):
         )
 
     def results_as_table(
-        self,
+            self,
     ) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
         table = []
         players_to_game = {
@@ -331,6 +340,22 @@ class Group(models.Model):
         member_to_remove.games_as_black.update(black=new_member)
         member_to_remove.delete()
 
+    def validate_type(self, group_type: GroupType):
+        if self.type != group_type:
+            raise NotMcmahonGroupError()
+
+    def set_initial_score(self):
+        self.season.validate_state(SeasonState.DRAFT)
+        self.validate_type(GroupType.MCMAHON)
+        members = self.members.all()
+        registered_players = [(member.player.nick, member.rank) for member in members]
+        initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
+        initial_ordering = {p.name: p for p in initial_ordering}
+        for member in members:
+            ordered_player = initial_ordering[member.player.nick]
+            member.initial_score = ordered_player.initial_score
+        Member.objects.bulk_update(members, ['initial_score'])
+
 
 class Player(models.Model):
     nick = models.CharField(max_length=32, unique=True)
@@ -376,6 +401,7 @@ class Member(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
+    initial_score = models.SmallIntegerField(default=0)
 
     objects = MemberManager()
 
@@ -391,7 +417,7 @@ class Member(models.Model):
 
     @cached_property
     def score(self) -> float:
-        result = 0.0
+        result = float(self.initial_score)
         for game in self.won_games.all():
             if game.win_type == WinType.NOT_PLAYED and not game.winner:
                 result += 0.5

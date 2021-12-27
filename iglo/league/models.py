@@ -458,7 +458,7 @@ class MemberManager(models.Manager):
         try:
             return self.filter(
                 player=player,
-                group__season__state=SeasonState.IN_PROGRESS,
+                group__season__state__in=[SeasonState.DRAFT, SeasonState.IN_PROGRESS],
             ).latest("group__season__number")
         except Member.DoesNotExist:
             return None

@@ -1,7 +1,13 @@
+from django.utils.safestring import mark_safe
+
 OGS_USERNAME_LABEL = "Konto OGS"
 KGS_USERNAME_LABEL = "Konto KGS"
 RANK_LABEL = "Ranking"
+EGD_PIN_LABEL = "Pin EGD"
+EGD_APPROVAL_LABEL = "Chce raportować moje gry do EGD"
 RANK_HELP_TEXT = "W punktach GoR."
+EGD_HELP_TEXT = mark_safe("Jeżeli posiadasz konto w EGD Twój pin znajdziesz na stronie swojego profilu. Aby znaleźć swój profil EGD użyj <a href='https://www.europeangodatabase.eu/EGD/Find_Player.php' target='blank'>wyszukiwarki</a>.")
+EGD_APPROVAL_HELP_TEXT = "Jeżeli wszyscy gracze w Twojej grupie wyrażą zgodę, to gry z danej grupy będą raportowanie do EGD."
 NICK_ERROR = "Ten nick jest już zajęty."
 PLAYER_UPDATE_SUCCESS = "Twoje dane zostały zmienione."
 MISSING_PLAYER_ERROR = "Gracz o podanym nicku nie istnieje."

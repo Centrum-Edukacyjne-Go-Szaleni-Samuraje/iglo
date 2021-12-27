@@ -112,6 +112,8 @@ class PlayerUpdateForm(forms.ModelForm):
             "ogs_username",
             "kgs_username",
             "auto_join",
+            "egd_pin",
+            "egd_approval",
         ]
         labels = {
             "first_name": texts.FIRST_NAME_LABEL,
@@ -120,10 +122,14 @@ class PlayerUpdateForm(forms.ModelForm):
             "kgs_username": texts.KGS_USERNAME_LABEL,
             "auto_join": texts.AUTO_JOIN_LABEL,
             "rank": texts.RANK_LABEL,
+            "egd_pin": texts.EGD_PIN_LABEL,
+            "egd_approval": texts.EGD_APPROVAL_LABEL,
         }
         help_texts = {
             "rank": texts.RANK_HELP_TEXT,
             "auto_join": texts.AUTO_JOIN_HELP_TEXT,
+            "egd_pin": texts.EGD_HELP_TEXT,
+            "egd_approval": texts.EGD_APPROVAL_HELP_TEXT
         }
 
     def clean_nick(self):

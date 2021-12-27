@@ -129,6 +129,7 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
                 "rounds__games__white__player",
                 "rounds__games__black__player",
                 "rounds__games__winner__player",
+                "members__player",
             ).annotate(
                 all_games_finished=~Exists(Game.objects.filter(
                     group=OuterRef('id'),

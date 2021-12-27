@@ -1,0 +1,61 @@
+import pytest
+
+from macmahon.macmahon import Player, GameRecord, Color, ResultType, Scoring
+
+alice = Player('Alice', 400, 0, games=[
+    GameRecord('Bob', Color.BLACK, ResultType.WIN),
+    GameRecord('Cindy', Color.WHITE, ResultType.WIN),
+    GameRecord('Dean', Color.WHITE, ResultType.LOSE),
+])
+bob = Player('Bob', 300, 0, games=[
+    GameRecord('Alice', Color.WHITE, ResultType.LOSE),
+    GameRecord('Eve', Color.BLACK, ResultType.LOSE),
+    GameRecord('', Color.BYE, ResultType.BYE),
+])
+cindy = Player('Cindy', 300, 0, games=[
+    GameRecord('Dean', Color.WHITE, ResultType.WIN),
+    GameRecord('Alice', Color.BLACK, ResultType.LOSE),
+    GameRecord('Eve', Color.WHITE, ResultType.LOSE),
+])
+dean = Player('Dean', 200, -1, games=[
+    GameRecord('Cindy', Color.BLACK, ResultType.LOSE),
+    GameRecord('', Color.BYE, ResultType.BYE),
+    GameRecord('Alice', Color.BLACK, ResultType.WIN),
+])
+eve = Player('Eve', 100, -1, games=[
+    GameRecord('', Color.BYE, ResultType.BYE),
+    GameRecord('Bob', Color.WHITE, ResultType.WIN),
+    GameRecord('Cindy', Color.BLACK, ResultType.WIN),
+])
+floyd = Player('Floyd', 50, -2, games=[
+    GameRecord('Alice', Color.WHITE, ResultType.WIN),
+    GameRecord('', Color.BYE, ResultType.BYE),
+    GameRecord('Cindy', Color.WHITE, ResultType.LOSE),
+])
+player_with_no_games = Player('Gwen', 1050, 0, games=[])
+player_with_only_bye = Player('Hugh', 1050, 0, games=[
+    GameRecord('', Color.BYE, ResultType.BYE)
+])
+
+
+@pytest.fixture
+def players():
+    return [alice, bob, cindy, dean, eve]
+
+
+@pytest.fixture
+def sorted_players(players):
+    s = Scoring()
+    return [score.player for score in s.get_scores(players)]
+
+
+@pytest.fixture
+def registered_players():
+    return [
+        ('Alice', 400),
+        ('Bob', 300),
+        ('Cindy', 300),
+        ('Dean', 200),
+        ('Eve', 100),
+        ('Floyd', 50)
+    ]

@@ -88,7 +88,20 @@
                         {% endif %}
                     </table>
                 </div>
-                <h3 class="mb-4">Gry</h3>
+                <div class="d-flex justify-content-between">
+                    <h3 class="mb-4">Gry</h3>
+                    {% if user|has_role:'referee' %}
+                        <div>
+                            {% if group.all_games_finished %}
+                            <form method="post" class="d-flex">{% csrf_token %}
+                                <button type="submit" class="btn btn-primary" name="action-pairing">
+                                    <i class="fa fa-table"></i> Nowa runda
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
                 {% for round in object.rounds.all %}
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center clickable"
@@ -146,6 +159,7 @@
                             <small class="text-muted">#{{ member.order }}</small>
                             <strong>{{ member.player.nick }}</strong>
                             <span class="text-muted">[{{ member.rank }}]</span>
+                            {% if group.type == "mcmahon" %}<span class="text-muted">Punkty początkowe: {{ member.initial_score }}</span>{% endif %}
                         </div>
                         {% if user.is_admin %}
                             <div class="card-body">

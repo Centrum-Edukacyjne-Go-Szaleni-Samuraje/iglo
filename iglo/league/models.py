@@ -10,7 +10,7 @@ from typing import Optional
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count
+from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Case, When, Value
 from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -115,7 +115,11 @@ class SeasonManager(models.Manager):
                 all_games=Count("groups__games"),
                 played_games=Count("groups__games", filter=Q(groups__games__win_type__isnull=False)),
             )
-            .annotate(games_progress=(F("played_games") * 100) / F("all_games"))
+            .annotate(
+                games_progress=Case(
+                    When(all_games__gt=0, then=(F("played_games") * 100) / F("all_games")), default=Value(0)
+                )
+            )
             .latest("number")
         )
 

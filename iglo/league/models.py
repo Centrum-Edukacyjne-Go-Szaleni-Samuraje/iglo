@@ -433,6 +433,7 @@ class Player(models.Model):
     auto_join = models.BooleanField(default=True)
     egd_pin = models.CharField(max_length=8, null=True, blank=True)
     egd_approval = models.BooleanField(default=False)
+    availability = models.TextField(blank=True)
 
     def __str__(self) -> str:
         return self.nick

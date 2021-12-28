@@ -6,3 +6,8 @@ OGS: {{ player.ogs_username }}<br>
 {% if player.kgs_username %}
 KGS: {{ player.kgs_username }}<br>
 {% endif %}
+{% if player.availability %}
+    <br>
+    <h6>Dostępność</h6>
+    <p><i>{{ player.availability }}</i></p>
+{% endif %}

@@ -58,7 +58,7 @@
                                         </div>
                                         <div>
                                             {% if not game.is_bye %}
-                                                {% if user.is_admin or user.player == game.black.player or user.player == game.white.player %}
+                                                {% if user.player == game.black.player or user.player == game.white.player %}
                                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                                             data-bs-target="#contact-modal-{{ game.id }}">
                                                         <i class="fas fa-envelope"></i> <span

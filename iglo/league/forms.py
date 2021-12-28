@@ -114,6 +114,7 @@ class PlayerUpdateForm(forms.ModelForm):
             "auto_join",
             "egd_pin",
             "egd_approval",
+            "availability",
         ]
         labels = {
             "first_name": texts.FIRST_NAME_LABEL,
@@ -124,12 +125,17 @@ class PlayerUpdateForm(forms.ModelForm):
             "rank": texts.RANK_LABEL,
             "egd_pin": texts.EGD_PIN_LABEL,
             "egd_approval": texts.EGD_APPROVAL_LABEL,
+            "availability": texts.AVAILABILITY_LABEL,
         }
         help_texts = {
             "rank": texts.RANK_HELP_TEXT,
             "auto_join": texts.AUTO_JOIN_HELP_TEXT,
             "egd_pin": texts.EGD_HELP_TEXT,
-            "egd_approval": texts.EGD_APPROVAL_HELP_TEXT
+            "egd_approval": texts.EGD_APPROVAL_HELP_TEXT,
+            "availability": texts.AVAILABILITY_HELP_TEXT,
+        }
+        widgets = {
+            "availability": forms.Textarea(attrs={"rows": 3}),
         }
 
     def clean_nick(self):

@@ -93,7 +93,7 @@
                     <h3 class="mb-4">Gry</h3>
                     {% if user|has_role:'referee' %}
                         <div>
-                            {% if group.all_games_finished %}
+                            {% if group.season.state == "in_progress" and group.type == "mcmahon" and group.all_games_finished %}
                             <form method="post" class="d-flex">{% csrf_token %}
                                 <button type="submit" class="btn btn-primary" name="action-pairing">
                                     <i class="fa fa-table"></i> Nowa runda

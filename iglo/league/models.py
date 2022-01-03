@@ -223,6 +223,9 @@ class Group(models.Model):
     type = models.CharField(choices=GroupType.choices, max_length=16)
     is_egd = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"
 

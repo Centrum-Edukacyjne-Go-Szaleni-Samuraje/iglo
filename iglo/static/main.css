@@ -28,6 +28,14 @@
     background-color: #f4cccc;
 }
 
+.group-table__cell-name {
+    text-align: left;
+}
+
+.group-table__cell-result {
+    padding: 0 10px;
+}
+
 .wgo-ctrlgroup-left, .wgo-ctrlgroup-right {
     display: none;
 }

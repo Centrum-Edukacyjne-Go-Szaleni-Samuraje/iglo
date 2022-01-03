@@ -178,15 +178,18 @@ class Season(models.Model):
             group_players = players[
                 group_order * self.players_per_group : (group_order + 1) * self.players_per_group
             ]
+            is_egd = all(p.egd_approval for p in group_players)
             if len(group_players) < max((self.players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
+                group.is_egd = group.is_egd and is_egd
                 group.save()
             else:
                 group = Group.objects.create(
                     name=string.ascii_uppercase[group_order],
                     season=self,
                     type=GroupType.ROUND_ROBIN,
+                    is_egd=is_egd,
                 )
                 last_group = group
             for player_order, player in enumerate(group_players, start=group.members.count() + 1):
@@ -218,6 +221,7 @@ class Group(models.Model):
     name = models.CharField(max_length=1)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
     type = models.CharField(choices=GroupType.choices, max_length=16)
+    is_egd = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"

@@ -247,6 +247,21 @@ class SeasonTestCase(TestCase):
             ],
         )
 
+    def test_prepare_season_with_egd_group(self):
+        PlayerFactory(rank=400, egd_approval=True)
+        PlayerFactory(rank=300, egd_approval=True)
+        PlayerFactory(rank=200, egd_approval=True)
+        PlayerFactory(rank=100, egd_approval=False)
+
+        new_season = Season.objects.prepare_season(
+            start_date=datetime.date(2021, 1, 1), players_per_group=2, promotion_count=1
+        )
+
+        new_group_a = new_season.groups.get(name="A")
+        self.assertTrue(new_group_a.is_egd)
+        new_group_b = new_season.groups.get(name="B")
+        self.assertFalse(new_group_b.is_egd)
+
     def test_prepare_season_when_previous_is_in_draft(self):
         SeasonFactory(state=SeasonState.DRAFT)
 

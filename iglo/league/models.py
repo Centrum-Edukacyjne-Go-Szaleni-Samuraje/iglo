@@ -11,7 +11,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Case, When, Value
-from django.db.models.functions import Ord, Chr
 from django.urls import reverse
 from django.utils.functional import cached_property
 
@@ -368,12 +367,12 @@ class Group(models.Model):
         if self.latest_round:
             self.latest_round.validate_is_completed()
             start_date = self.latest_round.end_date + datetime.timedelta(days=1)
-            end_date = start_date + datetime.timedelta(days=DAYS_PER_GAME)
             number = self.latest_round.number + 1
         else:
             start_date = self.season.start_date
-            end_date = start_date + datetime.timedelta(days=DAYS_PER_GAME)
             number = 1
+        days_until_end_of_round = DAYS_PER_GAME - 1
+        end_date = start_date + datetime.timedelta(days=days_until_end_of_round)
 
         new_round = Round.objects.create(
             group=self,

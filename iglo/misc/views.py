@@ -22,3 +22,10 @@ class ContactView(TemplateView):
 
 class ReviewsView(TemplateView):
     template_name = "misc/reviews.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        seasons = Season.objects.get_seasons_with_teachers()
+        context['latest_season'] = seasons[0]
+        context['season_list'] = seasons
+        return context

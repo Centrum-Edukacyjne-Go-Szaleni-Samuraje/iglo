@@ -19,6 +19,9 @@
                     <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                 </div>
                 <div>
+                    <a href="{% url "teachers-list" number=season.number %}" class="btn btn-light">
+                        <i class="fa fa-chalkboard-teacher"></i> <span class="d-none d-md-inline">Nauczyciele</span>
+                    </a>
                     {% if user|has_role:'referee' %}
                         <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
                             <i class="fa fa-file-export"></i> <span class="d-none d-md-inline">Eksport CSV</span>

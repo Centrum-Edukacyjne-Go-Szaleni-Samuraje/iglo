@@ -298,3 +298,18 @@ class PrepareSeasonView(UserRoleRequired, FormView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+class TeachersListView(ListView):
+    template_name = 'league/teachers_list.html'
+
+    def get_queryset(self):
+        season_number = self.kwargs['number']
+        return Group.objects.filter(season__number=season_number, teacher__isnull=False).prefetch_related('teacher')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        season = Season.objects.get(number=self.kwargs['number'])
+        context['season_number'] = season.number
+        context['season_is_finished'] = season.state == SeasonState.FINISHED
+        return context

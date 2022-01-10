@@ -6,46 +6,13 @@
     <div class="row">
         <div class="col">
             <h1>Komentarze</h1>
+            <p>Lista nauczycieli w bieżącym sezonie IGLO jest dostępna
+                <a href="{% url "teachers-list" number=latest_season.number %}">tutaj</a>.</p>
             <p>Wszystkie nasze archiwalne i bieżące wykłady możesz znaleźć na <a
                     href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ" target="_blank">YouTube</a>.
                 Jeśl z jakiś przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją wiedzę
                 zachęcamy do obejrzenia materiałów i subskrypcji naszego kanału.
             </p>
-            <p>W aktualnym sezonie gry komentują:</p>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Grupa</th>
-                        <th>Nauczyciel</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>A, B</td>
-                        <td>Stanisław Frejlak, 1 pro</td>
-                    </tr>
-                    <tr>
-                        <td>C, D, I</td>
-                        <td>Oleksandr Yeroshkin, 4 dan</td>
-                    </tr>
-                    <tr>
-                        <td>E, F</td>
-                        <td>Dawid Jurkiewicz, 4 dan</td>
-                    </tr>
-                    <tr>
-                        <td>G, H</td>
-                        <td>Maksym Wałaszewski, 3 dan</td>
-                    </tr>
-                    <tr>
-                        <td>J, K</td>
-                        <td>Paweł Kozioł, 5 kyu</td>
-                    </tr>
-                    <tr>
-                        <td>L, M</td>
-                        <td>Cyprian Doruch, 4 kyu</td>
-                    </tr>
-                </tbody>
-            </table>
             <p>Precyzyjne daty i godziny komentarzy gier będą aktualizowane w wydarzeniach na <a
                     href="https://www.facebook.com/SzaleniSamuraje/events" target="_blank">profilu FB Szalonych
                 Samurajów</a>. Komentarze "na żywo" odbywają się na <a href="https://discord.gg/ECSdsuNgkf"
@@ -59,7 +26,12 @@
                 Czerneckiego i innych uczestników Ligi i są do obejrzenia na kanale <a
                         href="https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg" target="_blank">IGLO
                     Plus</a>.</p>
-
+            <p>Listy nauczycieli w poszczególnych sezonach:</p>
+            <ul>
+                {% for season in season_list %}
+                    <li><a href="{% url "teachers-list" number=season.number %}">Sezon {{ season.number }}</a></li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 {% endblock %}

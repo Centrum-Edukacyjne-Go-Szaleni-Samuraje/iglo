@@ -237,15 +237,11 @@ class Group(models.Model):
         )
 
     @cached_property
-    def results_table(self) -> list[tuple[int, "Player", list[tuple[str, str]]]]:
-        members = self.members.select_related("player").all()
-        sorted_members = sorted(members, key=lambda m: (m.score, m.sodos, m.order), reverse=True)
-        enumerated_members = list(enumerate(sorted_members, start=1))
-        player_position = OrderedDict()
-        for idx, member in enumerated_members:
-            player_position[member.player.nick] = idx
+    def results_table(self) -> list[tuple[int, "Member", list[tuple[str, str]]]]:
+        members = self.members_qualification
+        player_position = {member.player.nick: idx for idx, member in enumerate(members, start=1)}
         table = []
-        for position, member in enumerated_members:
+        for position, member in enumerate(members, start=1):
             games = Game.objects.get_for_member(member)
             records = []
             for game in games:

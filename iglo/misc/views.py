@@ -22,7 +22,3 @@ class ContactView(TemplateView):
 
 class ReviewsView(TemplateView):
     template_name = "misc/reviews.html"
-
-
-class ResultTableFaqView(TemplateView):
-    template_name = "misc/result_table_faq.html"

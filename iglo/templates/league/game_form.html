@@ -13,39 +13,40 @@
 
 {% block content %}
     <div class="row">
-    <div class="col">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
-                <li class="breadcrumb-item">
-                    <a href="{% url "season-detail" object.group.season.number %}">
-                        Sezon #{{ object.group.season.number }}
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
-                        Grupa {{ object.group.name }}
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ object.get_absolute_url }}">
-                        Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}
-                    </a>
-                </li>
-                <li class="breadcrumb-item active">
-                    Edycja
-                </li>
-            </ol>
-        </nav>
-        <div>
-            <div class="fs-2 mb-3">
-                {% include "league/includes/game_players.html" with game=object %}
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "season-detail" object.group.season.number %}">
+                            Sezon #{{ object.group.season.number }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
+                            Grupa {{ object.group.name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ object.get_absolute_url }}">
+                            Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        Edycja
+                    </li>
+                </ol>
+            </nav>
+            <div>
+                <div class="fs-2 mb-3">
+                    {% include "league/includes/game_players.html" with game=object %}
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-success">Zapisz</button>
+                </form>
             </div>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit" class="btn btn-success">Zapisz</button>
-            </form>
         </div>
     </div>
     <script type="text/javascript">

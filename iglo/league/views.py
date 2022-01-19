@@ -3,8 +3,8 @@ import datetime
 
 from django.contrib import messages
 
-from django.db.models import Count, Exists, OuterRef
-from django.http import HttpResponse
+from django.db.models import Q, Count, Exists, OuterRef
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
@@ -307,6 +307,7 @@ class TeachersListView(TemplateView):
         context = super().get_context_data(**kwargs)
         season_number = self.kwargs['number']
         season = get_object_or_404(Season, number=season_number)
+        context['season'] = season
         context['season_is_finished'] = season.state == SeasonState.FINISHED
         context['groups'] = Group.objects.filter(
             season__number=season_number, teacher__isnull=False).prefetch_related('teacher').all()

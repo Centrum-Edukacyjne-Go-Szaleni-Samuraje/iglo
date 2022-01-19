@@ -6,8 +6,10 @@
     <div class="row">
         <div class="col">
             <h1>Komentarze</h1>
-            <p>Lista nauczycieli w bieżącym sezonie IGLO jest dostępna
-                <a href="{% url "teachers-list" number=latest_season.number %}">tutaj</a>.</p>
+            {% if latest_season %}
+                <p>Lista nauczycieli w bieżącym sezonie IGLO jest dostępna
+                    <a href="{% url "teachers-list" number=latest_season.number %}">tutaj</a>.</p>
+            {% endif %}
             <p>Wszystkie nasze archiwalne i bieżące wykłady możesz znaleźć na <a
                     href="https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ" target="_blank">YouTube</a>.
                 Jeśl z jakiś przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją wiedzę
@@ -30,6 +32,8 @@
             <ul>
                 {% for season in season_list %}
                     <li><a href="{% url "teachers-list" number=season.number %}">Sezon {{ season.number }}</a></li>
+                {% empty %}
+                    <p>Listy nauczycieli w przygotowaniu.</p>
                 {% endfor %}
             </ul>
         </div>

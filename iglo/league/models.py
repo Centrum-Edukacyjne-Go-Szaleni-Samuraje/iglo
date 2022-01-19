@@ -740,8 +740,11 @@ class Game(models.Model):
 
 
 class Teacher(models.Model):
-    player = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, related_name="teacher_profile")
-    name = models.CharField(max_length=32)
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, related_name="teacher_profile")
+    first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
     rank = models.CharField(max_length=5)
     review_info = models.TextField(blank=True)
+
+    def __str__(self) -> str:
+        return f"Teacher: {self.first_name} {self.last_name}"

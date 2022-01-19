@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block page_title %}Nauczyciele w sezonie {{ season_number }}
-{% endblock %}
+{% block page_title %}Nauczyciele w sezonie {{ season.number }}{% endblock %}
+
 {% block content %}
     <div class="row">
         <h1>Komentarze</h1>
     </div>
-    {% if group_list %}
+    {% if groups %}
         <div class="row">
             <div class="col">
                 {% if season_is_finished %}
-                    <p>W seazonie {{ season_number }} gry komentowali:</p>
+                    <p>W sezonie {{ season.number }} gry komentowali:</p>
                 {% else %}
                     <p>W aktualnym sezonie gry komentują:</p>
                 {% endif %}
@@ -25,10 +25,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for group in group_list %}
+                        {% for group in groups %}
                             <tr>
                                 <td>{{ group.name }}</td>
-                                <td>{{ group.teacher.name }} {{ group.teacher.last_name }}, {{ group.teacher.rank }}</td>
+                                <td>{{ group.teacher.first_name }} {{ group.teacher.last_name }}, {{ group.teacher.rank }}</td>
                                 {% if not season_is_finished %}
                                     <td>{{ group.teacher.review_info }}</td>
                                 {% endif %}

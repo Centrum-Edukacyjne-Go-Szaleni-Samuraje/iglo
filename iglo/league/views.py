@@ -3,11 +3,11 @@ import datetime
 
 from django.contrib import messages
 
-from django.db.models import Q, Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, UpdateView
+from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
 
 from accounts.models import UserRole
 from league import texts
@@ -300,16 +300,14 @@ class PrepareSeasonView(UserRoleRequired, FormView):
         return self.object.get_absolute_url()
 
 
-class TeachersListView(ListView):
+class TeachersListView(TemplateView):
     template_name = 'league/teachers_list.html'
-
-    def get_queryset(self):
-        season_number = self.kwargs['number']
-        return Group.objects.filter(season__number=season_number, teacher__isnull=False).prefetch_related('teacher')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        season = Season.objects.get(number=self.kwargs['number'])
-        context['season_number'] = season.number
+        season_number = self.kwargs['number']
+        season = get_object_or_404(Season, number=season_number)
         context['season_is_finished'] = season.state == SeasonState.FINISHED
+        context['groups'] = Group.objects.filter(
+            season__number=season_number, teacher__isnull=False).prefetch_related('teacher').all()
         return context

@@ -23,71 +23,69 @@
             </div>
             {% if object.season.state != "draft" %}
                 <div class="d-flex justify-content-center">
-                    <table class="group-table mb-4">
-                        {% if object.type == "round_robin" %}
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    {% for member in object.members.all %}
-                                        <th class="group-table__header d-none d-lg-table-cell"><a
-                                                href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
-                                        </th>
-                                    {% endfor %}
-                                    <th class="group-table__header">Punkty</th>
-                                    <th class="group-table__header">SODOS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for member, results in object.results_as_table %}
-                                    <tr class="group-table__row--result-{{ member.result.value.lower }}">
-                                        <td class="group-table__header">
-                                            <strong>
-                                                <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
-                                            </strong>
-                                            <span class="text-muted">[{{ member.rank }}]</span>
-                                        </td>
-                                        {% for other_member, result in results %}
-                                            <td class="group-table__result d-none d-lg-table-cell {% if member ==  other_member %}group-table__result--empty{% elif result.value == "W" %}group-table__result--win{% elif result.value == "L" %}group-table__result--lose{% endif %}">
-                                                {% if member ==  other_member %}
-                                                    X
-                                                {% elif result is not None %}
-                                                    {{ result.value }}
-                                                {% endif %}
+                    <div class="d-flex flex-column mb-4">
+                        <table class="group-table">
+                            {% if object.type == "round_robin" %}
+                                <thead>
+                                    <tr>
+                                        <th>Miejsce</th>
+                                        <th>Gracz</th>
+                                        <th colspan="5">Rundy</th>
+                                        <th class="group-table__header">Punkty</th>
+                                        <th class="group-table__header">SODOS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for position, member, results in object.results_table %}
+                                        <tr class="group-table__row--result-{{ member.result.value.lower }}">
+                                            <td>{{position}}</td>
+                                            <td class="group-table__header group-table__cell-name">
+                                                <strong>
+                                                    <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                                </strong>
+                                                <span class="text-muted">[{{ member.rank }}]</span>
                                             </td>
-                                        {% endfor %}
-                                        <td>{{ member.points }}</td>
-                                        <td>{{ member.sodos }}</td>
+                                            {% for result, url in results %}
+                                                <td class="group-table__cell-result">
+                                                    <a href="{{ url }}">{{ result }}</a>
+                                                </td>
+                                            {% endfor %}
+                                            <td>{{ member.points }}</td>
+                                            <td>{{ member.sodos }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            {% else %}
+                                <thead>
+                                    <tr>
+                                        <th class="group-table__header">Pozycja</th>
+                                        <th class="group-table__header">Gracz</th>
+                                        <th class="group-table__header">Punkty</th>
+                                        <th class="group-table__header">Score</th>
+                                        <th class="group-table__header">SOS</th>
+                                        <th class="group-table__header">SOSOS</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        {% else %}
-                            <thead>
-                                <tr>
-                                    <th class="group-table__header">Pozycja</th>
-                                    <th class="group-table__header">Gracz</th>
-                                    <th class="group-table__header">Punkty</th>
-                                    <th class="group-table__header">Score</th>
-                                    <th class="group-table__header">SOS</th>
-                                    <th class="group-table__header">SOSOS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for member in object.members_qualification %}
-                                    <tr class="group-table__row--result-{{ member.result.value.lower }}">
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>
-                                            <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
-                                            <span class="text-muted">[{{ member.rank }}]</span>
-                                        </td>
-                                        <td>{{ member.points }}</td>
-                                        <td>{{ member.score }}</td>
-                                        <td>{{ member.sos }}</td>
-                                        <td>{{ member.sosos }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        {% endif %}
-                    </table>
+                                </thead>
+                                <tbody>
+                                    {% for member in object.members_qualification %}
+                                        <tr class="group-table__row--result-{{ member.result.value.lower }}">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
+                                                <span class="text-muted">[{{ member.rank }}]</span>
+                                            </td>
+                                            <td>{{ member.points }}</td>
+                                            <td>{{ member.score }}</td>
+                                            <td>{{ member.sos }}</td>
+                                            <td>{{ member.sosos }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            {% endif %}
+                        </table>
+                        <a href="#" class="align-self-end text-decoration-none" data-bs-toggle="modal" data-bs-target="#result-table-modal">
+                            <span class="text-muted small">Jak czytać wyniki?</span></a>
+                    </div>
                 </div>
                 <div class="d-flex justify-content-between">
                     <h3 class="mb-4">Gry</h3>
@@ -181,6 +179,7 @@
             {% endif %}
         </div>
     </div>
+{% include "league/includes/result_table_modal.html" %}
     <script>
         function toggle_collapse(event) {
             event.stopPropagation();

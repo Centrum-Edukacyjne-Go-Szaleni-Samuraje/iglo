@@ -3,6 +3,7 @@ import decimal
 import math
 import re
 import string
+from collections import OrderedDict
 from enum import Enum
 from statistics import mean
 from typing import Optional
@@ -217,6 +218,13 @@ class NotMcmahonGroupError(Exception):
     pass
 
 
+class ResultSymbol(str, Enum):
+    win = '+'
+    lose = '-'
+    not_played = '?'
+    no_result = 'X'
+
+
 class Group(models.Model):
     name = models.CharField(max_length=1)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
@@ -235,26 +243,27 @@ class Group(models.Model):
             kwargs={"season_number": self.season.number, "group_name": self.name},
         )
 
-    def results_as_table(
-            self,
-    ) -> list[tuple["Player", list[tuple["Player", Optional[GameResult]]]]]:
+    @cached_property
+    def results_table(self) -> list[tuple[int, "Member", list[tuple[str, str]]]]:
+        members = self.members_qualification
+        player_position = {member.player.nick: idx for idx, member in enumerate(members, start=1)}
         table = []
-        players_to_game = {
-            frozenset({game.black.player, game.white.player}): game
-            for game in self.games.select_related("black__player", "white__player", "winner").all()
-        }
-        for member in self.members.select_related("player").all():
-            row = []
-            for other_member in self.members.select_related("player").all():
-                if member == other_member:
-                    row.append((other_member, None))
+        for position, member in enumerate(members, start=1):
+            games = Game.objects.get_for_member(member)
+            records = []
+            for game in games:
+                opponent = game.get_opponent(member)
+                opponent_position = player_position[opponent.player.nick]
+                if not game.is_played:
+                    result_symbol = ResultSymbol.not_played
+                elif game.winner == member:
+                    result_symbol = ResultSymbol.win
+                elif game.winner == opponent:
+                    result_symbol = ResultSymbol.lose
                 else:
-                    try:
-                        game = players_to_game[frozenset({member.player, other_member.player})]
-                        row.append((other_member, game.game_result_for(member)))
-                    except KeyError:
-                        row.append((other_member, None))
-            table.append((member, row))
+                    result_symbol = ResultSymbol.no_result
+                records.append((f'{opponent_position}{result_symbol}', game.get_absolute_url()))
+            table.append((position, member, records))
         return table
 
     @property

@@ -19,8 +19,6 @@
                     <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                 </div>
                 <div>
-                    <a href="{% url "teachers-list" number=season.number %}" class="btn btn-light">
-                        <i class="fa fa-chalkboard-teacher"></i> <span class="d-none d-md-inline">Nauczyciele</span>
                     </a>
                     {% if user|has_role:'referee' %}
                         <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
@@ -59,16 +57,17 @@
                         <div>
                             <div class="d-none d-md-block">
                                 <h5>Gracze ({{ group.members.count }})</h5>
+                                <p class="text-muted">Średni ranking: {{ group.avg_rank }}</p>
                                 <p>
                                     {% for member in group.members.all %}
                                         <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
                                         <span class="text-muted">[{{ member.rank }}]</span>{% if not forloop.last %},
                                     {% endif %}{% endfor %}
                                 </p>
+                                {% if group.teacher %}
+                                    <p>Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}</p>
+                                {% endif %}
                             </div>
-                            <p>
-                                Średni ranking: {{ group.avg_rank }}
-                            </p>
                         </div>
                         <div>
                             <a href="{% url "group-detail" season_number=group.season.number group_name=group.name %}"

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block page_title %}{{ object.first_name }} {{ object.last_name }} {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <div class="d-flex flex-column">
+            <small class="text-muted">Nauczyciel IGLO</small>
+            <div class="d-flex justify-content-between align-items-baseline">
+                <h2 class="mb-3">
+                    {{ teacher.first_name }} {{ teacher.last_name }}
+                    <small class="text-muted">{{ teacher.rank|lower }}</small>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card mb-3">
+            <div class="card-header">Komentarze</div>
+            <div class="card-body">{{ object.review_info }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

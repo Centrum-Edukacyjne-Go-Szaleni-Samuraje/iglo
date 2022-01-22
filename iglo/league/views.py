@@ -64,7 +64,8 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(
-            queryset.prefetch_related("groups__members__player"),
+            queryset.prefetch_related("groups__members__player",
+                                      "groups__teacher"),
             number=self.kwargs["number"],
         )
 
@@ -130,6 +131,7 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
                 "rounds__games__black__player",
                 "rounds__games__winner__player",
                 "members__player",
+                "teacher"
             ).annotate(
                 all_games_finished=~Exists(Game.objects.filter(
                     group=OuterRef('id'),
@@ -298,17 +300,3 @@ class PrepareSeasonView(UserRoleRequired, FormView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
-
-
-class TeachersListView(TemplateView):
-    template_name = 'league/teachers_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        season_number = self.kwargs['number']
-        season = get_object_or_404(Season, number=season_number)
-        context['season'] = season
-        context['season_is_finished'] = season.state == SeasonState.FINISHED
-        context['groups'] = Group.objects.filter(
-            season__number=season_number, teacher__isnull=False).prefetch_related('teacher').all()
-        return context

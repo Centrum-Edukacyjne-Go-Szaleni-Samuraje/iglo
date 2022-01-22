@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from league.models import Season, Group, Player, Game, Round, Member, Teacher
+from league.models import Season, Group, Player, Game, Round, Member
 
 
 class SeasonModelAdmin(admin.ModelAdmin):
@@ -59,14 +59,9 @@ class GroupModelAdmin(admin.ModelAdmin):
         return obj.season.number
 
 
-class TeacherModelAdmin(admin.ModelAdmin):
-    pass
-
-
 admin.site.register(Season, SeasonModelAdmin)
 admin.site.register(Group, GroupModelAdmin)
 admin.site.register(Player, PlayerModelAdmin)
 admin.site.register(Game, GameModelAdmin)
 admin.site.register(Round, RoundModelAdmin)
 admin.site.register(Member, MemberModelAdmin)
-admin.site.register(Teacher, TeacherModelAdmin)

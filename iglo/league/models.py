@@ -61,9 +61,6 @@ class SeasonManager(models.Manager):
             .latest("number")
         )
 
-    def get_seasons_with_teachers(self):
-        return self.exclude(state=SeasonState.DRAFT).filter(groups__teacher__isnull=False).distinct()
-
 
 class WrongSeasonStateError(Exception):
     pass
@@ -225,7 +222,7 @@ class Group(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
     type = models.CharField(choices=GroupType.choices, max_length=16)
     is_egd = models.BooleanField(default=False)
-    teacher = models.ForeignKey("Teacher", null=True, on_delete=models.SET_NULL, related_name="groups")
+    teacher = models.ForeignKey("review.Teacher", null=True, on_delete=models.SET_NULL, related_name="groups")
 
     class Meta:
         ordering = ["name"]
@@ -737,14 +734,3 @@ class Game(models.Model):
 
     def is_participant(self, player: Player):
         return player in [self.black.player, self.white.player]
-
-
-class Teacher(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, related_name="teacher_profile")
-    first_name = models.CharField(max_length=32)
-    last_name = models.CharField(max_length=32)
-    rank = models.CharField(max_length=5)
-    review_info = models.TextField(blank=True)
-
-    def __str__(self) -> str:
-        return f"Teacher: {self.first_name} {self.last_name}"

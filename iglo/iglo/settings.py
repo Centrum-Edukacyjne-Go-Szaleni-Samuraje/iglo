@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "accounts",
     "misc",
     "league",
+    "review",
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",

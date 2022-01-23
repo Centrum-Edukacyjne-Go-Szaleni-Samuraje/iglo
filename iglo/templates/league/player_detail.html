@@ -9,7 +9,7 @@
         <div class="col">
             <div class="d-flex justify-content-between align-items-baseline">
                 <h2 class="mb-3">
-                    {{ object.nick }} <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="Ten gracz jest patronem IGLO!"></i>{% if object.rank %}
+                    {{ object.nick }}{% if object.is_supporter %} <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="Ten gracz jest patronem IGLO!"></i>{% endif %}{% if object.rank %}
                     <small class="text-muted">[{{ object.rank }}]</small>{% endif %}
                 </h2>
                 {% if user.is_admin %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block page_title %}{{ object.first_name }} {{ object.last_name }} {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "teacher-list" %}">Nauczyciele</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ teacher.first_name }} {{ teacher.last_name }}</li>
+                </ol>
+            </nav>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-baseline">
+                    <h2 class="mb-3">
+                        {{ teacher.first_name }} {{ teacher.last_name }}
+                        <small class="text-muted">{{ teacher.rank|lower }}</small>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if object.review_info %}
+        <div class="row">
+            <div class="col">
+                <p>{{ object.review_info }}</p>
+            </div>
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            <h3>Grupy</h3>
+            <ul>
+                {% for group in teacher.groups.all %}
+                    <li>
+                        <a href="{{ group.get_absolute_url }}">
+                            Sezon #{{ group.season.number }} / Grupa {{ group.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -18,7 +18,3 @@ class RulesView(TemplateView):
 
 class ContactView(TemplateView):
     template_name = "misc/contact.html"
-
-
-class ReviewsView(TemplateView):
-    template_name = "misc/reviews.html"

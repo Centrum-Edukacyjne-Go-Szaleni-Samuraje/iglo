@@ -20,6 +20,12 @@
                 <h2>Grupa {{ object.name }}</h2>
                 {% if group.is_egd %}<span class="badge bg-info ms-2">EGD</span>{% endif %}
                 <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>
+
+                {% if group.teacher %}
+                    <div class="ms-auto">
+                        Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
+                    </div>
+                {% endif %}
             </div>
             {% if object.season.state != "draft" %}
                 <div class="d-flex justify-content-center">

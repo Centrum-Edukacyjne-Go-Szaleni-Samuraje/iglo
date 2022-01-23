@@ -28,7 +28,7 @@
                 {% url "accounts:registration" as registration_url %}
                 {% url "player-detail" user.player.nick as profile_url %}
                 {% url "contact" as contact_url %}
-                {% url "reviews" as reviews_url %}
+                {% url "teacher-list" as teachers_url %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == home_url %}active{% endif %}" aria-current="page"
                        href="{{ home_url }}">Home</a>
@@ -38,9 +38,9 @@
                        aria-current="page" href="{{ seasons_url }}">Sezony</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.get_full_path == reviews_url %}active{% endif %}"
+                    <a class="nav-link {% if teachers_url in request.get_full_path %}active{% endif %}"
                        aria-current="page"
-                       href="{{ reviews_url }}">Komentarze</a>
+                       href="{{ teachers_url }}">Nauczyciele</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == rules_url %}active{% endif %}" aria-current="page"

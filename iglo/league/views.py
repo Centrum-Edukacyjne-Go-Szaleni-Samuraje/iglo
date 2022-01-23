@@ -4,10 +4,10 @@ import datetime
 from django.contrib import messages
 
 from django.db.models import Q, Count, Exists, OuterRef
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, UpdateView
+from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
 
 from accounts.models import UserRole
 from league import texts
@@ -64,7 +64,8 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(
-            queryset.prefetch_related("groups__members__player"),
+            queryset.prefetch_related("groups__members__player",
+                                      "groups__teacher"),
             number=self.kwargs["number"],
         )
 
@@ -130,6 +131,7 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
                 "rounds__games__black__player",
                 "rounds__games__winner__player",
                 "members__player",
+                "teacher"
             ).annotate(
                 all_games_finished=~Exists(Game.objects.filter(
                     group=OuterRef('id'),

@@ -230,6 +230,7 @@ class Group(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
     type = models.CharField(choices=GroupType.choices, max_length=16)
     is_egd = models.BooleanField(default=False)
+    teacher = models.ForeignKey("review.Teacher", null=True, on_delete=models.SET_NULL, related_name="groups")
 
     class Meta:
         ordering = ["name"]

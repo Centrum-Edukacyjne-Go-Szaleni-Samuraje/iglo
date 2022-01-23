@@ -4,7 +4,7 @@ from review.models import Teacher
 
 
 class TeacherModelAdmin(admin.ModelAdmin):
-    pass
+    prepopulated_fields = {"slug": ("first_name", "last_name")}
 
 
 admin.site.register(Teacher, TeacherModelAdmin)

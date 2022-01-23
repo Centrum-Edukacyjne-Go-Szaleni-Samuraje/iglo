@@ -16,7 +16,7 @@
                     <li class="breadcrumb-item active" aria-current="page">Grupa {{ object.name }}</li>
                 </ol>
             </nav>
-            <div class="d-flex align-items-center mb-3">
+            <div class="d-flex align-items-center mb-3 flex-wrap">
                 <h2>Grupa {{ object.name }}</h2>
                 {% if group.is_egd %}<span class="badge bg-info ms-2">EGD</span>{% endif %}
                 <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>

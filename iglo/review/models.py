@@ -13,4 +13,6 @@ class Teacher(models.Model):
         return f"Teacher: {self.first_name} {self.last_name}"
 
     def get_absolute_url(self):
-        return reverse("teacher-detail", kwargs={"first_name": self.first_name, "last_name": self.last_name})
+        return reverse(
+            "teacher-detail", kwargs={"first_name": self.first_name.lower(), "last_name": self.last_name.lower()}
+        )

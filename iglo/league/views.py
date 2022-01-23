@@ -2,12 +2,11 @@ import csv
 import datetime
 
 from django.contrib import messages
-
-from django.db.models import Q, Count, Exists, OuterRef
-from django.http import HttpResponse, Http404
+from django.db.models import Count, Exists, OuterRef
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
+from django.views.generic import ListView, DetailView, FormView, UpdateView
 
 from accounts.models import UserRole
 from league import texts

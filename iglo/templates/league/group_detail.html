@@ -46,10 +46,7 @@
                                         <tr class="group-table__row--result-{{ member.result.value.lower }}">
                                             <td>{{position}}</td>
                                             <td class="group-table__header group-table__cell-name">
-                                                <strong>
-                                                    <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
-                                                </strong>
-                                                <span class="text-muted">[{{ member.rank }}]</span>
+                                                {% include "league/includes/player_badge.html" with member=member %}
                                             </td>
                                             {% for result, url in results %}
                                                 <td class="group-table__cell-result d-none d-lg-table-cell">

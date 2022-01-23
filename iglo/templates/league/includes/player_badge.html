@@ -1,1 +1,2 @@
-<a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a>&nbsp;<span class="text-muted">[{{ member.rank }}]</span>
+<a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a>{% if member.player.is_supporter %}
+    <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="Ten gracz jest patronem IGLO!"></i>{% endif %}&nbsp;<span class="text-muted">[{{ member.rank }}]</span>

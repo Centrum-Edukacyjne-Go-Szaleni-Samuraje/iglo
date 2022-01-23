@@ -43,7 +43,7 @@
             <h5 class="text-muted mb-4">
                 {{ season.start_date }} - {{ season.end_date }}
             </h5>
-            {% for group in object.groups.all %}
+            {% for group in object.get_groups %}
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
@@ -55,14 +55,13 @@
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div>
                             <div class="d-none d-md-block">
-                                <h5>Gracze ({{ group.members.count }})</h5>
-                                <p class="text-muted">Średni ranking: {{ group.avg_rank }}</p>
+                                <h5>Gracze</h5>
                                 <p>
                                     {% for member in group.members.all %}
-                                        <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
-                                        <span class="text-muted">[{{ member.rank }}]</span>{% if not forloop.last %},
-                                    {% endif %}{% endfor %}
+                                        {% include "league/includes/player_badge.html" with member=member %}
+                                    {% endfor %}
                                 </p>
+                                <p class="text-muted">{{ group.members_count }} graczy w tym {{ group.supporters_count }} {% if group.supporters_count == 1%}patron{% else %}patronów{% endif %}, średni ranking: {{ group.avg_rank | floatformat }}</p>
                                 {% if group.teacher %}
                                     <p>Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}</p>
                                 {% endif %}

@@ -3,7 +3,6 @@ import decimal
 import math
 import re
 import string
-from collections import OrderedDict
 from enum import Enum
 from statistics import mean
 from typing import Optional
@@ -12,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Case, When, Value
+from django.db.models.functions import Round as DjangoRound
 from django.urls import reverse
 from django.utils.functional import cached_property
 
@@ -203,6 +203,14 @@ class Season(models.Model):
             if group.type == GroupType.MCMAHON:
                 group.set_initial_score()
 
+    def get_groups(self):
+        return self.groups.select_related("teacher").prefetch_related("members__player").order_by("name").annotate(
+            members_count=Count("members"),
+            supporters_count=Count("members", filter=Q(members__player__is_supporter=True)),
+            avg_rank=DjangoRound(Avg("members__rank")),
+
+        )
+
 
 class GameResult(Enum):
     WIN = "W"
@@ -345,10 +353,6 @@ class Group(models.Model):
             order=self.members.count() + 1,
         )
 
-    def avg_rank(self) -> int:
-        result = self.members.aggregate(avg_rank=Avg("rank"))["avg_rank"]
-        return int(result or 0)
-
     def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
         member_to_remove = self.members.get(player__nick=player_nick_to_remove)
         self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
@@ -450,6 +454,7 @@ class Player(models.Model):
     egd_pin = models.CharField(max_length=8, null=True, blank=True)
     egd_approval = models.BooleanField(default=False)
     availability = models.TextField(blank=True)
+    is_supporter = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.nick

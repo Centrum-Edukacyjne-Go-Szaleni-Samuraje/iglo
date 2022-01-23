@@ -70,3 +70,8 @@
 .sgf-container {
     margin: 20px;
 }
+
+.player--supporter {
+    color: #f6b84b;
+    font-weight: bold;
+}

@@ -9,7 +9,7 @@
         <div class="col">
             <div class="d-flex justify-content-between align-items-baseline">
                 <h2 class="mb-3">
-                    {{ object.nick }} {% if object.rank %}
+                    {{ object.nick }} <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="Ten gracz jest patronem IGLO!"></i>{% if object.rank %}
                     <small class="text-muted">[{{ object.rank }}]</small>{% endif %}
                 </h2>
                 {% if user.is_admin %}
@@ -24,7 +24,7 @@
                             <a href="{% url "season-detail" number=current_membership.group.season.number %}">
                                 Sezon #{{ current_membership.group.season.number }}</a> /
                             <a href="{% url "group-detail" season_number=current_membership.group.season.number group_name=current_membership.group.name %}">
-                                Grupa #{{ current_membership.group.name }}
+                                Grupa {{ current_membership.group.name }}
                             </a>
                         </h5>
                         {% if current_games %}

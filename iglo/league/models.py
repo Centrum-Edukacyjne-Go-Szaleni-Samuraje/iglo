@@ -233,7 +233,7 @@ class Group(models.Model):
     teacher = models.ForeignKey("review.Teacher", null=True, on_delete=models.SET_NULL, related_name="groups")
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["-season__number", "name"]
 
     def __str__(self) -> str:
         return f"{self.name} - season: {self.season}"

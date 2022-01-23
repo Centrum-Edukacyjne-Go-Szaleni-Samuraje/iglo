@@ -1,7 +1,11 @@
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from review.models import Teacher
+
+
+class TeacherListView(ListView):
+    model = Teacher
 
 
 class TeacherDetailView(DetailView):

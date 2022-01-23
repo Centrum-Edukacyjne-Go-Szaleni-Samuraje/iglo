@@ -1,7 +1,6 @@
 from django.views.generic import TemplateView
 
 from league.models import Season
-from review.models import Teacher
 
 
 class HomeView(TemplateView):
@@ -19,15 +18,3 @@ class RulesView(TemplateView):
 
 class ContactView(TemplateView):
     template_name = "misc/contact.html"
-
-
-class ReviewsView(TemplateView):
-    template_name = "misc/reviews.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['teachers'] = (Teacher.objects
-                               .order_by('last_name',
-                                         'first_name')
-                               .all())
-        return context

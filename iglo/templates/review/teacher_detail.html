@@ -10,7 +10,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url "teacher-list" %}">Nauczyciele</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ teacher.first_name }} {{ teacher.last_name }}</li>
+                    <li class="breadcrumb-item active"
+                        aria-current="page">{{ teacher.first_name }} {{ teacher.last_name }}</li>
                 </ol>
             </nav>
             <div class="d-flex flex-column">
@@ -38,6 +39,19 @@
                     <li>
                         <a href="{{ group.get_absolute_url }}">
                             Sezon #{{ group.season.number }} / Grupa {{ group.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <h3>Komentarze</h3>
+            <ul>
+                {% for game in teacher.get_reviews %}
+                    <li>
+                        <a href="{{ game.get_absolute_url }}">
+                            Sezon #{{ game.group.season.number }} / Grupa {{ game.group.name }} - {{ game.black }} - {{ game.white }}</a>
+                        &nbsp;/&nbsp;
+                        <a href="{{ game.review_video_link }}" target="_blank">
+                            <i class="fab fa-youtube"></i> Komentarz
                         </a>
                     </li>
                 {% endfor %}

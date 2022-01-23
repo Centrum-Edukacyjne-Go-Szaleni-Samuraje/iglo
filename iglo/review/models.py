@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
+from league.models import Game
+
 
 class Teacher(models.Model):
     user = models.ForeignKey(
@@ -17,3 +19,8 @@ class Teacher(models.Model):
 
     def get_absolute_url(self):
         return reverse("teacher-detail", kwargs={"slug": self.slug})
+
+    def get_reviews(self):
+        return Game.objects.filter(review_video_link__isnull=False, group__in=self.groups.all()).select_related(
+            "white__player", "black__player", "group__season"
+        )

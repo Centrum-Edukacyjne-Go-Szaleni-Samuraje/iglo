@@ -33,7 +33,8 @@
                                 </button>
                             {% elif season.state == "in_progress" %}
                                 <button type="submit" class="btn btn-danger" name="action-finish-season">
-                                    <i class="fa fa-flag-checkered"></i> <span class="d-none d-md-inline">Zakończ Sezon</span>
+                                    <i class="fa fa-flag-checkered"></i> <span
+                                        class="d-none d-md-inline">Zakończ Sezon</span>
                                 </button>
                             {% endif %}
                         </form>
@@ -61,11 +62,16 @@
                                         {% include "league/includes/player_badge.html" with member=member %}
                                     {% endfor %}
                                 </p>
-                                <p class="text-muted">{{ group.members_count }} graczy w tym {{ group.supporters_count }} {% if group.supporters_count == 1%}patron{% else %}patronów{% endif %}, średni ranking: {{ group.avg_rank | floatformat }}</p>
-                                {% if group.teacher %}
-                                    <p>Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}</p>
-                                {% endif %}
                             </div>
+                            <p class="text-muted">
+                                {{ group.members_count }} graczy w tym {{ group.supporters_count }}
+                                {% if group.supporters_count == 1 %}patron{% else %}patronów{% endif %}<span
+                                    class="d-none d-md-inline">, średni ranking: {{ group.avg_rank | floatformat }}</span>
+                            </p>
+                            {% if group.teacher %}
+                                <p>
+                                    Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}</p>
+                            {% endif %}
                         </div>
                         <div>
                             <a href="{% url "group-detail" season_number=group.season.number group_name=group.name %}"

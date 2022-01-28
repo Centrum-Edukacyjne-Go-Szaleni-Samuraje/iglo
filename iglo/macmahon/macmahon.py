@@ -120,13 +120,16 @@ Pairing = Tuple[list[Pair], Optional[Player]]
 
 
 class MacMahon:
-    def get_pairing(self, sorted_players: list[Player]) -> Pairing:
-        players = sorted_players[:]
+    def __init__(self, sorted_players: list[Player]):
+        self.players = sorted_players[:]
+        self.position = {player.name: pos for pos, player in enumerate(self.players)}
+
+    def get_pairing(self) -> Pairing:
         pairs = []
-        bye = self._get_bye(players)
-        while len(players):
-            player1 = players.pop(0)
-            player2 = next(self._possible_opponents(player1, opponents=players))
+        bye = self._get_bye(self.players)
+        while len(self.players):
+            player1 = self._get_first_player()
+            player2 = self._get_second_player(player1)
             player1_color_preference = self._get_color_preference(player1)
             player2_color_preference = self._get_color_preference(player2)
             player1_color, _ = self._determine_colors(player1_color_preference, player2_color_preference)
@@ -134,7 +137,6 @@ class MacMahon:
                 pairs.append(Pair(player1, player2))
             else:
                 pairs.append(Pair(player2, player1))
-            players.remove(player2)
         return pairs, bye
 
     def _get_bye(self, players: list[Player]) -> Optional[Player]:
@@ -146,9 +148,24 @@ class MacMahon:
                 players.remove(player)
                 return player
 
-    def _possible_opponents(self, player: Player, opponents: list[Player]) -> Iterator[Player]:
+    def _get_first_player(self) -> Player:
+        sorted_players = sorted(self.players, key=lambda player: (len(list(self._possible_opponents(player))), self.position[player.name]))
+        first_player = sorted_players[0]
+        self.players.remove(first_player)
+        return first_player
+
+    def _get_second_player(self, player1: Player) -> Player:
+        player1_position = self.position[player1.name]
+        possible_opponents = self._possible_opponents(player1)
+        sorted_opponents = sorted(possible_opponents, key=lambda player: abs(self.position[player.name] - player1_position))
+        second_player = sorted_opponents[0]
+        self.players.remove(second_player)
+        return second_player
+
+    def _possible_opponents(self, player: Player) -> Iterator[Player]:
         past_opponents = [g.opponent for g in player.games]
-        return (opponent for opponent in opponents if opponent.name not in past_opponents)
+        excluded_players = past_opponents + [player.name]
+        return (opponent for opponent in self.players if opponent.name not in excluded_players)
 
     def _get_color_preference(self, player: Player) -> ColorPreference:
         color_history = [g.color for g in player.games if g.color != Color.BYE]
@@ -188,5 +205,5 @@ def prepare_next_round(players: list[Player]) -> Pairing:
     scoring = Scoring()
     scores = scoring.get_scores(players)
     sorted_players = [score.player for score in scores]
-    macmahon = MacMahon()
-    return macmahon.get_pairing(sorted_players)
+    macmahon = MacMahon(sorted_players)
+    return macmahon.get_pairing()

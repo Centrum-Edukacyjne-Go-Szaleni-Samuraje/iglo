@@ -562,6 +562,9 @@ class Round(models.Model):
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
 
+    class Meta:
+        ordering = ["number"]
+
     def is_current(self) -> bool:
         if not self.start_date or not self.end_date:
             return False

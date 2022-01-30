@@ -21,6 +21,8 @@ class Teacher(models.Model):
         return reverse("teacher-detail", kwargs={"slug": self.slug})
 
     def get_reviews(self):
-        return Game.objects.filter(review_video_link__isnull=False, group__in=self.groups.all()).select_related(
-            "white__player", "black__player", "group__season"
+        return (
+            Game.objects.filter(review_video_link__isnull=False, group__in=self.groups.all())
+            .select_related("white__player", "black__player", "group__season")
+            .order_by("-group__season__number", "group__name")
         )

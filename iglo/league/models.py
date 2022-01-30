@@ -462,6 +462,11 @@ class Player(models.Model):
     def get_absolute_url(self) -> str:
         return reverse("player-detail", kwargs={"slug": self.nick})
 
+    def get_egd_profile_url(self) -> Optional[str]:
+        if self.egd_pin:
+            return f"https://www.europeangodatabase.eu/EGD/Player_Card.php?&key={self.egd_pin}"
+        return None
+
 
 class GameServer(models.TextChoices):
     OGS = ("OGS", "OGS")

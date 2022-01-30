@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from macmahon.macmahon import Player, GameRecord, Color, ResultType, Scoring
@@ -59,3 +61,65 @@ def registered_players():
         ('Eve', 100),
         ('Floyd', 50)
     ]
+
+
+sylwia = Player('Sylwia', 506, 0, [
+    GameRecord('Kubit', Color.BLACK, ResultType.LOSE),
+    GameRecord('Patryk', Color.WHITE, ResultType.LOSE),
+    GameRecord('kam', Color.WHITE, ResultType.WIN),
+])
+kubit = Player('Kubit', 446, 0, [
+    GameRecord('Sylwia', Color.WHITE, ResultType.WIN),
+    GameRecord('HornedRat', Color.BLACK, ResultType.WIN),
+    GameRecord('Patryk', Color.BLACK, ResultType.WIN),
+])
+patryk = Player('Patryk', 415, 0, [
+    GameRecord('HornedRat', Color.BLACK, ResultType.LOSE),
+    GameRecord('Sylwia', Color.BLACK, ResultType.WIN),
+    GameRecord('Kubit', Color.WHITE, ResultType.LOSE),
+])
+hornedrat = Player('HornedRat', 428, 0, [
+    GameRecord('Patryk', Color.WHITE, ResultType.WIN),
+    GameRecord('Kubit', Color.WHITE, ResultType.LOSE),
+    GameRecord('Mithirii', Color.BLACK, ResultType.LOSE),
+])
+jetbrain = Player('JetBrain', 100, -1, [
+    GameRecord('Mithirii', Color.BLACK, ResultType.LOSE),
+    GameRecord('kam', Color.WHITE, ResultType.WIN),
+    GameRecord('KJKZ', Color.WHITE, ResultType.LOSE),
+])
+mithirii = Player('Mithirii', 100, -1, [
+    GameRecord('JetBrain', Color.WHITE, ResultType.WIN),
+    GameRecord('KJKZ', Color.BLACK, ResultType.WIN),
+    GameRecord('HornedRat', Color.WHITE, ResultType.WIN),
+])
+kjkz = Player('KJKZ', 130, -1, [
+    GameRecord('kam', Color.BLACK, ResultType.WIN),
+    GameRecord('Mithirii', Color.WHITE, ResultType.LOSE),
+    GameRecord('JetBrain', Color.BLACK, ResultType.WIN),
+])
+kam = Player('kam', 100, -1, [
+    GameRecord('KJKZ', Color.WHITE, ResultType.LOSE),
+    GameRecord('JetBrain', Color.BLACK, ResultType.LOSE),
+    GameRecord('Sylwia', Color.BLACK, ResultType.LOSE),
+])
+
+
+@pytest.fixture
+def real_live_players():
+    return [sylwia, kubit, patryk, hornedrat, jetbrain, mithirii, kjkz, kam]
+
+
+@pytest.fixture
+def real_live_players_round_2(real_live_players):
+    return [replace(player, games=player.games[:1]) for player in real_live_players]
+
+
+@pytest.fixture
+def real_live_players_round_3(real_live_players):
+    return [replace(player, games=player.games[:2]) for player in real_live_players]
+
+
+@pytest.fixture
+def real_live_players_round_4(real_live_players):
+    return [replace(player, games=player.games[:3]) for player in real_live_players]

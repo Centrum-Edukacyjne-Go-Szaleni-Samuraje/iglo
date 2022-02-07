@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 
 from league import texts
-from league.utils import round_robin, shuffle_colors
+from league.utils.paring import round_robin, shuffle_colors
 from macmahon import macmahon as mm
 
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"

@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from league.utils import round_robin, shuffle_colors
+from league.utils.paring import round_robin, shuffle_colors
 
 
 class RoundRobinTestCase(SimpleTestCase):

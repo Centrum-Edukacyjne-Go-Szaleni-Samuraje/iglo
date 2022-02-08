@@ -6,8 +6,9 @@ from django.contrib import messages
 from django.db.models import Count, Exists, OuterRef
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, UpdateView
+from django.views.generic import ListView, DetailView, FormView, UpdateView, RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
@@ -227,6 +228,21 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
         )
         response.write(data)
         return response
+
+
+class GameDetailRedirectView(RedirectView):
+    permanent = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'bye_player' in kwargs.keys():
+            return reverse(
+                "bye-game-detail",
+                kwargs=kwargs,
+            )
+        return reverse(
+            "game-detail",
+            kwargs=kwargs,
+        )
 
 
 class GameDetailView(DetailView):

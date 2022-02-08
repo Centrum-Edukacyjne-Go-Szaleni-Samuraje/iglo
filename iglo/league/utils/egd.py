@@ -34,7 +34,8 @@ class TimeLimit:
 
 @dataclass(frozen=True)
 class Player:
-    name: str
+    first_name: str
+    last_name: str
     rank: str
     country: str
     club: str
@@ -78,10 +79,10 @@ def create_tournament_table(
         f"; TM[{tm}]",
         ";",
     ]
-    max_name_width = max(len(player.name) for player in players)
+    max_name_width = max(len(player.first_name) + len(player.last_name) + 1 for player in players)
     place_width = len(str(len(players)))
     for place, player in enumerate(players, start=1):
-        name = _strip_local_chars(player.name)
+        name = _strip_local_chars(player.last_name) + " " + _strip_local_chars(player.first_name)
         line = f"{place:<{place_width}} {name:<{max_name_width}}  {player.rank:<3} {player.country} {player.club:<4}  "
         wins = 0
         results = ""

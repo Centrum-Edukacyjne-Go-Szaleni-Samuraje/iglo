@@ -193,7 +193,8 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
         )
         member_id_to_egd_player = {
             member.id: EGDPlayer(
-                name=f"{member.player.first_name} {member.player.last_name}",
+                first_name=member.player.first_name,
+                last_name=member.player.last_name,
                 rank=gor_to_rank(member.rank),
                 country=member.player.country.code,
                 club=member.player.club,

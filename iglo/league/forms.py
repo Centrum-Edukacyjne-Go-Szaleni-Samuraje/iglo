@@ -114,6 +114,8 @@ class PlayerUpdateForm(forms.ModelForm):
             "auto_join",
             "egd_pin",
             "egd_approval",
+            "country",
+            "club",
             "availability",
         ]
         labels = {
@@ -126,6 +128,8 @@ class PlayerUpdateForm(forms.ModelForm):
             "egd_pin": texts.EGD_PIN_LABEL,
             "egd_approval": texts.EGD_APPROVAL_LABEL,
             "availability": texts.AVAILABILITY_LABEL,
+            "country": texts.COUNTRY_LABEL,
+            "club": texts.CLUB_LABEL,
         }
         help_texts = {
             "rank": texts.RANK_HELP_TEXT,
@@ -133,6 +137,7 @@ class PlayerUpdateForm(forms.ModelForm):
             "egd_pin": texts.EGD_HELP_TEXT,
             "egd_approval": texts.EGD_APPROVAL_HELP_TEXT,
             "availability": texts.AVAILABILITY_HELP_TEXT,
+            "club": texts.CLUB_HELP_TEXT,
         }
         widgets = {
             "availability": forms.Textarea(attrs={"rows": 3}),

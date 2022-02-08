@@ -1,11 +1,14 @@
 import datetime
 import os
+from decimal import Decimal
 from pathlib import Path
 
 import dj_database_url
 import sentry_sdk
 from django.core.exceptions import ImproperlyConfigured
 from sentry_sdk.integrations.django import DjangoIntegration
+
+from league.utils.egd import Location, TimeLimit, ByoYomi, TournamentClass
 
 
 def env(key, as_bool=False, as_list=False, as_int=False, required=True, default=None):
@@ -58,7 +61,8 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
-    "bootstrap_pagination"
+    "bootstrap_pagination",
+    "django_countries",
 ]
 
 MIDDLEWARE = [
@@ -188,4 +192,25 @@ else:
 
 INTERNAL_IPS = [
     '127.0.0.1',
+]
+
+EGD_SETTINGS = {
+    "CLASS": TournamentClass.D,
+    "NAME": "IGLO - Sezon #{season_number} - Grupa {group_name}",
+    "LOCATION": Location(
+        country="PL",
+        city="OGS",
+    ),
+    "KOMI": Decimal("6.5"),
+    "TIME_LIMIT": TimeLimit(
+        basic=40,
+        byo_yomi=ByoYomi(
+            duration=30,
+            periods=3,
+        )
+    ),
+}
+
+COUNTRIES_FIRST = [
+    "PL",
 ]

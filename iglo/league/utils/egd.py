@@ -82,7 +82,7 @@ def create_tournament_table(
     place_width = len(str(len(players)))
     for place, player in enumerate(players, start=1):
         name = _strip_local_chars(player.name)
-        line = f"{place:<{place_width}} {name:<{max_name_width}}  {player.rank} {player.country} {player.club}  "
+        line = f"{place:<{place_width}} {name:<{max_name_width}}  {player.rank:<3} {player.country} {player.club:<4}  "
         wins = 0
         results = ""
         for round in rounds:
@@ -114,3 +114,12 @@ def create_tournament_table(
 
 def _strip_local_chars(text: str) -> str:
     return unicodedata.normalize("NFKD", text).encode("ASCII", "ignore").decode()
+
+
+def gor_to_rank(gor: int) -> str:
+    if gor < 2100:
+        result = -(gor // 100) + 21
+        return f"{result}k"
+    else:
+        result = (gor // 100) - 20
+        return f"{result}d"

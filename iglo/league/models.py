@@ -9,11 +9,13 @@ from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Case, When, Value
 from django.db.models.functions import Round as DjangoRound
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django_countries.fields import CountryField
 
 from league import texts
 from league.utils.paring import round_robin, shuffle_colors
@@ -455,6 +457,8 @@ class Player(models.Model):
     egd_approval = models.BooleanField(default=False)
     availability = models.TextField(blank=True)
     is_supporter = models.BooleanField(default=False)
+    country = CountryField()
+    club = models.CharField(max_length=4, blank=True, validators=[MinLengthValidator(4)])
 
     def __str__(self) -> str:
         return self.nick

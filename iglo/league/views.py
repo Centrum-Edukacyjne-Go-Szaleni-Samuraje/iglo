@@ -1,12 +1,14 @@
 import csv
 import datetime
 
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Exists, OuterRef
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView
+from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
 from league import texts
@@ -32,6 +34,7 @@ from league.permissions import (
     UserRoleRequiredForModify,
     UserRoleRequired,
 )
+from league.utils.egd import create_tournament_table, DatesRange, Player as EGDPlayer, Game as EGDGame, gor_to_rank
 
 
 class SeasonsListView(ListView):
@@ -121,11 +124,9 @@ class SeasonExportCSVView(UserRoleRequired, View):
         return response
 
 
-class GroupDetailView(UserRoleRequiredForModify, DetailView):
-    model = Group
-    required_roles = [UserRole.REFEREE]
-
+class GroupObjectMixin(SingleObjectMixin):
     def get_object(self, queryset=None):
+        print("GET OBJECT")
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(
@@ -143,6 +144,11 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
             season__number=self.kwargs["season_number"],
             name__iexact=self.kwargs["group_name"],
         )
+
+
+class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
+    model = Group
+    required_roles = [UserRole.REFEREE]
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -168,6 +174,59 @@ class GroupDetailView(UserRoleRequiredForModify, DetailView):
         elif "action-pairing" in request.POST:
             self.object.start_macmahon_round()
         return self.render_to_response(context)
+
+
+class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
+    model = Group
+    required_roles = [UserRole.REFEREE]
+
+    def get(self, request, *args, **kwargs):
+        group = self.get_object()
+        if not group.all_games_finished:
+            raise Http404()
+        filename = f"iglo_season_{group.season.number}_group_{group.name}.txt"
+        response = HttpResponse(
+            content_type="text/plain",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            },
+        )
+        member_id_to_egd_player = {
+            member.id: EGDPlayer(
+                name=f"{member.player.first_name} {member.player.last_name}",
+                rank=gor_to_rank(member.rank),
+                country=member.player.country.code,
+                club=member.player.club,
+                pin=member.player.egd_pin or "",
+            )
+            for member in group.members_qualification
+        }
+        data = create_tournament_table(
+            klass=settings.EGD_SETTINGS["CLASS"],
+            name=settings.EGD_SETTINGS["NAME"].format(season_number=group.season.number, group_name=group.name),
+            location=settings.EGD_SETTINGS["LOCATION"],
+            dates=DatesRange(
+                start=group.season.start_date,
+                end=group.season.end_date,
+            ),
+            handicap=None,
+            komi=settings.EGD_SETTINGS["KOMI"],
+            time_limit=settings.EGD_SETTINGS["TIME_LIMIT"],
+            players=list(member_id_to_egd_player.values()),
+            rounds=[
+                [
+                    EGDGame(
+                        white=member_id_to_egd_player[game.white.id] if game.white else None,
+                        black=member_id_to_egd_player[game.black.id] if game.black else None,
+                        winner=member_id_to_egd_player[game.winner.id]
+                    )
+                    for game in round.games.filter(winner__isnull=False)
+                ]
+                for round in group.rounds.all()
+            ],
+        )
+        response.write(data)
+        return response
 
 
 class GameDetailView(DetailView):

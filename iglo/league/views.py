@@ -102,7 +102,17 @@ class SeasonExportCSVView(UserRoleRequired, View):
         )
         writer = csv.DictWriter(
             f=response,
-            fieldnames=["nick", "name", "group", "email", "auto_join", "egd_approval", "egd_profile"],
+            fieldnames=[
+                "nick",
+                "name",
+                "rank",
+                "email",
+                "auto_join",
+                "egd_approval",
+                "egd_profile",
+                "group",
+                "season_rank",
+            ],
         )
         writer.writeheader()
         for member in (
@@ -114,11 +124,13 @@ class SeasonExportCSVView(UserRoleRequired, View):
                 {
                     "nick": member.player.nick,
                     "name": f"{member.player.first_name} {member.player.last_name}",
-                    "group": member.group.name,
+                    "rank": member.player.rank,
                     "email": member.player.user.email if member.player.user else "",
                     "auto_join": member.player.auto_join,
                     "egd_approval": member.player.egd_approval,
                     "egd_profile": member.player.get_egd_profile_url(),
+                    "group": member.group.name,
+                    "season_rank": member.rank,
                 }
             )
         return response

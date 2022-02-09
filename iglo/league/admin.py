@@ -6,11 +6,17 @@ from league.models import Season, Group, Player, Game, Round, Member
 class SeasonModelAdmin(admin.ModelAdmin):
     list_display = ["number", "start_date", "end_date"]
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class PlayerModelAdmin(admin.ModelAdmin):
     list_display = ["nick", "first_name", "last_name", "rank", "auto_join", "user"]
     search_fields = ["nick", "first_name", "last_name", "user__email"]
     list_select_related = ["user"]
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class GameModelAdmin(admin.ModelAdmin):
@@ -27,6 +33,9 @@ class GameModelAdmin(admin.ModelAdmin):
     def round_number(self, obj):
         return obj.round.number
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class RoundModelAdmin(admin.ModelAdmin):
     list_display = ["number", "season_number", "group_name"]
@@ -39,6 +48,9 @@ class RoundModelAdmin(admin.ModelAdmin):
     def group_name(self, obj):
         return obj.group.name
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class MemberModelAdmin(admin.ModelAdmin):
     list_display = ["player", "season_number", "group_name"]
@@ -50,6 +62,9 @@ class MemberModelAdmin(admin.ModelAdmin):
     def group_name(self, obj):
         return obj.group.name
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class GroupModelAdmin(admin.ModelAdmin):
     list_display = ["name", "season_number", "type"]
@@ -57,6 +72,9 @@ class GroupModelAdmin(admin.ModelAdmin):
 
     def season_number(self, obj):
         return obj.season.number
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Season, SeasonModelAdmin)

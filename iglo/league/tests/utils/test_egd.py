@@ -18,8 +18,8 @@ from league.utils.egd import (
 
 class CreateTournamentTableTestCase(SimpleTestCase):
     def test_create_tournament_table(self):
-        player_1 = Player(first_name="Jan", last_name="Nowak", rank="6d", country="PL", club="Wars", pin="12312312")
-        player_2 = Player(first_name="Adam", last_name="Kowalski", rank="3d", country="UK", club="Lond", pin="34534534")
+        player_1 = Player(first_name="Paweł", last_name="Nowak", rank="6d", country="PL", club="Wars", pin="12312312")
+        player_2 = Player(first_name="Adam", last_name="Kowąlski", rank="3d", country="UK", club="Lond", pin="34534534")
         player_3 = Player(first_name="Piotr", last_name="Wójcik", rank="15k", country="PL", club="Krak", pin="56756756")
 
         result = create_tournament_table(
@@ -99,15 +99,15 @@ class CreateTournamentTableTestCase(SimpleTestCase):
                     "; KM[6.5]",
                     "; TM[62.5]",
                     ";",
-                    "1 Nowak Jan      6d  PL Wars  3  0  0  0  2+/b  3+/w  0+    |12312312",
+                    "1 Nowak Pawel    6d  PL Wars  3  0  0  0  2+/b  3+/w  0+    |12312312",
                     "2 Kowalski Adam  3d  UK Lond  2  0  0  0  1-/w  0+    3+/b  |34534534",
                     "3 Wojcik Piotr   15k PL Krak  1  0  0  0  0+    1-/b  2-/w  |56756756",
                 ]
             ),
         )
 
-class GorToRankTestCase(SimpleTestCase):
 
+class GorToRankTestCase(SimpleTestCase):
     def test_for_kyu(self):
         self.assertEqual(gor_to_rank(2000), "1k")
         self.assertEqual(gor_to_rank(100), "20k")
@@ -116,4 +116,3 @@ class GorToRankTestCase(SimpleTestCase):
     def test_for_dan(self):
         self.assertEqual(gor_to_rank(2100), "1d")
         self.assertEqual(gor_to_rank(2900), "9d")
-

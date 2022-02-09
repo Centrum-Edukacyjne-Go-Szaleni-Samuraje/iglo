@@ -114,7 +114,7 @@ def create_tournament_table(
 
 
 def _strip_local_chars(text: str) -> str:
-    return unicodedata.normalize("NFKD", text).encode("ASCII", "ignore").decode()
+    return unicodedata.normalize("NFKD", text.replace("Ł", "L").replace("ł", "l")).encode("ASCII", "ignore").decode()
 
 
 def gor_to_rank(gor: int) -> str:

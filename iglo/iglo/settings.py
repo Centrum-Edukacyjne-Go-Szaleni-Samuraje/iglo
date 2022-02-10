@@ -203,7 +203,7 @@ EGD_SETTINGS = {
     ),
     "KOMI": Decimal("6.5"),
     "TIME_LIMIT": TimeLimit(
-        basic=40,
+        basic=30,
         byo_yomi=ByoYomi(
             duration=30,
             periods=3,

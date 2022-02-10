@@ -196,7 +196,7 @@ INTERNAL_IPS = [
 
 EGD_SETTINGS = {
     "CLASS": TournamentClass.D,
-    "NAME": "IGLO - Sezon #{season_number} - Grupa {group_name}",
+    "NAME": "Internet Go League IGLO - Season #{season_number} - Group {group_name}",
     "LOCATION": Location(
         country="PL",
         city="OGS",

@@ -139,7 +139,6 @@ class SeasonExportCSVView(UserRoleRequired, View):
 
 class GroupObjectMixin(SingleObjectMixin):
     def get_object(self, queryset=None):
-        print("GET OBJECT")
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(

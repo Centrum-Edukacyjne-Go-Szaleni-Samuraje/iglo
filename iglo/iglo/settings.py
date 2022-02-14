@@ -216,3 +216,28 @@ COUNTRIES_FIRST = [
 ]
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
+
+AI_SENSEI = {
+    "AUTH_URL": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAjXnHmLSy6IKWu_rQHBCDlf7Vj9d4IafU",
+    "SERVICE_URL": "https://us-central1-sensei-160117.cloudfunctions.net/betaServer/user/upload",
+    "EMAIL": "szaleni.samuraje@outlook.com",
+    "PASSWORD": "sz@l3n1.s@mur@j3",
+}
+
+OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
+OGS_SGF_LINK_FORMAT = "https://online-go.com/api/v1/games/{id}/sgf"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}

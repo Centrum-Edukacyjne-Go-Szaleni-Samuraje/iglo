@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from league.models import Season, Group, Player, Game, Round, Member
+from league.models import Season, Group, Player, Game, Round, Member, GameAIAnalyseUpload
 
 
 class SeasonModelAdmin(admin.ModelAdmin):
@@ -77,9 +77,18 @@ class GroupModelAdmin(admin.ModelAdmin):
         return False
 
 
+class GameAIAnalyseUploadAdmin(admin.ModelAdmin):
+    list_display = ["created", "game", "status"]
+    raw_id_fields = ["game"]
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin.site.register(Season, SeasonModelAdmin)
 admin.site.register(Group, GroupModelAdmin)
 admin.site.register(Player, PlayerModelAdmin)
 admin.site.register(Game, GameModelAdmin)
 admin.site.register(Round, RoundModelAdmin)
 admin.site.register(Member, MemberModelAdmin)
+admin.site.register(GameAIAnalyseUpload, GameAIAnalyseUploadAdmin)

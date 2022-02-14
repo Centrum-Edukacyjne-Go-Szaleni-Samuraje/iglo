@@ -2,6 +2,7 @@ import datetime
 import string
 
 import factory
+from django.db.models.signals import post_save
 
 from league.models import Member, Player, Group, Season, Game, Round
 
@@ -50,6 +51,7 @@ class RoundFactory(factory.django.DjangoModelFactory):
     number = factory.Sequence(lambda n: n)
 
 
+@factory.django.mute_signals(post_save)
 class GameFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Game
@@ -58,3 +60,4 @@ class GameFactory(factory.django.DjangoModelFactory):
     group = factory.SubFactory(GroupFactory)
     black = factory.SubFactory(MemberFactory)
     white = factory.SubFactory(MemberFactory)
+    sgf = factory.django.FileField(filename='file.sgf')

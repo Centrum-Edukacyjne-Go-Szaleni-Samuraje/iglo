@@ -466,10 +466,3 @@ class GroupTestCase(TestCase):
         game_2.refresh_from_db()
         self.assertEqual(game_1.black, new_member)
         self.assertEqual(game_2.white, new_member)
-
-
-class GameTestCase(TestCase):
-    def test_external_sgf_link(self):
-        game = GameFactory(link="https://online-go.com/game/33759361")
-
-        self.assertEqual(game.external_sgf_link, "https://online-go.com/api/v1/games/33759361/sgf")

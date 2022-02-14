@@ -214,3 +214,5 @@ EGD_SETTINGS = {
 COUNTRIES_FIRST = [
     "PL",
 ]
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")

@@ -219,10 +219,10 @@ CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
 
 AI_SENSEI = {
-    "AUTH_URL": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAjXnHmLSy6IKWu_rQHBCDlf7Vj9d4IafU",
-    "SERVICE_URL": "https://us-central1-sensei-160117.cloudfunctions.net/betaServer/user/upload",
-    "EMAIL": "szaleni.samuraje@outlook.com",
-    "PASSWORD": "sz@l3n1.s@mur@j3",
+    "AUTH_URL": env("AI_SENSEI_AUTH_URL", required=False),
+    "SERVICE_URL": env("AI_SENSEI_SERVICE", required=False),
+    "EMAIL": env("AI_SENSEI_EMAIL", required=False),
+    "PASSWORD": env("AI_SENSEI_PASSWORD", required=False),
 }
 
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"

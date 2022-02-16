@@ -66,7 +66,6 @@ def game_sgf_fetch_task(game_id: int) -> None:
         try:
             sgf_data = fetch_sgf(game_url=game.link)
             game.sgf.save(f"game-{game.id}.sgf", ContentFile(sgf_data))
-            game.save()
             logger.info("SGF fetched successfully for game %d", game_id)
         except OGSException as err:
             logger.info("SGF fetch fail for game %d - %s", game_id, str(err))

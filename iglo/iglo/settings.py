@@ -214,3 +214,30 @@ EGD_SETTINGS = {
 COUNTRIES_FIRST = [
     "PL",
 ]
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
+
+AI_SENSEI = {
+    "AUTH_URL": env("AI_SENSEI_AUTH_URL", required=False),
+    "SERVICE_URL": env("AI_SENSEI_SERVICE", required=False),
+    "EMAIL": env("AI_SENSEI_EMAIL", required=False),
+    "PASSWORD": env("AI_SENSEI_PASSWORD", required=False),
+}
+
+OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
+OGS_SGF_LINK_FORMAT = "https://online-go.com/api/v1/games/{id}/sgf"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}

@@ -1,10 +1,11 @@
 import re
 
 from django import forms
+from django.conf import settings
 from django.db.models import BLANK_CHOICE_DASH
 
 from league import texts
-from league.models import Game, Member, Player, WinType, OGS_GAME_LINK_REGEX
+from league.models import Game, Member, Player, WinType
 
 
 class PrepareSeasonForm(forms.Form):
@@ -14,7 +15,7 @@ class PrepareSeasonForm(forms.Form):
 
 
 def ogs_game_link_validator(value: str) -> None:
-    if not re.match(OGS_GAME_LINK_REGEX, value):
+    if not re.match(settings.OGS_GAME_LINK_REGEX, value):
         raise forms.ValidationError(texts.OGS_GAME_LINK_ERROR)
 
 
@@ -85,6 +86,9 @@ class GameResultUpdateRefereeForm(GameResultUpdateForm):
         labels = GameResultUpdateForm.Meta.labels | {
             "review_video_link": "Komentarz na YouTube",
             "ai_analyse_link": "Analiza AI Sensei",
+        }
+        help_texts = GameResultUpdateForm.Meta.labels | {
+            "ai_analyse_link": texts.AI_ANALYSE_LINK_HELP_TEXT,
         }
 
 

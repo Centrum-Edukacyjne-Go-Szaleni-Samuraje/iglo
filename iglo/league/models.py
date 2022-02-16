@@ -1,7 +1,6 @@
 import datetime
 import decimal
 import math
-import re
 import string
 from enum import Enum
 from statistics import mean
@@ -13,6 +12,8 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Case, When, Value
 from django.db.models.functions import Round as DjangoRound
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django_countries.fields import CountryField
@@ -20,8 +21,6 @@ from django_countries.fields import CountryField
 from league import texts
 from league.utils.paring import round_robin, shuffle_colors
 from macmahon import macmahon as mm
-
-OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 
 DAYS_PER_GAME = 7
 NUMBER_OF_BARS = 2
@@ -741,22 +740,30 @@ class Game(models.Model):
             return None
         return self.white if member == self.black else self.black
 
-    @cached_property
-    def external_sgf_link(self) -> Optional[str]:
-        if not self.link:
-            return None
-        match = re.match(OGS_GAME_LINK_REGEX, self.link)
-        if not match:
-            return None
-        return f"https://online-go.com/api/v1/games/{match.group(1)}/sgf"
-
-    @property
-    def sgf_link(self) -> Optional[str]:
-        if self.sgf:
-            return self.sgf.url
-        elif self.external_sgf_link:
-            return self.external_sgf_link
-        return None
-
     def is_participant(self, player: Player):
         return player in [self.black.player, self.white.player]
+
+
+class GameAIAnalyseUploadStatus(TextChoices):
+    IN_PROGRESS = "in_progress", "in_progress"
+    DONE = "done", "done"
+    FAILED = "failed", "failed"
+
+
+class GameAIAnalyseUpload(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="ai_analyse_uploads")
+    sgf_hash = models.CharField(max_length=32, null=True)
+    status = models.CharField(max_length=16, choices=GameAIAnalyseUploadStatus.choices)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    error = models.TextField()
+    result = models.URLField(null=True)
+
+
+@receiver(signal=post_save, sender=Game)
+def game_updated(instance, raw, **kwargs):
+    from league.tasks import game_ai_analyse_upload_task, game_sgf_fetch_task
+    if instance.link and not instance.sgf:
+        game_sgf_fetch_task.delay(game_id=instance.id)
+    if instance.sgf and not instance.ai_analyse_link:
+        game_ai_analyse_upload_task.delay(game_id=instance.id)

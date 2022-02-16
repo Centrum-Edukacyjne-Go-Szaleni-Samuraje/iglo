@@ -69,11 +69,17 @@
                     {% if object.is_played %}{{ object.result }}{% else %}Gra jeszcze się nie odbyła.{% endif %}
                 </h5>
                 {% if object.date %}<i class="fas fa-calendar-day"></i> {{ object.date }}{% endif %}
-                {% if object.sgf_link %}
+                {% if object.sgf %}
                     <div class="sgf-container">
-                        <div data-wgo="{{ object.sgf_link }}"
+                        <div data-wgo="{{ object.sgf.url }}"
                              data-wgo-enablewheel="false" data-wgo-move="1000"></div>
                     </div>
+                {% elif object.link %}
+                    <p class="alert alert-info mt-3">
+                        Trwa pobieranie pliku SGF - może to potrwać kilka chwil... Jeżeli pobieranie się przedłuża
+                        sprawdź czy Twoja gra nie jest ustawiona jako "prywatna". W takim wypadku prosimy o ręczne
+                        wgranie pliku SGF.
+                    </p>
                 {% endif %}
             </div>
         {% endif %}

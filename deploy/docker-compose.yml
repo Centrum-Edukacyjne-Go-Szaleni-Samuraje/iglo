@@ -20,6 +20,7 @@ services:
       EMAIL_HOST: $EMAIL_HOST
       EMAIL_HOST_USER: $EMAIL_HOST_USER
       EMAIL_HOST_PASSWORD: $EMAIL_HOST_PASSWORD
+      CELERY_BROKER_URL: $CELERY_BROKER_URL
     depends_on:
       - db
     volumes:
@@ -34,3 +35,27 @@ services:
     volumes:
       - "${DATA_PATH}/postgres:/var/lib/postgresql/data/pgdata"
       - "${DATA_PATH}/pg_backups:/backups"
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: /app/deploy/worker.sh
+    environment:
+      DEBUG: $DEBUG
+      SECRET_KEY: $SECRET_KEY
+      DATABASE_URL: $DATABASE_URL
+      DOMAIN: $DOMAIN
+      SENTRY_DSN: $SENTRY_DSN
+      EMAIL_HOST: $EMAIL_HOST
+      EMAIL_HOST_USER: $EMAIL_HOST_USER
+      EMAIL_HOST_PASSWORD: $EMAIL_HOST_PASSWORD
+      CELERY_BROKER_URL: $CELERY_BROKER_URL
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - "${DATA_PATH}/static:/data/static"
+      - "${DATA_PATH}/media:/data/media"
+      - "${DATA_PATH}/fixtures:/data/fixtures"
+  redis:
+    image: redis:6.2.6

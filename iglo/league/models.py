@@ -763,7 +763,7 @@ class GameAIAnalyseUpload(models.Model):
 @receiver(signal=post_save, sender=Game)
 def game_updated(instance, raw, **kwargs):
     from league.tasks import game_ai_analyse_upload_task, game_sgf_fetch_task
-    if instance.link and not instance.sgf:
-        game_sgf_fetch_task.delay(game_id=instance.id)
     if instance.sgf and not instance.ai_analyse_link:
         game_ai_analyse_upload_task.delay(game_id=instance.id)
+    if instance.link and not instance.sgf:
+        game_sgf_fetch_task.delay(game_id=instance.id)

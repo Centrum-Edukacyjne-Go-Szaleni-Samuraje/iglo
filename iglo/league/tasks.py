@@ -1,12 +1,16 @@
 import hashlib
 import logging
+from typing import Optional
 
 from celery import shared_task
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.mail import send_mail
 
-from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus
+from league import texts
+from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, Player
 from league.utils.aisensei import upload_sgf, AISenseiConfig, AISenseiException
+from league.utils.egd import get_gor_by_pin, EGDException
 from league.utils.ogs import fetch_sgf, OGSException
 
 logger = logging.getLogger("league")
@@ -71,3 +75,24 @@ def game_sgf_fetch_task(game_id: int) -> None:
             logger.info("SGF fetch fail for game %d - %s", game_id, str(err))
     else:
         logger.info("SGF fetch skipped for game %d - SGF already exists", game_id)
+
+
+@shared_task(time_limit=10)
+def update_gor(triggering_user_email: Optional[str] = None):
+    logger.info("Updating players ranks")
+    players = Player.objects.filter(egd_pin__isnull=False).all()
+    logger.info(f"Found {len(players)} players to update")
+    for idx, player in enumerate(players, start=1):
+        try:
+            player.rank = get_gor_by_pin(player.egd_pin)
+            player.save()
+            logger.info(f"{idx}/{len(players)} Updated {player.nick} [{player.egd_pin}] ")
+        except EGDException as err:
+            logger.info(f"{idx}/{len(players)} Failed to update {player.nick} [{player.egd_pin}] rank - {err}")
+    if triggering_user_email:
+        send_mail(
+            subject=texts.UPDATE_GOR_MAIL_SUBJECT,
+            message=texts.UPDATE_GOR_MAIL_CONTENT,
+            from_email=None,
+            recipient_list=[triggering_user_email]
+        )

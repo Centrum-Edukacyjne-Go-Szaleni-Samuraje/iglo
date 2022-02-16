@@ -8,11 +8,11 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, UpdateView, RedirectView
+from django.views.generic import ListView, DetailView, FormView, UpdateView, RedirectView, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
-from league import texts
+from league import texts, tasks
 from league.forms import (
     GameResultUpdateForm,
     PlayerUpdateForm,
@@ -390,3 +390,19 @@ class PrepareSeasonView(UserRoleRequired, FormView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+class PlayersView(TemplateView, UserRoleRequired):
+    template_name = "league/players.html"
+    required_roles = [UserRole.TEACHER]
+
+    def post(self, request, *args, **kwargs):
+        if "action-update-gor" in request.POST:
+            tasks.update_gor.delay(triggering_user_email=self.request.user.email)
+            messages.add_message(
+                request=request,
+                level=messages.SUCCESS,
+                message=texts.UPDATE_GOR_MESSAGE,
+            )
+        context = self.get_context_data()
+        return self.render_to_response(context)

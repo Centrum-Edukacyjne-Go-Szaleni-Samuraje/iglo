@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import math
+import re
 import string
 from enum import Enum
 from statistics import mean
@@ -742,6 +743,23 @@ class Game(models.Model):
 
     def is_participant(self, player: Player):
         return player in [self.black.player, self.white.player]
+
+    @cached_property
+    def external_sgf_link(self) -> Optional[str]:
+        if not self.link:
+            return None
+        match = re.match(settings.OGS_GAME_LINK_REGEX, self.link)
+        if not match:
+            return None
+        return settings.OGS_SGF_LINK_FORMAT.format(id=match.group(1))
+
+    @property
+    def sgf_link(self) -> Optional[str]:
+        if self.sgf:
+            return self.sgf.url
+        elif self.external_sgf_link:
+            return self.external_sgf_link
+        return None
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

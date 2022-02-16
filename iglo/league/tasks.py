@@ -62,9 +62,9 @@ def game_ai_analyse_upload_task(game_id: int) -> None:
 def game_sgf_fetch_task(game_id: int) -> None:
     logger.info("SGF fetch started for game %d", game_id)
     game = Game.objects.get(id=game_id)
-    if game.link and not game.sgf:
+    if game.external_sgf_link and not game.sgf:
         try:
-            sgf_data = fetch_sgf(game_url=game.link)
+            sgf_data = fetch_sgf(sgf_url=game.external_sgf_link)
             game.sgf.save(f"game-{game.id}.sgf", ContentFile(sgf_data))
             logger.info("SGF fetched successfully for game %d", game_id)
         except OGSException as err:

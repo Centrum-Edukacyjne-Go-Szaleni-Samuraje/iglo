@@ -5,6 +5,12 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile
     command: /app/deploy/web.sh
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+        reservations:
+          memory: 200M
     expose:
       - $VIRTUAL_PORT
     environment:
@@ -45,6 +51,12 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile
     command: /app/deploy/worker.sh
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+        reservations:
+          memory: 200M
     environment:
       DEBUG: $DEBUG
       SECRET_KEY: $SECRET_KEY

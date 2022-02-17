@@ -44,6 +44,7 @@ def game_ai_analyse_upload_task(game_id: int) -> None:
                 password=settings.AI_SENSEI["PASSWORD"],
             ),
             sgf_data=sgf_data,
+            tags=[f"IGLO - Grupa {game.group.name}"],
         )
         upload.result = result
         upload.status = GameAIAnalyseUploadStatus.DONE

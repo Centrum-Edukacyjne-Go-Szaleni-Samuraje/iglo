@@ -16,7 +16,7 @@ class AISenseiException(Exception):
     pass
 
 
-def upload_sgf(config: AISenseiConfig, sgf_data: Optional[str] = None) -> str:
+def upload_sgf(config: AISenseiConfig, sgf_data: str, tags: list[str]) -> str:
     response_token = requests.post(
         url=config.auth_url,
         data={
@@ -34,7 +34,7 @@ def upload_sgf(config: AISenseiConfig, sgf_data: Optional[str] = None) -> str:
         json={
             "token": response_token.json()["idToken"],
             "game": sgf_data,
-            "options": {"quality": "pro"},
+            "options": {"quality": "pro", "tags": tags},
         },
     )
     if response_upload.status_code != 200:

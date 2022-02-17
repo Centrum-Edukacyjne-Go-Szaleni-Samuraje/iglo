@@ -11,13 +11,13 @@ from league.utils.aisensei import AISenseiException
 class GameAIAnalyseUploadTaskTestCase(TestCase):
 
     def test_task_succeed(self):
-        game = GameFactory(sgf__data="data")
+        game = GameFactory(sgf__data="data", group__name="A")
 
         with mock.patch("league.tasks.upload_sgf") as upload_sgf_mock:
             upload_sgf_mock.return_value = "https://ai.com/123"
             game_ai_analyse_upload_task(game_id=game.id)
 
-        upload_sgf_mock.assert_called_once_with(config=mock.ANY, sgf_data="data")
+        upload_sgf_mock.assert_called_once_with(config=mock.ANY, sgf_data="data", tags=["IGLO - Grupa A"])
         game.refresh_from_db()
         self.assertEqual(game.ai_analyse_link, "https://ai.com/123")
         upload = game.ai_analyse_uploads.get()

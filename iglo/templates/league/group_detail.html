@@ -63,7 +63,6 @@
                                     <tr>
                                         <th class="group-table__header">Pozycja</th>
                                         <th class="group-table__header">Gracz</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">Punkty</th>
                                         <th class="group-table__header d-none d-lg-table-cell">Score</th>
                                         <th class="group-table__header d-none d-lg-table-cell">SOS</th>
                                         <th class="group-table__header d-none d-lg-table-cell">SOSOS</th>
@@ -77,7 +76,6 @@
                                                 <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
                                                 <span class="text-muted">[{{ member.rank }}]</span>
                                             </td>
-                                            <td class="d-none d-lg-table-cell">{{ member.points }}</td>
                                             <td class="d-none d-lg-table-cell">{{ member.score }}</td>
                                             <td class="d-none d-lg-table-cell">{{ member.sos }}</td>
                                             <td class="d-none d-lg-table-cell">{{ member.sosos }}</td>

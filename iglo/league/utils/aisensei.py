@@ -34,7 +34,8 @@ def upload_sgf(config: AISenseiConfig, sgf_data: str, tags: list[str]) -> str:
         json={
             "token": response_token.json()["idToken"],
             "game": sgf_data,
-            "options": {"quality": "pro", "tags": tags},
+            "options": {"quality": "pro"},
+            "tags": tags
         },
     )
     if response_upload.status_code != 200:

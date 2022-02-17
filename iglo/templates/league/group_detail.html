@@ -39,6 +39,7 @@
                                         <th colspan="5" class="group-table__header d-none d-lg-table-cell">Rundy</th>
                                         <th class="group-table__header d-none d-lg-table-cell">Punkty</th>
                                         <th class="group-table__header d-none d-lg-table-cell">SODOS</th>
+                                        <th class="group-table__header d-none d-lg-table-cell">Start</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,6 +56,7 @@
                                             {% endfor %}
                                             <td class="d-none d-lg-table-cell">{{ member.points }}</td>
                                             <td class="d-none d-lg-table-cell">{{ member.sodos }}</td>
+                                            <td class="d-none d-lg-table-cell">{{ member.order }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

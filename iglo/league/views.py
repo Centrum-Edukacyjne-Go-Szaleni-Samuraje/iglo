@@ -146,8 +146,9 @@ class GroupObjectMixin(SingleObjectMixin):
                 "rounds__games__white__player",
                 "rounds__games__black__player",
                 "rounds__games__winner__player",
+                "rounds__games__group__season",
                 "members__player",
-                "teacher"
+                "teacher",
             ).annotate(
                 all_games_finished=~Exists(Game.objects.filter(
                     group=OuterRef('id'),
@@ -263,6 +264,7 @@ class GameDetailView(DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
+        queryset = queryset.select_related("white__player", "black__player")
         if "bye_player" in self.kwargs:
             return get_object_or_404(
                 queryset,

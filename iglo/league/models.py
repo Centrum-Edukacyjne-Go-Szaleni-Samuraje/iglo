@@ -301,7 +301,7 @@ class Group(models.Model):
             [
                 member
                 for member in self.members.select_related("player")
-                .prefetch_related("won_games", "games_as_black", "games_as_white")
+                .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
                 .all()
             ],
             key=lambda member: (-member.points, -member.sodos, member.order)

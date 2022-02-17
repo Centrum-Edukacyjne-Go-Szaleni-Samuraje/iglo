@@ -25,13 +25,13 @@ class GameAIAnalyseUploadTaskTestCase(TestCase):
         self.assertEqual(upload.result, "https://ai.com/123")
 
     def test_task_failed(self):
-        game = GameFactory(sgf__data="data")
+        game = GameFactory(sgf__data="data", group__name="A")
 
         with mock.patch("league.tasks.upload_sgf") as upload_sgf_mock:
             upload_sgf_mock.side_effect = AISenseiException("error message")
             game_ai_analyse_upload_task(game_id=game.id)
 
-        upload_sgf_mock.assert_called_once_with(config=mock.ANY, sgf_data="data")
+        upload_sgf_mock.assert_called_once_with(config=mock.ANY, sgf_data="data", tags=["IGLO - Grupa A"])
         game.refresh_from_db()
         self.assertIsNone(game.ai_analyse_link)
         upload = game.ai_analyse_uploads.get()

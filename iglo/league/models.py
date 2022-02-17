@@ -304,9 +304,9 @@ class Group(models.Model):
                 .prefetch_related("won_games", "games_as_black", "games_as_white")
                 .all()
             ],
-            key=lambda member: (-member.points, -member.sodos)
+            key=lambda member: (-member.points, -member.sodos, member.order)
             if self.type == GroupType.ROUND_ROBIN
-            else (-member.points, -member.score, -member.sos, -member.sosos),
+            else (-member.score, -member.sos, -member.sosos),
         )
 
     def delete_member(self, member_id: int) -> None:

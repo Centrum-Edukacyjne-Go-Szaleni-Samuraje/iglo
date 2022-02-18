@@ -44,14 +44,14 @@
                                 </thead>
                                 <tbody>
                                     {% for position, member, results in object.results_table %}
-                                        <tr class="group-table__row--result-{{ member.result.value.lower }}">
+                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}" data-position="{{ position }}">
                                             <td>{{position}}</td>
                                             <td class="group-table__header group-table__cell-name">
                                                 {% include "league/includes/player_badge.html" with member=member %}
                                             </td>
                                             {% for result, url in results %}
-                                                <td class="group-table__cell-result d-none d-lg-table-cell">
-                                                    <a href="{{ url }}">{{ result }}</a>
+                                                <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
+                                                    <a class="group-table__result-link" data-result="{{ result }}" href="{{ url }}">{{ result }}</a>
                                                 </td>
                                             {% endfor %}
                                             <td class="d-none d-lg-table-cell">{{ member.points }}</td>
@@ -72,7 +72,7 @@
                                 </thead>
                                 <tbody>
                                     {% for member in object.members_qualification %}
-                                        <tr class="group-table__row--result-{{ member.result.value.lower }}">
+                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}">
                                             <td>{{ forloop.counter }}</td>
                                             <td>
                                                 <a href="{% url "player-detail" member.player.nick %}">{{ member.player.nick }}</a>
@@ -87,7 +87,7 @@
                             {% endif %}
                         </table>
                         {% if object.type == "round_robin" %}
-                        <a href="#" class="align-self-end text-decoration-none" data-bs-toggle="modal" data-bs-target="#result-table-modal">
+                        <a href="#" class="align-self-end text-decoration-none mt-1" data-bs-toggle="modal" data-bs-target="#result-table-modal">
                             <span class="text-muted small">Jak czytać wyniki?</span></a>
                         {% endif %}
                     </div>
@@ -199,5 +199,25 @@
             document.getElementById(icon_id).classList.toggle("fa-chevron-down");
             document.getElementById(icon_id).classList.toggle("fa-chevron-up");
         }
+        function toggleRowHighlight(event, highlight) {
+            const result = event.target.getAttribute("data-result");
+               if (result) {
+                   const position = result.slice(0, -1);
+                   const row = document.querySelector(`.group-table__row[data-position="${position}"]`)
+                   if (highlight) {
+                       row.classList.add("group-table__row--highlighted");
+                   } else {
+                       row.classList.remove("group-table__row--highlighted");
+                   }
+               }
+        }
+        document.querySelectorAll('.group-table__result-link').forEach(function (item) {
+           item.addEventListener("mouseover", function (event) {
+               toggleRowHighlight(event, true);
+           });
+           item.addEventListener("mouseleave", function (event) {
+               toggleRowHighlight(event, false);
+           });
+        });
     </script>
 {% endblock %}

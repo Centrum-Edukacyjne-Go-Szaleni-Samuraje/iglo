@@ -3,6 +3,7 @@
 {% load static crispy_forms_filters %}
 
 {% block page_title %}
+    Sezon #{{ object.group.season.number }} - Grupa {{ object.group.name }} -
     {% if object.is_bye %}
         Bye: {{ object.winner.player.nick }}
     {% else %}

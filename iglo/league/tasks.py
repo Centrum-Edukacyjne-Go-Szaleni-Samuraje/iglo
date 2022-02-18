@@ -78,7 +78,7 @@ def game_sgf_fetch_task(game_id: int) -> None:
         logger.info("SGF fetch skipped for game %d - SGF already exists", game_id)
 
 
-@shared_task(time_limit=10)
+@shared_task(time_limit=120)
 def update_gor(triggering_user_email: Optional[str] = None):
     logger.info("Updating players ranks")
     players = Player.objects.filter(egd_pin__isnull=False).all()

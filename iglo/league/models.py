@@ -453,7 +453,7 @@ class Player(models.Model):
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
     auto_join = models.BooleanField(default=True)
-    egd_pin = models.CharField(max_length=8, null=True, blank=True)
+    egd_pin = models.CharField(max_length=8, null=True, blank=True, validators=[MinLengthValidator(8)])
     egd_approval = models.BooleanField(default=False)
     availability = models.TextField(blank=True)
     is_supporter = models.BooleanField(default=False)

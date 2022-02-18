@@ -51,10 +51,14 @@ class SeasonManager(models.Manager):
 
     def get_latest(self) -> Optional["Season"]:
         return (
-            Season.objects.prefetch_related("groups")
+            Season.objects.prefetch_related("groups", "groups__members")
             .annotate(
-                all_games=Count("groups__games"),
-                played_games=Count("groups__games", filter=Q(groups__games__win_type__isnull=False)),
+                games_per_round=(Count('groups__members', distinct=True) / 2),
+                rounds=(F("players_per_group") - 1),
+            )
+            .annotate(
+                all_games=F('games_per_round')*F('rounds'),
+                played_games=Count("groups__games", distinct=True, filter=Q(groups__games__win_type__isnull=False)),
             )
             .annotate(
                 games_progress=Case(

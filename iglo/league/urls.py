@@ -12,8 +12,10 @@ from league.views import (
     GameUpdateView,
     SeasonExportCSVView,
     GroupEGDExportView,
-    GameDetailRedirectView, PlayersView,
+    GameDetailRedirectView, LeagueAdminView,
 )
+
+
 
 urlpatterns = [
     path("seasons", SeasonsListView.as_view(), name="seasons-list"),
@@ -52,7 +54,7 @@ urlpatterns = [
         GameUpdateView.as_view(),
         name="game-update",
     ),
-    path("players", PlayersView.as_view(), name="players-view"),
     path("players/<slug>", PlayerDetailView.as_view(), name="player-detail"),
     path("players/<slug>/settings", PlayerUpdateView.as_view(), name="player-settings"),
+    path("league/admin", LeagueAdminView.as_view(), name="league-admin-view"),
 ]

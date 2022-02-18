@@ -392,8 +392,8 @@ class PrepareSeasonView(UserRoleRequired, FormView):
         return self.object.get_absolute_url()
 
 
-class PlayersView(TemplateView, UserRoleRequired):
-    template_name = "league/players.html"
+class LeagueAdminView(TemplateView, UserRoleRequired):
+    template_name = "league/league_admin.html"
     required_roles = [UserRole.TEACHER]
 
     def post(self, request, *args, **kwargs):

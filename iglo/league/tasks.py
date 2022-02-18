@@ -29,7 +29,11 @@ def game_ai_analyse_upload_task(game_id: int) -> None:
     with game.sgf.open("r") as file:
         sgf_data = file.read()
     upload, created = GameAIAnalyseUpload.objects.get_or_create(
-        game=game, sgf_hash=hashlib.md5(sgf_data.encode()).hexdigest()
+        game=game,
+        sgf_hash=hashlib.md5(sgf_data.encode()).hexdigest(),
+        defaults={
+            "status": GameAIAnalyseUploadStatus.IN_PROGRESS,
+        },
     )
     if not created:
         if upload.status == GameAIAnalyseUploadStatus.DONE:
@@ -95,5 +99,5 @@ def update_gor(triggering_user_email: Optional[str] = None):
             subject=texts.UPDATE_GOR_MAIL_SUBJECT,
             message=texts.UPDATE_GOR_MAIL_CONTENT,
             from_email=None,
-            recipient_list=[triggering_user_email]
+            recipient_list=[triggering_user_email],
         )

@@ -4,6 +4,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Optional
 
+import requests
 import unicodedata
 
 
@@ -124,3 +125,19 @@ def gor_to_rank(gor: int) -> str:
     else:
         result = (gor // 100) - 20
         return f"{result}d"
+
+
+class EGDException(Exception):
+    pass
+
+
+def get_gor_by_pin(pin: str) -> int:
+    url = f'http://www.europeangodatabase.eu/EGD/GetPlayerDataByPIN.php?pin={pin}'
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise EGDException(f'EGD is responding with {response.status_code}')
+    content = response.json()
+    try:
+        return int(content['Gor'])
+    except KeyError:
+        raise EGDException(f'can not fetch player data (probably invalid pin)')

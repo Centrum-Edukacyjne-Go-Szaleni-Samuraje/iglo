@@ -3,6 +3,7 @@ import decimal
 import math
 import re
 import string
+from collections import defaultdict
 from enum import Enum
 from statistics import mean
 from typing import Optional
@@ -163,6 +164,7 @@ class Season(models.Model):
     def _redistribute_new_players(self, players: list["Player"], players_per_group: int) -> list["Player"]:
         result = players[:]
         new_players = Player.objects.filter(auto_join=True).order_by("-rank").exclude(id__in=[p.id for p in result])
+        added_to_group = defaultdict(int)
         for new_player in new_players:
             add_to_next = False
             previous_avg_rank = None
@@ -170,7 +172,8 @@ class Season(models.Model):
                 group_players = result[group_order * players_per_group : (group_order + 1) * players_per_group]
                 avg_rank = mean(player.rank for player in group_players)
                 if add_to_next and previous_avg_rank > avg_rank:
-                    result.insert((group_order + 1) * players_per_group - 1, new_player)
+                    result.insert(group_order * players_per_group + added_to_group[group_order], new_player)
+                    added_to_group[group_order] += 1
                     break
                 if avg_rank < new_player.rank:
                     add_to_next = True

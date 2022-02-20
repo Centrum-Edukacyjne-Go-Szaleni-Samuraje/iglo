@@ -150,7 +150,7 @@ class SeasonTestCase(TestCase):
         new_group_b = new_season.groups.get(name="B")
         self._check_players_order(
             group=new_group_b,
-            players=[group_a_member_3.player, group_b_member_2.player, new_player_1],
+            players=[new_player_1, group_a_member_3.player, group_b_member_2.player],
         )
 
         new_group_c = new_season.groups.get(name="C")

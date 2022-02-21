@@ -54,11 +54,11 @@ class SeasonManager(models.Manager):
         return (
             Season.objects.prefetch_related("groups", "groups__members")
             .annotate(
-                games_per_round=(Count('groups__members', distinct=True) / 2),
+                games_per_round=(Count("groups__members", distinct=True) / 2),
                 rounds=(F("players_per_group") - 1),
             )
             .annotate(
-                all_games=F('games_per_round')*F('rounds'),
+                all_games=F("games_per_round") * F("rounds"),
                 played_games=Count("groups__games", distinct=True, filter=Q(groups__games__win_type__isnull=False)),
             )
             .annotate(
@@ -185,9 +185,7 @@ class Season(models.Model):
     def _assign_players_to_groups(self, players: list["Player"]) -> None:
         last_group = None
         for group_order in range(math.ceil(len(players) / self.players_per_group)):
-            group_players = players[
-                group_order * self.players_per_group : (group_order + 1) * self.players_per_group
-            ]
+            group_players = players[group_order * self.players_per_group : (group_order + 1) * self.players_per_group]
             is_egd = all(p.egd_approval for p in group_players)
             if len(group_players) < max((self.players_per_group - 1), 2) and last_group:
                 group = last_group
@@ -213,11 +211,15 @@ class Season(models.Model):
                 group.set_initial_score()
 
     def get_groups(self):
-        return self.groups.select_related("teacher").prefetch_related("members__player").order_by("name").annotate(
-            members_count=Count("members"),
-            supporters_count=Count("members", filter=Q(members__player__is_supporter=True)),
-            avg_rank=DjangoRound(Avg("members__rank")),
-
+        return (
+            self.groups.select_related("teacher")
+            .prefetch_related("members__player")
+            .order_by("name")
+            .annotate(
+                members_count=Count("members"),
+                supporters_count=Count("members", filter=Q(members__player__is_supporter=True)),
+                avg_rank=DjangoRound(Avg("members__rank")),
+            )
         )
 
 
@@ -236,10 +238,10 @@ class NotMcmahonGroupError(Exception):
 
 
 class ResultSymbol(str, Enum):
-    win = '+'
-    lose = '-'
-    not_played = '?'
-    no_result = 'X'
+    win = "+"
+    lose = "-"
+    not_played = "?"
+    no_result = "X"
 
 
 class Group(models.Model):
@@ -280,7 +282,7 @@ class Group(models.Model):
                     result_symbol = ResultSymbol.lose
                 else:
                     result_symbol = ResultSymbol.no_result
-                records.append((f'{opponent_position}{result_symbol}', game.get_absolute_url()))
+                records.append((f"{opponent_position}{result_symbol}", game.get_absolute_url()))
             table.append((position, member, records))
         return table
 
@@ -299,8 +301,8 @@ class Group(models.Model):
         return chr(ord(self.name) + 1)
 
     @cached_property
-    def latest_round(self) -> 'Round':
-        return self.rounds.order_by('-number').first()
+    def latest_round(self) -> "Round":
+        return self.rounds.order_by("-number").first()
 
     @cached_property
     def members_qualification(self) -> list["Member"]:
@@ -390,7 +392,7 @@ class Group(models.Model):
         for member in members:
             ordered_player = initial_ordering[member.player.nick]
             member.initial_score = ordered_player.initial_score
-        Member.objects.bulk_update(members, ['initial_score'])
+        Member.objects.bulk_update(members, ["initial_score"])
 
     def start_macmahon_round(self):
         self.validate_type(GroupType.MCMAHON)
@@ -404,12 +406,7 @@ class Group(models.Model):
         days_until_end_of_round = DAYS_PER_GAME - 1
         end_date = start_date + datetime.timedelta(days=days_until_end_of_round)
 
-        new_round = Round.objects.create(
-            group=self,
-            number=number,
-            start_date=start_date,
-            end_date=end_date
-        )
+        new_round = Round.objects.create(group=self, number=number, start_date=start_date, end_date=end_date)
 
         players = self.get_macmahon_players()
         pairs, bye = mm.prepare_next_round(players)
@@ -422,15 +419,13 @@ class Group(models.Model):
                 round=new_round,
                 black=black,
                 white=white,
-                date=datetime.datetime.combine(
-                    new_round.end_date, settings.DEFAULT_GAME_TIME
-                )
+                date=datetime.datetime.combine(new_round.end_date, settings.DEFAULT_GAME_TIME),
             )
         if bye:
             Game.objects.create_bye_game(self, new_round, Member.objects.get(player__nick=bye.name, group=self))
 
     def get_macmahon_players(self):
-        members = Member.objects.filter(group=self).prefetch_related('player').all()
+        members = Member.objects.filter(group=self).prefetch_related("player").all()
         players = []
         for member in members:
             player = mm.Player(
@@ -441,7 +436,7 @@ class Group(models.Model):
             games = Game.objects.filter(Q(white=member) | Q(black=member) | Q(winner=member)).all()
             for game in games:
                 if game.is_bye:
-                    player.games.append(mm.GameRecord('', mm.Color.BYE, mm.ResultType.BYE))
+                    player.games.append(mm.GameRecord("", mm.Color.BYE, mm.ResultType.BYE))
                 elif game.is_played:
                     opponent = game.get_opponent(member).player.nick
                     color = mm.Color.BLACK if game.black == member else mm.Color.WHITE
@@ -591,7 +586,7 @@ class Round(models.Model):
 
     def validate_is_completed(self):
         if not self.is_completed():
-            raise RoundNotYetCompletedError(f'Round: {self} not yet completed')
+            raise RoundNotYetCompletedError(f"Round: {self} not yet completed")
 
 
 class WinType(models.TextChoices):
@@ -788,6 +783,7 @@ class GameAIAnalyseUpload(models.Model):
 @receiver(signal=post_save, sender=Game)
 def game_updated(instance, raw, **kwargs):
     from league.tasks import game_ai_analyse_upload_task, game_sgf_fetch_task
+
     if instance.sgf and not instance.ai_analyse_link:
         game_ai_analyse_upload_task.delay(game_id=instance.id)
     if instance.link and not instance.sgf:

@@ -1,4 +1,5 @@
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext as _
 
 OGS_USERNAME_LABEL = "Konto OGS"
 KGS_USERNAME_LABEL = "Konto KGS"
@@ -51,3 +52,5 @@ AI_ANALYSE_LINK_HELP_TEXT = "Pole zostanie wypełnione automatycznie jeżeli poz
 UPDATE_GOR_MESSAGE = "Ranking są aktualizowane. O zakończeniu procesu zostaniesz poinformowany emailem."
 UPDATE_GOR_MAIL_SUBJECT = "Aktualizacja GOR"
 UPDATE_GOR_MAIL_CONTENT = "Aktualizacja rankingów graczy została zakończona"
+MEMBER_WITHDRAW_SUCCESS = _("Gracz został wycofany z aktualnego sezonu.")
+ALREADY_PLAYED_GAMES_ERROR = _("Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe.")

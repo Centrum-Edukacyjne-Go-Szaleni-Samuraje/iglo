@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static i18n %}
 
 {% block page_title %}{{ object.nick }}{% endblock %}
 
@@ -9,12 +9,52 @@
         <div class="col">
             <div class="d-flex justify-content-between align-items-baseline">
                 <h2 class="mb-3">
-                    {{ object.nick }}{% if object.is_supporter %} <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="Ten gracz jest patronem IGLO!"></i>{% endif %}{% if object.rank %}
-                    <small class="text-muted">[{{ object.rank }}]</small>{% endif %}
+                    {{ object.nick }}{% if object.is_supporter %}
+                        <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="Ten gracz jest patronem IGLO!"></i>{% endif %}{% if object.rank %}
+                        <small class="text-muted">[{{ object.rank }}]</small>{% endif %}
                 </h2>
-                {% if user.is_admin %}
-                <a href="{% url "player-settings" object.nick %}" class="btn btn-primary"><i class="fas fa-user"></i> Edytuj</a>
-                {% endif %}
+                    <div>
+                        {% if user|has_role:'referee' and current_membership %}
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#withdraw-modal">
+                            <i class="fas fa-user-slash"></i>
+                            <span class="d-none d-md-inline">
+                            {% translate "Wycofaj" %}
+                            </span>
+                        </button>
+                        <div class="modal fade" id="withdraw-modal" tabindex="-1" aria-labelledby="contactModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"
+                                            id="contactModalLabel">{% translate "Wycofaj gracza" %}</h5>
+                                        <button type="button" class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% blocktrans %}Czy na pewno chcesz wycofać gracza z aktualnego sezonu? Ta
+                                        operacja jest nieodwracalna.{% endblocktrans %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form method="post">{% csrf_token %}
+                                            <button type="submit" class="btn btn-danger" name="action-withdraw">{% translate "Wycofaj" %}</button>
+                                        </form>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            {% translate "Zamknij" %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if user.is_admin %}
+                        <a href="{% url "player-settings" object.nick %}" class="btn btn-primary"><i
+                                class="fas fa-user"></i> Edytuj</a>
+                        {% endif %}
+                    </div>
             </div>
             {% if current_membership %}
                 <div class="card mb-3">

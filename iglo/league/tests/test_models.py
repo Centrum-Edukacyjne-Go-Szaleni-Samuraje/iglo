@@ -13,6 +13,7 @@ from league.models import (
     Member,
     GroupType,
     GamesWithoutResultError,
+    WinType,
 )
 from league.tests.factories import (
     MemberFactory,
@@ -83,6 +84,29 @@ class MemberTestCase(TestCase):
         GameFactory(group=group, white=member_2, black=member_3, winner=member_2)
 
         self.assertEqual(member_2.result, MemberResult.STAY)
+
+    def test_withdraw(self):
+        PlayerFactory.create_batch(size=4)
+        season = Season.objects.prepare_season(
+            start_date=datetime.date.today(), players_per_group=4, promotion_count=1
+        )
+        season.start()
+        group = season.groups.get()
+        member_1 = group.members.get(order=1)
+        member_2 = group.members.get(order=2)
+        member_3 = group.members.get(order=3)
+        member_4 = group.members.get(order=4)
+
+        member_1.withdraw()
+
+        self.assertEqual(group.members.count(), 3)
+        self.assertEqual(group.games.filter(win_type=WinType.BYE).count(), 3)
+        member_2.refresh_from_db()
+        member_3.refresh_from_db()
+        member_4.refresh_from_db()
+        self.assertEqual(member_2.order, 1)
+        self.assertEqual(member_3.order, 2)
+        self.assertEqual(member_4.order, 3)
 
 
 class SeasonTestCase(TestCase):

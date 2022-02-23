@@ -275,16 +275,19 @@ class Group(models.Model):
             records = []
             for game in games:
                 opponent = game.get_opponent(member)
-                opponent_position = player_position[opponent.player.nick]
-                if not game.is_played:
-                    result_symbol = ResultSymbol.not_played
-                elif game.winner == member:
-                    result_symbol = ResultSymbol.win
-                elif game.winner == opponent:
-                    result_symbol = ResultSymbol.lose
+                if opponent:
+                    opponent_position = player_position[opponent.player.nick]
+                    if not game.is_played:
+                        result_symbol = ResultSymbol.not_played
+                    elif game.winner == member:
+                        result_symbol = ResultSymbol.win
+                    elif game.winner == opponent:
+                        result_symbol = ResultSymbol.lose
+                    else:
+                        result_symbol = ResultSymbol.no_result
+                    records.append((f"{opponent_position}{result_symbol}", game.get_absolute_url()))
                 else:
-                    result_symbol = ResultSymbol.no_result
-                records.append((f"{opponent_position}{result_symbol}", game.get_absolute_url()))
+                    records.append((f"0=", game.get_absolute_url()))
             table.append((position, member, records))
         return table
 
@@ -498,6 +501,10 @@ class MemberManager(models.Manager):
             return None
 
 
+class AlreadyPlayedGamesError(Exception):
+    pass
+
+
 class Member(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
@@ -515,7 +522,11 @@ class Member(models.Model):
 
     @cached_property
     def points(self) -> int:
-        return self.won_games.count()
+        result = 0
+        for game in self.won_games.all():
+            if game.win_type != WinType.BYE:
+                result += 1
+        return result
 
     @cached_property
     def score(self) -> float:
@@ -531,7 +542,8 @@ class Member(models.Model):
     def sodos(self) -> int:
         result = 0
         for game in self.won_games.all():
-            result += game.loser.points
+            if game.loser:
+                result += game.loser.points
         return result
 
     @cached_property
@@ -559,6 +571,26 @@ class Member(models.Model):
         if self in self.group.members_qualification[-self.group.season.promotion_count :]:
             return MemberResult.RELEGATION
         return MemberResult.STAY
+
+    def withdraw(self) -> None:
+        self.group.season.validate_state(state=SeasonState.IN_PROGRESS)
+        if self.group.members.count() % 2 or self.group.type != GroupType.ROUND_ROBIN:
+            raise NotImplementedError()
+        played_games = (
+            Game.objects.get_for_member(member=self)
+            .exclude(win_type__in=[WinType.BYE, WinType.NOT_PLAYED])
+            .filter(win_type__isnull=False)
+        )
+        if played_games.exists():
+            raise AlreadyPlayedGamesError()
+        self.games_as_black.exclude(win_type=WinType.BYE).update(
+            black=None, white=None, win_type=WinType.BYE, winner=F("white")
+        )
+        self.games_as_white.exclude(win_type=WinType.BYE).update(
+            black=None, white=None, win_type=WinType.BYE, winner=F("black")
+        )
+        self.group.members.filter(order__gt=self.order).update(order=F("order") - 1)
+        self.delete()
 
 
 def game_upload_to(instance, filename) -> str:

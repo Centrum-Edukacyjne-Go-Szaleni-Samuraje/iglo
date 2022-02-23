@@ -28,6 +28,7 @@ from league.models import (
     Member,
     GamesWithoutResultError,
     WinType,
+    AlreadyPlayedGamesError,
 )
 from league.models import SeasonState
 from league.permissions import (
@@ -319,9 +320,10 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
         return GameResultUpdateForm
 
 
-class PlayerDetailView(DetailView):
+class PlayerDetailView(UserRoleRequiredForModify, DetailView):
     model = Player
     slug_field = "nick__iexact"
+    required_roles = [UserRole.REFEREE]
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
@@ -341,6 +343,26 @@ class PlayerDetailView(DetailView):
             "current_games": current_games,
             "upcoming_game": upcoming_game,
         }
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        current_membership = Member.objects.get_current_membership(player=self.object)
+        if "action-withdraw" in request.POST and current_membership:
+            try:
+                current_membership.withdraw()
+                messages.add_message(
+                    self.request,
+                    messages.SUCCESS,
+                    texts.MEMBER_WITHDRAW_SUCCESS,
+                )
+            except AlreadyPlayedGamesError:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    texts.ALREADY_PLAYED_GAMES_ERROR,
+                )
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
 
 class PlayerUpdateView(AdminPermissionRequired, UpdateView):

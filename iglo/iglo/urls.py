@@ -8,6 +8,7 @@ admin.site.site_header = "IGLO Administration"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
     path("", include("league.urls")),
     path("", include("misc.urls")),
     path("", include("accounts.urls", namespace="accounts")),

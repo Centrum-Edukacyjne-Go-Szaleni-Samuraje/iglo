@@ -79,3 +79,7 @@
     color: #f6b84b;
     font-weight: bold;
 }
+
+.language-dropdown {
+    min-width: 0;
+}

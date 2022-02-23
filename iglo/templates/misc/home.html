@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static i18n %}
 
 {% block page_title %}Internetowa Liga Go IGLO{% endblock %}
 
@@ -14,15 +14,17 @@
         <div class="col">
             <div class="card text-center mb-3">
                 <div class="card-body">
-                    <h1 class="card-title">Internetowa Liga Go IGLO</h1>
-                    <p class="card-text">IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie
-                        pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja do regularnego
-                        grania dłuższych gier oraz uzyskiwania komentarzy od silnych graczy. Dzięki czemu motywuje do
-                        rozwoju i pogłębiania wiedzy o Go.</p>
+                    <h1 class="card-title">{% translate "Internetowa Liga Go IGLO" %}</h1>
+                    <p class="card-text">{% blocktrans trimmed %}IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na
+                        celu
+                        budowanie pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja do
+                        regularnego grania dłuższych gier oraz uzyskiwania komentarzy od silnych graczy. Dzięki czemu
+                        motywuje do rozwoju i pogłębiania wiedzy o Go.{% endblocktrans %}</p>
                     {% if not user.is_authenticated %}
-                        <p class="card-text">Każdy gracz może znaleźć grupę odpowiadającą jego poziomowi, dlatego nie
-                            czekaj tylko dołącz do nas!</p>
-                        <a href="{% url "accounts:registration" %}" class="btn btn-success">Zapisz się!</a>
+                        <p class="card-text">{% blocktrans trimmed %}Każdy gracz może znaleźć grupę odpowiadającą jego
+                            poziomowi, dlatego nie czekaj tylko dołącz do nas!{% endblocktrans %}</p>
+                        <a href="{% url "accounts:registration" %}"
+                           class="btn btn-success">{% translate "Zapisz się!" %}</a>
                     {% endif %}
                 </div>
             </div>
@@ -33,21 +35,23 @@
             <div class="col">
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Aktualny sezon</span>
+                        <span>{% translate "Aktualny sezon" %}</span>
                         <span class="badge season-state--{{ latest_season.state }} ms-2">{{ latest_season.get_state_display | upper }}</span>
                     </div>
                     <div class="card-body">
-                        <h2><a href="{{ latest_season.get_absolute_url }}">Sezon #{{ latest_season.number }}</a>
+                        <h2><a href="{{ latest_season.get_absolute_url }}">{% translate "Sezon" %}
+                            #{{ latest_season.number }}</a>
                         </h2>
                         <p class="text-muted">{{ latest_season.start_date }} - {{ latest_season.end_date }}</p>
-                        <h5>Grupy</h5>
+                        <h5>{% translate "Grupy" %}</h5>
                         <div>
                             {% for group in latest_season.groups.all %}
                                 <a href="{{ group.get_absolute_url }}"
                                    class="btn btn-primary mb-3" style="min-width: 40px">{{ group.name }}</a>
                             {% endfor %}
                         </div>
-                        <p>Rozegranych gier: {{ latest_season.played_games }} / {{ latest_season.all_games }}</p>
+                        <p>{% translate "Rozegranych gier" %}: {{ latest_season.played_games }}
+                            / {{ latest_season.all_games }}</p>
                         <div class="progress">
                             <div class="progress-bar" role="progressbar"
                                  style="width: {{ latest_season.games_progress }}%"
@@ -62,16 +66,20 @@
         {% endif %}
         <div class="col-12 col-md-6 mb-3">
             <div class="card h-100">
-                <div class="card-header">Zasady</div>
+                <div class="card-header">{% translate "Zasady" %}</div>
                 <div class="card-body">
-                    <p>Skrócone zasady IGLO:</p>
+                    <p>{% blocktrans %}Skrócone zasady IGLO{% endblocktrans %}:</p>
                     <ul>
-                        <li>Jedna gra tygodniowo z domyślnym terminem gry.</li>
-                        <li>Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia czasu.</li>
-                        <li>Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć.</li>
-                        <li>Gramy na OGS (preferowany serwer) lub KGS.</li>
+                        <li>{% blocktrans %}Jedna gra tygodniowo z domyślnym terminem gry.{% endblocktrans %}</li>
+                        <li>{% blocktrans trimmed %}Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30.
+                            Zachęcamy do przedłużenia czasu.{% endblocktrans %}</li>
+                        <li>{% blocktrans trimmed %}Gracz, któremu wyznaczony termin nie odpowiada, musi grę
+                            przełożyć.{% endblocktrans %}</li>
+                        <li>{% blocktrans trimmed %}Gramy na OGS (preferowany serwer) lub KGS.{% endblocktrans %}</li>
                     </ul>
-                    <p>Więcej informacji znajdziesz w <a href="{% url "rules" %}">regulaminie</a>.</p>
+                    {% url "rules" as rules_url %}
+                    <p>{% blocktrans trimmed %}Więcej informacji znajdziesz w <a href="{{ rules_url }}">regulaminie</a>
+                        .{% endblocktrans %}</p>
                 </div>
             </div>
         </div>
@@ -79,7 +87,7 @@
     <div class="row">
         <div class="col-12 mb-3">
             <div class="card h-100">
-                <div class="card-header">Wsparcie</div>
+                <div class="card-header">{% translate "Wsparcie" %}</div>
                 <div class="card-body">
                     <p>Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić wykłady i komentarze
                         korzystamy ze wsparcia naszych patronów. Jeśli również chcesz brać udział w rozwoju Ligi i
@@ -87,7 +95,8 @@
                     <p>Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:</p>
                     <ul>
                         <li>Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z profesjonalnych wykładów
-                            i komentarzy dostosowanych do każdej z grup (więcej w sekcji <a href="{% url "teacher-list" %}">Nauczyciele</a>).
+                            i komentarzy dostosowanych do każdej z grup (więcej w sekcji <a
+                                    href="{% url "teacher-list" %}">Nauczyciele</a>).
                         </li>
                         <li>Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada własne konto,
                             dzięki któremu może w łatwy sposób obsługiwać swoje gry.

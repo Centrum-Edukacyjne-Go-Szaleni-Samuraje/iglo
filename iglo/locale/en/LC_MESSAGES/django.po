@@ -1,0 +1,160 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-23 20:15+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: league/texts.py:55
+msgid "Gracz został wycofany z aktualnego sezonu."
+msgstr ""
+
+#: league/texts.py:56
+msgid "Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe."
+msgstr ""
+
+#: templates/base.html:38
+msgid "Sezony"
+msgstr "Seasons"
+
+#: templates/base.html:43
+msgid "Nauczyciele"
+msgstr "Teachers"
+
+#: templates/base.html:47
+msgid "Regulamin"
+msgstr "Rules"
+
+#: templates/base.html:52
+msgid "Kontakt"
+msgstr "Contact"
+
+#: templates/base.html:61
+msgid "Twoje Gry"
+msgstr "Your Games"
+
+#: templates/base.html:75
+msgid "Edytuj profil"
+msgstr "Edit profile"
+
+#: templates/base.html:82
+msgid "Zmień hasło/email"
+msgstr "Edit password/email"
+
+#: templates/base.html:90
+msgid "Wyloguj"
+msgstr "Log out"
+
+#: templates/base.html:99
+msgid "Logowanie"
+msgstr "Log in"
+
+#: templates/base.html:104
+msgid "Rejestracja"
+msgstr "Sign in"
+
+#: templates/league/player_detail.html:23
+#: templates/league/player_detail.html:43
+msgid "Wycofaj"
+msgstr "Withdraw"
+
+#: templates/league/player_detail.html:32
+msgid "Wycofaj gracza"
+msgstr "Withdraw player"
+
+#: templates/league/player_detail.html:38
+msgid ""
+"Czy na pewno chcesz wycofać gracza z aktualnego sezonu? Ta operacja jest "
+"nieodwracalna."
+msgstr ""
+
+#: templates/league/player_detail.html:46
+msgid "Zamknij"
+msgstr "Close"
+
+#: templates/misc/home.html:17
+msgid "Internetowa Liga Go IGLO"
+msgstr "Internet Go League IGLO"
+
+#: templates/misc/home.html:18
+msgid ""
+"IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie "
+"pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja "
+"do regularnego grania dłuższych gier oraz uzyskiwania komentarzy od silnych "
+"graczy. Dzięki czemu motywuje do rozwoju i pogłębiania wiedzy o Go."
+msgstr ""
+
+#: templates/misc/home.html:24
+msgid ""
+"Każdy gracz może znaleźć grupę odpowiadającą jego poziomowi, dlatego nie "
+"czekaj tylko dołącz do nas!"
+msgstr ""
+
+#: templates/misc/home.html:27
+msgid "Zapisz się!"
+msgstr "Sign in!"
+
+#: templates/misc/home.html:38
+msgid "Aktualny sezon"
+msgstr "Current season"
+
+#: templates/misc/home.html:42
+msgid "Sezon"
+msgstr "Season"
+
+#: templates/misc/home.html:46
+msgid "Grupy"
+msgstr "Groups"
+
+#: templates/misc/home.html:53
+msgid "Rozegranych gier"
+msgstr "Played games"
+
+#: templates/misc/home.html:69
+msgid "Zasady"
+msgstr "Rules"
+
+#: templates/misc/home.html:71
+msgid "Skrócone zasady IGLO"
+msgstr "Summary of IGLO rules"
+
+#: templates/misc/home.html:73
+msgid "Jedna gra tygodniowo z domyślnym terminem gry."
+msgstr "One game per week"
+
+#: templates/misc/home.html:74
+msgid ""
+"Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia "
+"czasu."
+msgstr ""
+
+#: templates/misc/home.html:76
+msgid "Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć."
+msgstr ""
+
+#: templates/misc/home.html:78
+msgid "Gramy na OGS (preferowany serwer) lub KGS."
+msgstr ""
+
+#: templates/misc/home.html:81
+#, python-format
+msgid ""
+"Więcej informacji znajdziesz w <a href=\"%(rules_url)s\">regulaminie</a> ."
+msgstr ""
+
+#: templates/misc/home.html:90
+msgid "Wsparcie"
+msgstr "Support"

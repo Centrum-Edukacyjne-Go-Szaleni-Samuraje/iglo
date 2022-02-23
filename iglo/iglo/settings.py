@@ -74,6 +74,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "iglo.urls"
@@ -191,7 +192,7 @@ else:
 
 
 INTERNAL_IPS = [
-    '127.0.0.1',
+    # '127.0.0.1',
 ]
 
 EGD_SETTINGS = {
@@ -241,3 +242,13 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+LANGUAGES = [
+    ("pl", "Polski"),
+    ("en", "English"),
+]
+
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -35,21 +35,21 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if seasons_url in request.get_full_path %}active{% endif %}"
-                       aria-current="page" href="{{ seasons_url }}">Sezony</a>
+                       aria-current="page" href="{{ seasons_url }}">{% translate "Sezony" %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if teachers_url in request.get_full_path %}active{% endif %}"
                        aria-current="page"
-                       href="{{ teachers_url }}">Nauczyciele</a>
+                       href="{{ teachers_url }}">{% translate "Nauczyciele" %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == rules_url %}active{% endif %}" aria-current="page"
-                       href="{{ rules_url }}">Regulamin</a>
+                       href="{{ rules_url }}">{% translate "Regulamin" %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == contact_url %}active{% endif %}"
                        aria-current="page"
-                       href="{{ contact_url }}">Kontakt</a>
+                       href="{{ contact_url }}">{% translate "Kontakt" %}</a>
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -58,7 +58,7 @@
                         <li class="nav-item">
                             <a href="{{ profile_url }}"
                                class="nav-link {% if request.get_full_path == profile_url %}active{% endif %}">
-                                <i class="fas fa-calendar-alt"></i> Twoje Gry
+                                <i class="fas fa-calendar-alt"></i> {% translate "Twoje Gry" %}
                             </a>
                         </li>
                     {% endif %}
@@ -72,14 +72,14 @@
                                 <li>
                                     <a class="dropdown-item"
                                        href="{% url "player-settings" request.user.player.nick %}">
-                                        <i class="fas fa-user"></i> Edytuj profil
+                                        <i class="fas fa-user"></i> {% translate "Edytuj profil" %}
                                     </a>
                                 </li>
                             {% endif %}
                             <li>
                                 <a class="dropdown-item"
                                    href="{% url "accounts:password_change" %}">
-                                    <i class="fas fa-cog"></i> Zmień hasło/email
+                                    <i class="fas fa-cog"></i> {% translate "Zmień hasło/email" %}
                                 </a>
                             </li>
                             <li>
@@ -87,7 +87,7 @@
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{% url "accounts:logout" %}">
-                                    <i class="fas fa-sign-out-alt"></i> Wyloguj
+                                    <i class="fas fa-sign-out-alt"></i> {% translate "Wyloguj" %}
                                 </a>
                             </li>
                         </ul>
@@ -96,13 +96,35 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.get_full_path == login_url %}active{% endif %}"
                            aria-current="page"
-                           href="{{ login_url }}">Logowanie</a>
+                           href="{{ login_url }}">{% translate "Logowanie" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.get_full_path == registration_url %}active{% endif %}"
                            aria-current="page"
-                           href="{{ registration_url }}">Rejestracja</a>
+                           href="{{ registration_url }}">{% translate "Rejestracja" %}</a>
                     </li>
+                {% endif %}
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% if user.is_admin %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="language-dropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ LANGUAGE_CODE.upper }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end language-dropdown" aria-labelledby="language-dropdown">
+                        <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+                        {% for language in languages %}
+                            <li>
+                                <button value="{{ language.code }}" name="language" class="dropdown-item" type="submit">
+                                    {{ language.code.upper }}
+                                </button>
+                            </li>
+                        {% endfor %}
+                        </form>
+                    </ul>
+                </li>
                 {% endif %}
             </ul>
         </div>

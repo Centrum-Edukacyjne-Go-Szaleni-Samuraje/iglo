@@ -577,7 +577,9 @@ class Member(models.Model):
         if self.group.members.count() % 2 or self.group.type != GroupType.ROUND_ROBIN:
             raise NotImplementedError()
         played_games = (
-            Game.objects.get_for_member(member=self).exclude(win_type=WinType.BYE).filter(win_type__isnull=False)
+            Game.objects.get_for_member(member=self)
+            .exclude(win_type__in=[WinType.BYE, WinType.NOT_PLAYED])
+            .filter(win_type__isnull=False)
         )
         if played_games.exists():
             raise AlreadyPlayedGamesError()

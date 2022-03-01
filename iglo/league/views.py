@@ -154,7 +154,9 @@ class GroupObjectMixin(SingleObjectMixin):
                 all_games_finished=~Exists(Game.objects.filter(
                     group=OuterRef('id'),
                     win_type__isnull=True
-                ))),
+                )),
+                rounds_number=Count('rounds', distinct=True)
+            ),
             season__number=self.kwargs["season_number"],
             name__iexact=self.kwargs["group_name"],
         )

@@ -67,7 +67,7 @@
                                         <th class="group-table__header">{% translate "Pozycja" %}</th>
                                         <th class="group-table__header">{% translate "Gracz" %}</th>
                                         <th colspan="{{ object.rounds_number }}" class="group-table__header d-none d-lg-table-cell">{% translate "Rundy" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "Punkty" %}</th>
+                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "Score" %}</th>
                                         <th class="group-table__header d-none d-lg-table-cell">{% translate "SOS" %}</th>
                                         <th class="group-table__header d-none d-lg-table-cell">{% translate "SOSOS" %}</th>
                                         <th class="group-table__header d-none d-lg-table-cell">{% translate "Start" %}</th>
@@ -75,7 +75,7 @@
                                 </thead>
                                 <tbody>
                                     {% for position, member, results in object.results_table %}
-                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}">
+                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}" data-position="{{ position }}">
                                             <td>{{ forloop.counter }}</td>
                                             <td class="group-table__header group-table__cell-name">
                                                 {% include "league/includes/player_badge.html" with member=member %}

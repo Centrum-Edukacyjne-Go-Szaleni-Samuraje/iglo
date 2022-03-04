@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-25 11:40+0100\n"
+"POT-Creation-Date: 2022-03-04 11:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -259,7 +259,7 @@ msgid "Grupa"
 msgstr "Groups"
 
 #: templates/league/game_detail.html:8 templates/league/game_detail.html:39
-#: templates/league/game_detail.html:49 templates/league/group_detail.html:163
+#: templates/league/game_detail.html:49 templates/league/group_detail.html:159
 msgid "Bye"
 msgstr ""
 
@@ -277,7 +277,7 @@ msgstr ""
 msgid "Edytuj"
 msgstr "Edit profile"
 
-#: templates/league/game_detail.html:78
+#: templates/league/game_detail.html:78 templates/league/group_detail.html:172
 msgid "Gra jeszcze się nie odbyła."
 msgstr ""
 
@@ -297,75 +297,75 @@ msgstr "Sign in!"
 msgid "Nauczyciel"
 msgstr "Teachers"
 
-#: templates/league/group_detail.html:43
-msgid "Miejsce"
-msgstr ""
-
-#: templates/league/group_detail.html:44 templates/league/group_detail.html:83
-msgid "Gracz"
-msgstr ""
-
-#: templates/league/group_detail.html:46
-msgid "Rundy"
-msgstr ""
-
-#: templates/league/group_detail.html:49
-msgid "Punkty"
-msgstr ""
-
-#: templates/league/group_detail.html:52
-msgid "SODOS"
-msgstr ""
-
-#: templates/league/group_detail.html:55
-msgid "Start"
-msgstr ""
-
-#: templates/league/group_detail.html:82
+#: templates/league/group_detail.html:43 templates/league/group_detail.html:74
 msgid "Pozycja"
 msgstr ""
 
-#: templates/league/group_detail.html:85
+#: templates/league/group_detail.html:44 templates/league/group_detail.html:75
+msgid "Gracz"
+msgstr ""
+
+#: templates/league/group_detail.html:45 templates/league/group_detail.html:77
+msgid "Rundy"
+msgstr ""
+
+#: templates/league/group_detail.html:46
+msgid "Punkty"
+msgstr ""
+
+#: templates/league/group_detail.html:47
+msgid "SODOS"
+msgstr ""
+
+#: templates/league/group_detail.html:48 templates/league/group_detail.html:87
+msgid "Start"
+msgstr ""
+
+#: templates/league/group_detail.html:80
 msgid "Score"
 msgstr ""
 
-#: templates/league/group_detail.html:88
+#: templates/league/group_detail.html:83
 msgid "SOS"
 msgstr ""
 
-#: templates/league/group_detail.html:91
+#: templates/league/group_detail.html:86
 msgid "SOSOS"
 msgstr ""
 
-#: templates/league/group_detail.html:115
+#: templates/league/group_detail.html:110
+msgid "Nieznany typ grupy"
+msgstr ""
+
+#: templates/league/group_detail.html:114
 msgid "Jak czytać wyniki?"
 msgstr ""
 
-#: templates/league/group_detail.html:128
+#: templates/league/group_detail.html:124
 msgid "Nowa runda"
 msgstr ""
 
-#: templates/league/group_detail.html:135
+#: templates/league/group_detail.html:131
 msgid "Eksport EGD"
 msgstr ""
 
-#: templates/league/group_detail.html:145
+#: templates/league/group_detail.html:141
 msgid "Runda"
 msgstr ""
 
-#: templates/league/group_detail.html:185
+#: templates/league/group_detail.html:186
 msgid "Gracze"
 msgstr ""
 
-#: templates/league/group_detail.html:190
+#: templates/league/group_detail.html:191
 msgid "Dodaj"
 msgstr ""
 
-#: templates/league/group_detail.html:203
+#: templates/league/group_detail.html:204
 msgid "Punkty początkowe"
 msgstr ""
 
-#: templates/league/group_detail.html:218
+#: templates/league/group_detail.html:219
 msgid "Usuń"
 msgstr ""
 

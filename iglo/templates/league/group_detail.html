@@ -1,30 +1,35 @@
 {% extends "base.html" %}
 
-{% load static %}
-{% load i18n %}
+{% load static i18n %}
 
-{% block page_title %}Sezon #{{ object.season.number }} - Grupa {{ object.name }}{% endblock %}
+{% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %} {{ object.name }}{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
-                    <li class="breadcrumb-item"><a
-                            href="{% url "season-detail" object.season.number %}">Sezon #{{ object.season.number }}</a>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Grupa {{ object.name }}</li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "season-detail" object.season.number %}">
+                            {% translate "Sezon" %} #{{ object.season.number }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% translate "Grupa" %} {{ object.name }}
+                    </li>
                 </ol>
             </nav>
             <div class="d-flex align-items-center mb-3 flex-wrap">
-                <h2>Grupa {{ object.name }}</h2>
+                <h2>{% translate "Grupa" %} {{ object.name }}</h2>
                 {% if group.is_egd %}<span class="badge bg-info ms-2">EGD</span>{% endif %}
                 <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>
 
                 {% if group.teacher %}
                     <div class="ms-auto">
-                        Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
+                        {% translate "Nauczyciel" %}: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
                     </div>
                 {% endif %}
             </div>
@@ -45,14 +50,16 @@
                                 </thead>
                                 <tbody>
                                     {% for position, member, results in object.results_table %}
-                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}" data-position="{{ position }}">
-                                            <td>{{position}}</td>
+                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
+                                            data-position="{{ position }}">
+                                            <td>{{ position }}</td>
                                             <td class="group-table__header group-table__cell-name">
                                                 {% include "league/includes/player_badge.html" with member=member %}
                                             </td>
                                             {% for result, url in results %}
                                                 <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
-                                                    <a class="group-table__result-link" data-result="{{ result }}" href="{{ url }}">{{ result }}</a>
+                                                    <a class="group-table__result-link" data-result="{{ result }}"
+                                                       href="{{ url }}">{{ result }}</a>
                                                 </td>
                                             {% endfor %}
                                             <td class="d-none d-lg-table-cell">{{ member.points }}</td>
@@ -69,9 +76,14 @@
                                         {% if object.rounds_number %}
                                         <th colspan="{{ object.rounds_number }}" class="group-table__header d-none d-lg-table-cell">{% translate "Rundy" %}</th>
                                         {% endif %}
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "Score" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "SOS" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "SOSOS" %}</th>
+                                        <th class="group-table__header d-none d-lg-table-cell">
+                                            {% translate "Score" %}
+                                        </th>
+                                        <th class="group-table__header d-none d-lg-table-cell">
+                                            {% translate "SOS" %}
+                                        </th>
+                                        <th class="group-table__header d-none d-lg-table-cell">
+                                            {% translate "SOSOS" %}</th>
                                         <th class="group-table__header d-none d-lg-table-cell">{% translate "Start" %}</th>
                                     </tr>
                                 </thead>
@@ -99,7 +111,7 @@
                             {% endif %}
                         </table>
                         <a href="#" class="align-self-end text-decoration-none mt-1" data-bs-toggle="modal" data-bs-target="#result-table-modal">
-                            <span class="text-muted small">Jak czytać wyniki?</span></a>
+                            <span class="text-muted small">{% blocktrans %}Jak czytać wyniki?{% endblocktrans %}</span></a>
                     </div>
                 </div>
                 <div class="d-flex justify-content-between mb-4">
@@ -107,16 +119,17 @@
                     {% if user|has_role:'referee' %}
                         <div>
                             {% if group.season.state == "in_progress" and group.type == "mcmahon" and group.all_games_finished %}
-                            <form method="post" class="d-inline-block">{% csrf_token %}
-                                <button type="submit" class="btn btn-primary" name="action-pairing">
-                                    <i class="fa fa-table"></i> Nowa runda
-                                </button>
-                            </form>
+                                <form method="post" class="d-inline-block">{% csrf_token %}
+                                    <button type="submit" class="btn btn-primary" name="action-pairing">
+                                        <i class="fa fa-table"></i> {% blocktrans %}Nowa runda{% endblocktrans %}
+                                    </button>
+                                </form>
                             {% endif %}
                             {% if group.all_games_finished and group.is_egd %}
-                            <a href="{% url "group-egd-export" season_number=group.season.number group_name=group.name %}" class="btn btn-primary">
-                                <i class="fa fa-file-export"></i> Eksport EGD
-                            </a>
+                                <a href="{% url "group-egd-export" season_number=group.season.number group_name=group.name %}"
+                                   class="btn btn-primary">
+                                    <i class="fa fa-file-export"></i> {% blocktrans %}Eksport EGD{% endblocktrans %}
+                                </a>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -125,11 +138,12 @@
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center clickable"
                              onClick="toggle_collapse(event)" data-target="round-{{ forloop.counter }}">
-                            <strong>Runda #{{ round.number }}</strong>
+                            <strong>{% translate "Runda" %} #{{ round.number }}</strong>
                             <div>
                                 {% if round.start_date and round.end_date %}{{ round.start_date }} -
                                     {{ round.end_date }}{% endif %}
-                                <button class="btn" onClick="toggle_collapse(event)" data-target="round-{{ forloop.counter }}">
+                                <button class="btn" onClick="toggle_collapse(event)"
+                                        data-target="round-{{ forloop.counter }}">
                                     <i id="collapse-round-{{ forloop.counter }}" style="pointer-events: none;" class="fas
                                        {% if round.is_current %} fa-chevron-up {% else %} fa-chevron-down {% endif %}"></i>
                                 </button>
@@ -142,7 +156,7 @@
                                     <div class="card-header d-flex justify-content-between">
                                     <span>
                                         {% if game.is_bye %}
-                                            BYE:
+                                            {% translate "Bye" %}:
                                             {% include "league/includes/player_badge.html" with member=game.winner %}
                                         {% else %}
                                             {% include "league/includes/game_players.html" with game=game %}
@@ -151,8 +165,13 @@
                                         {% if game.date and not game.is_bye %}<span>{{ game.date }}</span>{% endif %}
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-baseline flex-wrap">
-                                        <p>{% if game.is_played %}{{ game.result }}{% else %}Gra jeszcze się
-                                            nie odbyła.{% endif %}</p>
+                                        <p>
+                                            {% if game.is_played %}
+                                                {{ game.result }}
+                                            {% else %}
+                                                {% blocktrans trimmed %}Gra jeszcze się nie odbyła.{% endblocktrans %}
+                                            {% endif %}
+                                        </p>
                                         <div>
                                             {% include "league/includes/game_actions.html" with show_link=True %}
                                         </div>
@@ -164,11 +183,13 @@
                 {% endfor %}
             {% elif object.season.state == "draft" %}
                 <div class="d-flex justify-content-between mb-3">
-                    <h3>Gracze</h3>
+                    <h3>{% translate "Gracze" %}</h3>
                     {% if user.is_admin %}
                         <form method="post" class="d-flex">{% csrf_token %}
                             <input type="text" class="form-control me-2" placeholder="Nick" name="player_nick">
-                            <button type="submit" class="btn btn-primary" name="action-add">Dodaj</button>
+                            <button type="submit" class="btn btn-primary" name="action-add">
+                                {% translate "Dodaj" %}
+                            </button>
                         </form>
                     {% endif %}
                 </div>
@@ -178,7 +199,11 @@
                             <small class="text-muted">#{{ member.order }}</small>
                             <strong><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
                             <span class="text-muted">[{{ member.rank }}]</span>
-                            {% if group.type == "mcmahon" %}<span class="text-muted">Punkty początkowe: {{ member.initial_score }}</span>{% endif %}
+                            {% if group.type == "mcmahon" %}
+                                <span class="text-muted">
+                                    {% translate "Punkty początkowe" %}: {{ member.initial_score }}
+                                </span>
+                            {% endif %}
                         </div>
                         {% if user.is_admin %}
                             <div class="card-body">
@@ -190,7 +215,9 @@
                                     <button type="submit" class="btn btn-primary" name="action-down"
                                             {% if forloop.last %}disabled{% endif %}>▼
                                     </button>
-                                    <button type="submit" class="btn btn-danger" name="action-delete">Usuń</button>
+                                    <button type="submit" class="btn btn-danger" name="action-delete">
+                                        {% translate "Usuń" %}
+                                    </button>
                                 </form>
                             </div>
                         {% endif %}
@@ -199,35 +226,37 @@
             {% endif %}
         </div>
     </div>
-{% include "league/includes/result_table_modal.html" %}
+    {% include "league/includes/result_table_modal.html" %}
     <script>
         function toggle_collapse(event) {
             event.stopPropagation();
             element_id = event.target.getAttribute("data-target");
             document.getElementById(element_id).classList.toggle("show");
-            icon_id = "collapse-"+element_id;
+            icon_id = "collapse-" + element_id;
             document.getElementById(icon_id).classList.toggle("fa-chevron-down");
             document.getElementById(icon_id).classList.toggle("fa-chevron-up");
         }
+
         function toggleRowHighlight(event, highlight) {
             const result = event.target.getAttribute("data-result");
-               if (result) {
-                   const position = result.slice(0, -1);
-                   const row = document.querySelector(`.group-table__row[data-position="${position}"]`)
-                   if (highlight) {
-                       row.classList.add("group-table__row--highlighted");
-                   } else {
-                       row.classList.remove("group-table__row--highlighted");
-                   }
-               }
+            if (result) {
+                const position = result.slice(0, -1);
+                const row = document.querySelector(`.group-table__row[data-position="${position}"]`)
+                if (highlight) {
+                    row.classList.add("group-table__row--highlighted");
+                } else {
+                    row.classList.remove("group-table__row--highlighted");
+                }
+            }
         }
+
         document.querySelectorAll('.group-table__result-link').forEach(function (item) {
-           item.addEventListener("mouseover", function (event) {
-               toggleRowHighlight(event, true);
-           });
-           item.addEventListener("mouseleave", function (event) {
-               toggleRowHighlight(event, false);
-           });
+            item.addEventListener("mouseover", function (event) {
+                toggleRowHighlight(event, true);
+            });
+            item.addEventListener("mouseleave", function (event) {
+                toggleRowHighlight(event, false);
+            });
         });
     </script>
 {% endblock %}

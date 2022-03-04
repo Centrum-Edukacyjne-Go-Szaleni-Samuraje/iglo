@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-23 20:15+0100\n"
+"POT-Creation-Date: 2022-02-25 11:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,193 @@ msgstr ""
 msgid "Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe."
 msgstr ""
 
-#: templates/base.html:38
+#: templates/accounts/login.html:8 templates/base.html:99
+msgid "Logowanie"
+msgstr "Log in"
+
+#: templates/accounts/login.html:13
+#, fuzzy
+#| msgid "Wyloguj"
+msgid "Zaloguj"
+msgstr "Log out"
+
+#: templates/accounts/login.html:16
+msgid "Nie pamiętasz hasła?"
+msgstr ""
+
+#: templates/accounts/password_and_email_change.html:5
+#, fuzzy
+#| msgid "Zmień hasło/email"
+msgid "Zmiana hasła i/lub email"
+msgstr "Edit password/email"
+
+#: templates/accounts/password_and_email_change.html:8
+#, fuzzy
+#| msgid "Zmień hasło/email"
+msgid "Zmień hasło i/lub email"
+msgstr "Edit password/email"
+
+#: templates/accounts/password_and_email_change.html:13
+msgid "Zmień"
+msgstr ""
+
+#: templates/accounts/password_reset.html:5
+#: templates/accounts/password_reset.html:8
+msgid "Resetowanie hasła"
+msgstr ""
+
+#: templates/accounts/password_reset.html:10
+msgid ""
+"Jeżeli zapomniałeś swojego hasła lub Twoje hasło nie zostało jeszcze "
+"ustawione wpisz swój adres email a wyślemy na niego instrukcje jak zmienić "
+"hasło."
+msgstr ""
+
+#: templates/accounts/password_reset.html:17
+msgid "Zresetuj moje hasło"
+msgstr ""
+
+#: templates/accounts/password_reset_complete.html:5
+#: templates/accounts/password_reset_complete.html:10
+msgid "Zresetowanie hasła powiodło się"
+msgstr ""
+
+#: templates/accounts/password_reset_complete.html:11
+msgid "Twoje hasło zostało ustawione. Możesz się teraz zalogować."
+msgstr ""
+
+#: templates/accounts/password_reset_complete.html:12
+msgid "Zaloguj się"
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:5
+#: templates/accounts/password_reset_confirm.html:8
+msgid "Wprowadź nowe hasło"
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:9
+msgid "Tutaj możesz ustawić nowe hasło do swojego konta na stronie IGLO."
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:10
+msgid "Pamiętaj, aby wybrać silne hasło!"
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:14
+#, fuzzy
+#| msgid "Zmień hasło/email"
+msgid "Zmień hasło"
+msgstr "Edit password/email"
+
+#: templates/accounts/password_reset_done.html:5
+#: templates/accounts/password_reset_done.html:11
+msgid "Potwierdzenie zresetowania hasła zostało wysłane"
+msgstr ""
+
+#: templates/accounts/password_reset_done.html:16
+msgid ""
+"Instrukcja pozwalająca ustawić nowe hasło dla podanego adresu e-mail została "
+"wysłana. Niebawem powinna się pojawić na twoim koncie pocztowym."
+msgstr ""
+
+#: templates/accounts/password_reset_done.html:22
+msgid ""
+"W przypadku nieotrzymania wiadomości e-mail: upewnij się czy adres "
+"wprowadzony jest zgodny z tym podanym podczas rejestracji i sprawdź "
+"zawartość folderu SPAM na swoim koncie."
+msgstr ""
+
+#: templates/accounts/password_reset_email.html:2
+#, python-format
+msgid ""
+"Otrzymujesz tę wiadomość, gdyż skorzystano z opcji resetu hasła dla Twojego "
+"konta na stronie %(site_name)s."
+msgstr ""
+
+#: templates/accounts/password_reset_email.html:4
+msgid ""
+"Aby wprowadzić nowe hasło, proszę przejść na stronę, której adres widnieje "
+"poniżej:"
+msgstr ""
+
+#: templates/accounts/password_reset_email.html:8
+msgid "Twoja nazwa użytkownika, na wypadek, gdybyś zapomniał(a):"
+msgstr ""
+
+#: templates/accounts/password_reset_email.html:10
+msgid "Dziękujemy za korzystanie naszej strony."
+msgstr ""
+
+#: templates/accounts/password_reset_email.html:12
+msgid "Zespół IGLO"
+msgstr ""
+
+#: templates/accounts/password_reset_subject.txt:2
+msgid "Resetowanie hasła na stronie IGLO"
+msgstr ""
+
+#: templates/accounts/registration.html:5
+#: templates/accounts/registration.html:8 templates/base.html:104
+msgid "Rejestracja"
+msgstr "Sign in"
+
+#: templates/accounts/registration.html:10
+msgid ""
+"W celu rozpoczęcia gry w lidze konieczne jest posiadanie konta w naszym "
+"systemie."
+msgstr ""
+
+#: templates/accounts/registration.html:17
+#, fuzzy
+#| msgid "Rejestracja"
+msgid "Zarejestruj"
+msgstr "Sign in"
+
+#: templates/accounts/registration.html:24
+msgid "Punkty GoR"
+msgstr ""
+
+#: templates/accounts/registration.html:29
+msgid ""
+"Punkty GoR to system służący do oceny siły poszczególnych graczy przez EGF "
+"(European Go Federation). Lista rankingowa obejmuje wszystkich graczy z "
+"Europy, którzy uczestniczyli w oficjalnych turniejach. Różnica między "
+"stopniami jest ustawiona na 100 (na przykład: 6 dan ma 2600 punktów, 1 kyu "
+"to 2000, a 20 kyu to 100 itd.). Znajomość twojej siły pozwoli nam dopasować "
+"Cię do odpowiedniej grupy w Lidze."
+msgstr ""
+
+#: templates/accounts/registration.html:38
+msgid ""
+"Jeśli chcesz dowiedzieć się więcej zapraszamy na stronę <a href=\"https://"
+"europeangodatabase.eu/EGD/EGF_rating_system.php\" target=\"_blank\">EGD</a>."
+msgstr ""
+
+#: templates/accounts/registration.html:43
+msgid "Gdzie znaleźć informację o punktach GoR?"
+msgstr ""
+
+#: templates/accounts/registration.html:45
+msgid ""
+"Jeśli uczestniczyłeś już w oficjalnym turnieju punkty są widoczne na <a href="
+"\"https://europeangodatabase.eu/EGD/Find_Player.php\" target=\"_blank"
+"\">Twoim profilu</a> w European Go Database w okienku o nazwie ‘GoR’."
+msgstr ""
+
+#: templates/accounts/registration.html:52
+msgid "Co jeśli nie ma mnie w oficjalnej bazie?"
+msgstr ""
+
+#: templates/accounts/registration.html:54
+msgid "Jeśli nie grałeś w oficjalnym turnieju i nie znasz swojej siły wpisz:"
+msgstr ""
+
+#: templates/accounts/registration.html:61
+#: templates/league/player_detail.html:46
+msgid "Zamknij"
+msgstr "Close"
+
+#: templates/base.html:38 templates/league/group_detail.html:13
 msgid "Sezony"
 msgstr "Seasons"
 
@@ -58,13 +244,155 @@ msgstr "Edit password/email"
 msgid "Wyloguj"
 msgstr "Log out"
 
-#: templates/base.html:99
-msgid "Logowanie"
-msgstr "Log in"
+#: templates/league/game_detail.html:6 templates/league/game_detail.html:29
+#: templates/league/game_form.html:22 templates/league/group_detail.html:5
+#: templates/league/group_detail.html:17 templates/misc/home.html:42
+msgid "Sezon"
+msgstr "Season"
 
-#: templates/base.html:104
-msgid "Rejestracja"
-msgstr "Sign in"
+#: templates/league/game_detail.html:6 templates/league/game_detail.html:34
+#: templates/league/game_form.html:27 templates/league/group_detail.html:5
+#: templates/league/group_detail.html:21 templates/league/group_detail.html:26
+#, fuzzy
+#| msgid "Grupy"
+msgid "Grupa"
+msgstr "Groups"
+
+#: templates/league/game_detail.html:8 templates/league/game_detail.html:39
+#: templates/league/game_detail.html:49 templates/league/group_detail.html:163
+msgid "Bye"
+msgstr ""
+
+#: templates/league/game_detail.html:41 templates/league/game_form.html:32
+msgid "Gra"
+msgstr ""
+
+#: templates/league/game_detail.html:52
+msgid "Brak przeciwnika w tej rundzie."
+msgstr ""
+
+#: templates/league/game_detail.html:68
+#, fuzzy
+#| msgid "Edytuj profil"
+msgid "Edytuj"
+msgstr "Edit profile"
+
+#: templates/league/game_detail.html:78
+msgid "Gra jeszcze się nie odbyła."
+msgstr ""
+
+#: templates/league/game_form.html:36
+msgid "Edycja"
+msgstr ""
+
+#: templates/league/game_form.html:47
+#, fuzzy
+#| msgid "Zapisz się!"
+msgid "Zapisz"
+msgstr "Sign in!"
+
+#: templates/league/group_detail.html:32
+#, fuzzy
+#| msgid "Nauczyciele"
+msgid "Nauczyciel"
+msgstr "Teachers"
+
+#: templates/league/group_detail.html:43
+msgid "Miejsce"
+msgstr ""
+
+#: templates/league/group_detail.html:44 templates/league/group_detail.html:83
+msgid "Gracz"
+msgstr ""
+
+#: templates/league/group_detail.html:46
+msgid "Rundy"
+msgstr ""
+
+#: templates/league/group_detail.html:49
+msgid "Punkty"
+msgstr ""
+
+#: templates/league/group_detail.html:52
+msgid "SODOS"
+msgstr ""
+
+#: templates/league/group_detail.html:55
+msgid "Start"
+msgstr ""
+
+#: templates/league/group_detail.html:82
+msgid "Pozycja"
+msgstr ""
+
+#: templates/league/group_detail.html:85
+msgid "Score"
+msgstr ""
+
+#: templates/league/group_detail.html:88
+msgid "SOS"
+msgstr ""
+
+#: templates/league/group_detail.html:91
+msgid "SOSOS"
+msgstr ""
+
+#: templates/league/group_detail.html:115
+msgid "Jak czytać wyniki?"
+msgstr ""
+
+#: templates/league/group_detail.html:128
+msgid "Nowa runda"
+msgstr ""
+
+#: templates/league/group_detail.html:135
+msgid "Eksport EGD"
+msgstr ""
+
+#: templates/league/group_detail.html:145
+msgid "Runda"
+msgstr ""
+
+#: templates/league/group_detail.html:185
+msgid "Gracze"
+msgstr ""
+
+#: templates/league/group_detail.html:190
+msgid "Dodaj"
+msgstr ""
+
+#: templates/league/group_detail.html:203
+msgid "Punkty początkowe"
+msgstr ""
+
+#: templates/league/group_detail.html:218
+msgid "Usuń"
+msgstr ""
+
+#: templates/league/includes/game_actions.html:10
+msgid "Komentarz"
+msgstr ""
+
+#: templates/league/includes/game_actions.html:15
+msgid "Analiza AI"
+msgstr ""
+
+#: templates/league/includes/player_badge.html:3
+msgid "Ten gracz jest patronem IGLO!"
+msgstr ""
+
+#: templates/league/includes/player_contact.html:12
+msgid "Dostępność"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:8
+msgid "Jak czytać tabelę z wynikami?"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:13
+msgid ""
+"Z kolumny <b>Miejsce</b> można odczytać aktualną pozycję gracza w grupie."
+msgstr ""
 
 #: templates/league/player_detail.html:23
 #: templates/league/player_detail.html:43
@@ -80,10 +408,6 @@ msgid ""
 "Czy na pewno chcesz wycofać gracza z aktualnego sezonu? Ta operacja jest "
 "nieodwracalna."
 msgstr ""
-
-#: templates/league/player_detail.html:46
-msgid "Zamknij"
-msgstr "Close"
 
 #: templates/misc/home.html:17
 msgid "Internetowa Liga Go IGLO"
@@ -110,10 +434,6 @@ msgstr "Sign in!"
 #: templates/misc/home.html:38
 msgid "Aktualny sezon"
 msgstr "Current season"
-
-#: templates/misc/home.html:42
-msgid "Sezon"
-msgstr "Season"
 
 #: templates/misc/home.html:46
 msgid "Grupy"

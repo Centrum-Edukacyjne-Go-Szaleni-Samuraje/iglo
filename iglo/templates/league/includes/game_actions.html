@@ -1,3 +1,5 @@
+{% load i18n %}
+
 {% if game.link %}
     <a href="{{ game.link }}" target="_blank" class="btn btn-primary">
         <i class="fa fa-external-link-alt"></i> <span class="d-none d-md-inline">OGS</span>
@@ -5,12 +7,12 @@
 {% endif %}
 {% if game.review_video_link %}
     <a href="{{ game.review_video_link }}" class="btn btn-primary" target="_blank">
-        <i class="fab fa-youtube"></i> <span class="d-none d-md-inline">Komentarz</span>
+        <i class="fab fa-youtube"></i> <span class="d-none d-md-inline">{% translate "Komentarz"%}</span>
     </a>
 {% endif %}
 {% if game.ai_analyse_link %}
     <a href="{{ game.ai_analyse_link }}" class="btn btn-primary" target="_blank">
-        <i class="fas fa-robot"></i> <span class="d-none d-md-inline">Analiza AI</span>
+        <i class="fas fa-robot"></i> <span class="d-none d-md-inline">{% translate "Analiza AI" %}</span>
     </a>
 {% endif %}
 {% if game.sgf_link %}

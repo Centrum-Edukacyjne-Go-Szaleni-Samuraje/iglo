@@ -1,3 +1,4 @@
+{% load i18n %}
 {{ player.first_name }} {{ player.last_name }}<br>
 <a href="mailto:{{ player.user.email }}">{{ player.user.email }}</a><br>
 {% if player.ogs_username %}
@@ -8,6 +9,6 @@ KGS: {{ player.kgs_username }}<br>
 {% endif %}
 {% if player.availability %}
     <br>
-    <h6>Dostępność</h6>
+    <h6>{% translate "Dostępność" %}</h6>
     <p><i>{{ player.availability }}</i></p>
 {% endif %}

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% load static crispy_forms_filters %}
+{% load static crispy_forms_filters i18n %}
 
 {% block page_title %}
-    Sezon #{{ object.group.season.number }} - Grupa {{ object.group.name }} -
+    {% translate "Sezon" %} #{{ object.group.season.number }} - {% translate "Grupa" %} {{ object.group.name }} -
     {% if object.is_bye %}
-        Bye: {{ object.winner.player.nick }}
+        {% translate "Bye" %}: {{ object.winner.player.nick }}
     {% else %}
         {{ object.black.player.nick }} vs {{ object.white.player.nick }}
     {% endif %}
@@ -26,19 +26,19 @@
                 <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
                 <li class="breadcrumb-item">
                     <a href="{% url "season-detail" object.group.season.number %}">
-                        Sezon #{{ object.group.season.number }}
+                        {% translate "Sezon" %} #{{ object.group.season.number }}
                     </a>
                 </li>
                 <li class="breadcrumb-item">
                     <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
-                        Grupa {{ object.group.name }}
+                        {% translate "Grupa" %} {{ object.group.name }}
                     </a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">
                     {% if object.is_bye %}
-                        Bye: {{ object.winner.player.nick }}
+                        {% translate "Bye" %}: {{ object.winner.player.nick }}
                     {% else %}
-                        Gra {{ object.black.player.nick }} vs {{ object.white.player.nick }}
+                        {% translate "Gra" %} {{ object.black.player.nick }} vs {{ object.white.player.nick }}
                     {% endif %}
                 </li>
             </ol>
@@ -46,8 +46,12 @@
         {% if object.is_bye %}
             <div>
                 <div class="d-flex flex-column justify-content-between align-items-start">
-                    <div class="fs-2 mb-3">BYE</div>
-                    <div><small class="text-muted">Brak przeciwnika w tej rundzie.</small></div>
+                    <div class="fs-2 mb-3">{% translate "Bye" %}</div>
+                    <div>
+                        <small class="text-muted">
+                            {% blocktrans %}Brak przeciwnika w tej rundzie.{% endblocktrans %}
+                        </small>
+                    </div>
                 </div>
             </div>
         {% else %}
@@ -60,14 +64,19 @@
                         {% if user|has_role:'referee' or user|has_role:'teacher' %}
                             <a href="{% url "game-update" season_number=object.group.season.number group_name=object.group.name black_player=object.black.player.nick white_player=object.white.player.nick %}"
                                class="btn btn-primary">
-                                <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edytuj</span>
+                                <i class="fas fa-edit"></i>
+                                <span class="d-none d-md-inline">{% translate "Edytuj" %}</span>
                             </a>
                         {% endif %}
                         {% include "league/includes/game_actions.html" with show_link=False %}
                     </div>
                 </div>
                 <h5>
-                    {% if object.is_played %}{{ object.result }}{% else %}Gra jeszcze się nie odbyła.{% endif %}
+                    {% if object.is_played %}
+                        {{ object.result }}
+                    {% else %}
+                        {% blocktrans %}Gra jeszcze się nie odbyła.{% endblocktrans %}
+                    {% endif %}
                 </h5>
                 {% if object.date %}<i class="fas fa-calendar-day"></i> {{ object.date }}{% endif %}
                 {% if object.sgf_link %}

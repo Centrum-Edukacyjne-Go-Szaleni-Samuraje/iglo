@@ -1,43 +1,65 @@
 {% extends "accounts/base.html" %}
 
-{% load crispy_forms_filters %}
+{% load crispy_forms_filters i18n %}
 
-{% block page_title %}Rejestracja{% endblock %}
+{% block page_title %}{% blocktrans %}Rejestracja{% endblocktrans %}{% endblock %}
 
 {% block form_content %}
-    <h2>Rejestracja</h2>
-    <p>W celu rozpoczęcia gry w lidze konieczne jest posiadanie konta w naszym systemie.</p>
+    <h2>{% blocktrans %}Rejestracja{% endblocktrans %}</h2>
+    <p>
+        {% blocktrans trimmed %}
+            W celu rozpoczęcia gry w lidze konieczne jest posiadanie konta w naszym systemie.
+        {% endblocktrans %}
+    </p>
     <form method="post">
         {% csrf_token %}
         {{ form | crispy }}
-        <button type="submit" class="btn btn-primary">Zarejestruj</button>
+        <button type="submit" class="btn btn-primary">{% blocktrans %}Zarejestruj{% endblocktrans %}</button>
     </form>
     <div class="modal fade" id="gor-modal" tabindex="-1" aria-labelledby="gor-modal"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Punkty GoR</h5>
+                    <h5 class="modal-title">{% blocktrans %}Punkty GoR{% endblocktrans %}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Punkty GoR to system służący do oceny siły poszczególnych graczy przez EGF (European Go
-                        Federation). Lista rankingowa obejmuje wszystkich graczy z Europy, którzy uczestniczyli w
-                        oficjalnych turniejach. Różnica między stopniami jest ustawiona na 100 (na przykład: 6 dan ma
-                        2600 punktów, 1 kyu to 2000, a 20 kyu to 100 itd.). Znajomość twojej siły pozwoli nam dopasować
-                        Cię do odpowiedniej grupy w Lidze.</p>
-                    <p>Jeśli chcesz dowiedzieć się więcej zapraszamy na stronę
-                        <a href="https://europeangodatabase.eu/EGD/EGF_rating_system.php" target="_blank">EGD</a>.</p>
-                    <h5>Gdzie znaleźć informację o punktach GoR?</h5>
-                    <p>Jeśli uczestniczyłeś już w oficjalnym turnieju punkty są widoczne na <a
-                            href="https://europeangodatabase.eu/EGD/Find_Player.php" target="_blank">Twoim profilu</a>
-                        w European Go Database w okienku o nazwie ‘GoR’.</p>
-
-                    <h5>Co jeśli nie ma mnie w oficjalnej bazie?</h5>
-                    <p>Jeśli nie grałeś w oficjalnym turnieju i nie znasz swojej siły wpisz: <strong>100</strong>.</p>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Punkty GoR to system służący do oceny siły poszczególnych graczy przez EGF (European Go
+                            Federation). Lista rankingowa obejmuje wszystkich graczy z Europy, którzy uczestniczyli w
+                            oficjalnych turniejach. Różnica między stopniami jest ustawiona na 100 (na przykład: 6 dan
+                            ma 2600 punktów, 1 kyu to 2000, a 20 kyu to 100 itd.). Znajomość twojej siły pozwoli nam
+                            dopasować Cię do odpowiedniej grupy w Lidze.
+                        {% endblocktrans %}
+                    </p>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Jeśli chcesz dowiedzieć się więcej zapraszamy na stronę
+                            <a href="https://europeangodatabase.eu/EGD/EGF_rating_system.php" target="_blank">EGD</a>.
+                        {% endblocktrans %}
+                    </p>
+                    <h5>{% blocktrans %}Gdzie znaleźć informację o punktach GoR?{% endblocktrans %}</h5>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Jeśli uczestniczyłeś już w oficjalnym turnieju punkty są widoczne na <a
+                                href="https://europeangodatabase.eu/EGD/Find_Player.php" target="_blank">Twoim
+                            profilu</a>
+                            w European Go Database w okienku o nazwie ‘GoR’.
+                        {% endblocktrans %}
+                    </p>
+                    <h5>{% blocktrans %}Co jeśli nie ma mnie w oficjalnej bazie?{% endblocktrans %}</h5>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Jeśli nie grałeś w oficjalnym turnieju i nie znasz swojej siły wpisz:
+                        {% endblocktrans %} <strong>100</strong>.
+                    </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Zamknij</button>
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        {% blocktrans %}Zamknij{% endblocktrans %}
+                    </button>
                 </div>
             </div>
         </div>

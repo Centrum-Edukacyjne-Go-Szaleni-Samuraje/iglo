@@ -1,40 +1,45 @@
 {% extends "base.html" %}
 
-{% block page_title %}Sezon #{{ object.number }}{% endblock %}
+{% load i18n %}
+
+{% block page_title %}{% translate "Sezon" %} #{{ object.number }}{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
+                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Sezon #{{ object.number }}
+                        {% translate "Sezon" %} #{{ object.number }}
                     </li>
                 </ol>
             </nav>
             <div class="d-flex justify-content-between">
                 <div class="d-flex align-items-center">
-                    <h2>Sezon #{{ object.number }}</h2>
+                    <h2>{% translate "Sezon" %} #{{ object.number }}</h2>
                     <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                 </div>
                 <div>
                     {% if user|has_role:'referee' %}
                         <a href="{% url "season-export" number=season.number %}" class="btn btn-primary">
-                            <i class="fa fa-file-export"></i> <span class="d-none d-md-inline">Eksport CSV</span>
+                            <i class="fa fa-file-export"></i>
+                            <span class="d-none d-md-inline">{% translate "Eksport CSV" %}</span>
                         </a>
                         <form method="post" class="d-inline">{% csrf_token %}
                             {% if season.state == "draft" %}
                                 <button type="submit" class="btn btn-warning" name="action-start-season">
-                                    <i class="fas fa-play"></i> <span class="d-none d-md-inline">Wystartuj Sezon</span>
+                                    <i class="fas fa-play"></i>
+                                    <span class="d-none d-md-inline">{% translate "Wystartuj Sezon" %}</span>
                                 </button>
                                 <button type="submit" class="btn btn-warning" name="action-reset-groups">
-                                    <i class="fas fa-undo"></i> <span class="d-none d-md-inline">Resetuj Grupy</span>
+                                    <i class="fas fa-undo"></i>
+                                    <span class="d-none d-md-inline">{% translate "Resetuj Grupy" %}</span>
                                 </button>
                             {% elif season.state == "in_progress" %}
                                 <button type="submit" class="btn btn-danger" name="action-finish-season">
-                                    <i class="fa fa-flag-checkered"></i> <span
-                                        class="d-none d-md-inline">Zakończ Sezon</span>
+                                    <i class="fa fa-flag-checkered"></i>
+                                    <span class="d-none d-md-inline">{% translate "Zakończ Sezon" %}</span>
                                 </button>
                             {% endif %}
                         </form>
@@ -48,7 +53,7 @@
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <strong>Grupa {{ group.name }}</strong>
+                            <strong>{% translate "Grupa" %} {{ group.name }}</strong>
                             {% if group.is_egd %}<span class="badge bg-info ms-2">EGD</span>{% endif %}
                         </div>
                         <span class="badge bg-secondary">{{ group.get_type_display | upper }}</span>
@@ -56,7 +61,7 @@
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div>
                             <div class="d-none d-md-block">
-                                <h5>Gracze</h5>
+                                <h5>{% translate "Gracze" %}</h5>
                                 <p>
                                     {% for member in group.members.all %}
                                         {% include "league/includes/player_badge.html" with member=member %}
@@ -64,13 +69,15 @@
                                 </p>
                             </div>
                             <p class="text-muted">
-                                {{ group.members_count }} graczy w tym {{ group.supporters_count }}
-                                {% if group.supporters_count == 1 %}patron{% else %}patronów{% endif %}<span
-                                    class="d-none d-md-inline">, średni ranking: {{ group.avg_rank | floatformat }}</span>
+                                {% blocktrans trimmed with members_count=group.members_count supporters_count=group.supporters_count avg_rank=group.avg_rank|floatformat %}
+                                    Graczy: {{ members_count }} / Patronów: {{ supporters_count }} / Średni ranking:
+                                    {{ avg_rank }}
+                                {% endblocktrans %}
                             </p>
                             {% if group.teacher %}
                                 <p>
-                                    Nauczyciel: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}</p>
+                                    {% translate "Nauczyciel" %}: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
+                                </p>
                             {% endif %}
                         </div>
                         <div>

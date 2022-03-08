@@ -1,37 +1,44 @@
 {% extends "base.html" %}
-{% load bootstrap_pagination %}
 
-{% block page_title %}Sezony{% endblock %}
+{% load bootstrap_pagination i18n %}
+
+{% block page_title %}{% translate "Sezony" %}{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item active" aria-current="page">Sezony</li>
+                    <li class="breadcrumb-item active" aria-current="page">{% translate "Sezony" %}</li>
                 </ol>
             </nav>
             <div class="d-flex align-items-baseline justify-content-between">
                 <h2 class="mb-4">Sezony</h2>
                 {% if user|has_role:'referee' %}
                     <a href="{% url "seasons-prepare" %}"
-                       class="btn btn-warning{% if not can_prepare_season %} disabled{% endif %}">Stwórz Sezon</a>
+                       class="btn btn-warning{% if not can_prepare_season %} disabled{% endif %}">
+                        {% blocktrans %}Stwórz Sezon{% endblocktrans %}
+                    </a>
                 {% endif %}
             </div>
             {% for season in page_obj %}
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between">
                         <strong>
-                            Sezon #{{ season.number }}
+                            {% translate "Sezon" %} #{{ season.number }}
                             <span class="badge season-state--{{ season.state }} ms-2">{{ season.get_state_display | upper }}</span>
                         </strong>
                         <span class="text-muted d-none d-sm-inline">{{ season.start_date }} - {{ season.end_date }}</span>
                     </div>
                     <div class="card-body d-flex justify-content-between align-items-baseline">
-                        <p class="card-text">{{ season.number_of_players }} graczy w {{ season.groups.count }}
-                            grupach</p>
-                        <a href="{% url "season-detail" number=season.number %}" class="btn btn-primary"><i
-                                class="fas fa-arrow-right"></i></a>
+                        <p class="card-text">
+                            {% blocktrans trimmed with number_of_players=season.number_of_players groups_count=season.groups.count %}
+                                {{ number_of_players }} graczy w {{ groups_count }} grupach
+                            {% endblocktrans %}
+                        </p>
+                        <a href="{% url "season-detail" number=season.number %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
                     <a href="{% url "season-detail" season.id %}"></a>
                 </div>

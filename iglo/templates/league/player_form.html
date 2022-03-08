@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static crispy_forms_filters %}
+{% load static crispy_forms_filters i18n %}
 
 {% block page_title %}{{ object.nick }}{% endblock %}
 
@@ -8,12 +8,12 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            <h2>Ustawienia</h2>
-            <p>Tutaj możesz zmienić informacje o sobie.</p>
+            <h2>{% translate "Ustawienia" %}</h2>
+            <p>{% blocktrans %}Tutaj możesz zmienić informacje o sobie.{% endblocktrans %}</p>
             <form method="post">
                 {% csrf_token %}
                 {{ form | crispy }}
-                <button type="submit" class="btn btn-primary">Zapisz</button>
+                <button type="submit" class="btn btn-primary">{% translate "Zapisz" %}</button>
             </form>
         </div>
     </div>

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% load static crispy_forms_filters %}
+{% load static crispy_forms_filters i18n %}
 
-{% block page_title %}Stwórz Sezon{% endblock %}
+{% block page_title %}{% blocktrans %}Stwórz Sezon{% endblocktrans %}{% endblock %}
 
 {% block head %}
     {{ block.super }}
@@ -14,11 +14,11 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            <h2>Stwórz Sezon</h2>
+            <h2>{% blocktrans %}Stwórz Sezon{% endblocktrans %}</h2>
             <form method="post">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <button type="submit" class="btn btn-primary">Stwórz</button>
+                <button type="submit" class="btn btn-primary">{% translate "Stwórz" %}</button>
             </form>
         </div>
     </div>

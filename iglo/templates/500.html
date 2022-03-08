@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 
-{% block page_title %}Błąd serwera{% endblock %}
+{% load i18n %}
+
+{% block page_title %}{% blocktrans %}Błąd serwera{% endblocktrans %}{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col">
-            <h2>Błąd serwera</h2>
-            <p>Zoastaliśmy o tym poinformowani.</p>
+            <h2>{% blocktrans %}Błąd serwera{% endblocktrans %}</h2>
+            <p>{% blocktrans %}Zoastaliśmy o tym poinformowani.{% endblocktrans %}</p>
         </div>
     </div>
 {% endblock %}

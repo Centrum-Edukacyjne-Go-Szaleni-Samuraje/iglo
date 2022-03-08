@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 11:52+0100\n"
+"POT-Creation-Date: 2022-03-08 13:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,29 +25,40 @@ msgstr ""
 msgid "Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe."
 msgstr ""
 
-#: templates/accounts/login.html:8 templates/base.html:99
+#: templates/404.html:5
+msgid "Brak strony"
+msgstr ""
+
+#: templates/404.html:10
+msgid "Ta strona nie istnieje."
+msgstr ""
+
+#: templates/500.html:5 templates/500.html:10
+msgid "Błąd serwera"
+msgstr ""
+
+#: templates/500.html:11
+msgid "Zoastaliśmy o tym poinformowani."
+msgstr ""
+
+#: templates/accounts/login.html:5 templates/accounts/login.html:8
+#: templates/base.html:99
 msgid "Logowanie"
 msgstr "Log in"
 
 #: templates/accounts/login.html:13
-#, fuzzy
-#| msgid "Wyloguj"
 msgid "Zaloguj"
-msgstr "Log out"
+msgstr ""
 
 #: templates/accounts/login.html:16
 msgid "Nie pamiętasz hasła?"
 msgstr ""
 
 #: templates/accounts/password_and_email_change.html:5
-#, fuzzy
-#| msgid "Zmień hasło/email"
 msgid "Zmiana hasła i/lub email"
 msgstr "Edit password/email"
 
 #: templates/accounts/password_and_email_change.html:8
-#, fuzzy
-#| msgid "Zmień hasło/email"
 msgid "Zmień hasło i/lub email"
 msgstr "Edit password/email"
 
@@ -99,8 +109,6 @@ msgid "Pamiętaj, aby wybrać silne hasło!"
 msgstr ""
 
 #: templates/accounts/password_reset_confirm.html:14
-#, fuzzy
-#| msgid "Zmień hasło/email"
 msgid "Zmień hasło"
 msgstr "Edit password/email"
 
@@ -163,8 +171,6 @@ msgid ""
 msgstr ""
 
 #: templates/accounts/registration.html:17
-#, fuzzy
-#| msgid "Rejestracja"
 msgid "Zarejestruj"
 msgstr "Sign in"
 
@@ -208,15 +214,21 @@ msgid "Jeśli nie grałeś w oficjalnym turnieju i nie znasz swojej siły wpisz:
 msgstr ""
 
 #: templates/accounts/registration.html:61
-#: templates/league/player_detail.html:46
+#: templates/league/includes/result_table_modal.html:57
+#: templates/league/player_detail.html:50
+#: templates/league/player_detail.html:149
 msgid "Zamknij"
 msgstr "Close"
 
 #: templates/base.html:38 templates/league/group_detail.html:13
+#: templates/league/season_detail.html:12 templates/league/season_list.html:5
+#: templates/league/season_list.html:12
 msgid "Sezony"
 msgstr "Seasons"
 
-#: templates/base.html:43
+#: templates/base.html:43 templates/review/teacher_detail.html:13
+#: templates/review/teacher_list.html:5 templates/review/teacher_list.html:12
+#: templates/review/teacher_list.html:15
 msgid "Nauczyciele"
 msgstr "Teachers"
 
@@ -224,7 +236,8 @@ msgstr "Teachers"
 msgid "Regulamin"
 msgstr "Rules"
 
-#: templates/base.html:52
+#: templates/base.html:52 templates/league/player_detail.html:121
+#: templates/misc/contact.html:5 templates/misc/contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
 
@@ -246,17 +259,25 @@ msgstr "Log out"
 
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:29
 #: templates/league/game_form.html:22 templates/league/group_detail.html:5
-#: templates/league/group_detail.html:17 templates/misc/home.html:42
+#: templates/league/group_detail.html:17 templates/league/player_detail.html:70
+#: templates/league/player_detail.html:210
+#: templates/league/season_detail.html:5 templates/league/season_detail.html:14
+#: templates/league/season_detail.html:20 templates/league/season_list.html:28
+#: templates/misc/home.html:42 templates/review/teacher_detail.html:43
+#: templates/review/teacher_detail.html:54
 msgid "Sezon"
 msgstr "Season"
 
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:34
 #: templates/league/game_form.html:27 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:21 templates/league/group_detail.html:26
-#, fuzzy
-#| msgid "Grupy"
+#: templates/league/player_detail.html:72
+#: templates/league/player_detail.html:211
+#: templates/league/season_detail.html:56
+#: templates/review/teacher_detail.html:44
+#: templates/review/teacher_detail.html:55
 msgid "Grupa"
-msgstr "Groups"
+msgstr "Group"
 
 #: templates/league/game_detail.html:8 templates/league/game_detail.html:39
 #: templates/league/game_detail.html:49 templates/league/group_detail.html:159
@@ -267,13 +288,12 @@ msgstr ""
 msgid "Gra"
 msgstr ""
 
-#: templates/league/game_detail.html:52
+#: templates/league/game_detail.html:52 templates/league/player_detail.html:99
 msgid "Brak przeciwnika w tej rundzie."
 msgstr ""
 
-#: templates/league/game_detail.html:68
-#, fuzzy
-#| msgid "Edytuj profil"
+#: templates/league/game_detail.html:68 templates/league/player_detail.html:59
+#: templates/league/player_detail.html:159
 msgid "Edytuj"
 msgstr "Edit profile"
 
@@ -285,17 +305,13 @@ msgstr ""
 msgid "Edycja"
 msgstr ""
 
-#: templates/league/game_form.html:47
-#, fuzzy
-#| msgid "Zapisz się!"
+#: templates/league/game_form.html:47 templates/league/player_form.html:16
 msgid "Zapisz"
-msgstr "Sign in!"
+msgstr "Save"
 
-#: templates/league/group_detail.html:32
-#, fuzzy
-#| msgid "Nauczyciele"
+#: templates/league/group_detail.html:32 templates/league/season_detail.html:79
 msgid "Nauczyciel"
-msgstr "Teachers"
+msgstr "Teacher"
 
 #: templates/league/group_detail.html:43 templates/league/group_detail.html:74
 msgid "Pozycja"
@@ -354,6 +370,7 @@ msgid "Runda"
 msgstr ""
 
 #: templates/league/group_detail.html:186
+#: templates/league/season_detail.html:64
 msgid "Gracze"
 msgstr ""
 
@@ -370,6 +387,7 @@ msgid "Usuń"
 msgstr ""
 
 #: templates/league/includes/game_actions.html:10
+#: templates/review/teacher_detail.html:59
 msgid "Komentarz"
 msgstr ""
 
@@ -394,8 +412,69 @@ msgid ""
 "Z kolumny <b>Miejsce</b> można odczytać aktualną pozycję gracza w grupie."
 msgstr ""
 
+#: templates/league/includes/result_table_modal.html:18
+msgid "W kolumnie <b>Gracz</b> widzimy nick oraz rating gracza."
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:21
+msgid ""
+"W kolumnach opisanych jako <b>Rundy</b> zawarte są informacje o grach danego "
+"gracza w kolejnych rundach (np. <i>2+</i>, <i>4-</i>, <i>1?</i>). Liczba "
+"oznacza pozycję w grupie/tabeli przeciwnika z danej rundy. Symbol po liczbie "
+"oznacza wynik/status gry:"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:28
+msgid "oznacza zwycięstwo"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:29
+msgid "oznacza przegraną"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:30
+msgid "oznacza, że gra została zaplanowana, ale jeszcze nie rozegrana"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:32
+msgid "oznacza, że gra pozostała nierozstrzygnięta"
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:35
+msgid ""
+"W kolumnie <b>Punkty</b> znajdziemy sumę punktów zdobytych przez gracza w "
+"tej grupie."
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:40
+msgid ""
+"Kolumna <b>SODOS</b> zawiera sumę punktów pokonanych przeciwnków. Jest to "
+"tzw. tie-breaker, który jest wykorzystywany do rozstrzygania remisów."
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:46
+msgid "Kolumna <b>Start</b> oznacza pozycje startową gracza w danej grupie."
+msgstr ""
+
+#: templates/league/includes/result_table_modal.html:52
+msgid "Więcej informacji o tabelach z wynikami"
+msgstr ""
+
+#: templates/league/league_admin.html:10
+msgid "Zaktualizuj rankingi graczy"
+msgstr ""
+
+#: templates/league/league_admin.html:15
+msgid ""
+"Zaktualizuj rankingi (GOR) wszystkich graczy, którzy podali swój PIN EGD."
+msgstr ""
+
+#: templates/league/league_admin.html:21
+msgid "Zaktualizuj rankingi"
+msgstr ""
+
 #: templates/league/player_detail.html:23
-#: templates/league/player_detail.html:43
+#: templates/league/player_detail.html:46
 msgid "Wycofaj"
 msgstr "Withdraw"
 
@@ -409,7 +488,139 @@ msgid ""
 "nieodwracalna."
 msgstr ""
 
-#: templates/misc/home.html:17
+#: templates/league/player_detail.html:66
+msgid "Aktualne rozgrywki"
+msgstr ""
+
+#: templates/league/player_detail.html:82
+msgid "NASTĘPNA GRA"
+msgstr ""
+
+#: templates/league/player_detail.html:86
+msgid "WYGRANA"
+msgstr ""
+
+#: templates/league/player_detail.html:90
+msgid "PRZEGRANA"
+msgstr ""
+
+#: templates/league/player_detail.html:131
+msgid "Dane kontaktowe"
+msgstr ""
+
+#: templates/league/player_detail.html:171
+msgid ""
+"Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego "
+"rozpoczęciu."
+msgstr ""
+
+#: templates/league/player_detail.html:177
+msgid "Brak nadchodzących gier."
+msgstr ""
+
+#: templates/league/player_detail.html:186
+#, python-format
+msgid ""
+"Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy "
+"sezon <strong>zostaniesz do niego automatycznie dołączony</strong>. Jeżeli "
+"nie chcesz brać w nim udziału <a href=\"%(player_settings_url)s\">zmień "
+"swoje ustawienia</a>."
+msgstr ""
+
+#: templates/league/player_detail.html:194
+#, python-format
+msgid ""
+"Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami "
+"Twojego konta <strong>nie zostaniesz automatycznie dołączony do "
+"nadchodzącego sezonu</strong>. Jeżeli chcesz wziąć w nim udział <a href="
+"\"%(player_settings_url)s\">zmień swoje ustawienia</a> ."
+msgstr ""
+
+#: templates/league/player_detail.html:205
+msgid "Poprzednie sezony"
+msgstr ""
+
+#: templates/league/player_detail.html:217
+msgid "Brak rozegranych sezonów."
+msgstr ""
+
+#: templates/league/player_form.html:11
+msgid "Ustawienia"
+msgstr ""
+
+#: templates/league/player_form.html:12
+msgid "Tutaj możesz zmienić informacje o sobie."
+msgstr ""
+
+#: templates/league/season_detail.html:27
+msgid "Eksport CSV"
+msgstr ""
+
+#: templates/league/season_detail.html:33
+msgid "Wystartuj Sezon"
+msgstr ""
+
+#: templates/league/season_detail.html:37
+msgid "Resetuj Grupy"
+msgstr ""
+
+#: templates/league/season_detail.html:42
+msgid "Zakończ Sezon"
+msgstr ""
+
+#: templates/league/season_detail.html:72
+#, python-format
+msgid ""
+"Graczy: %(members_count)s / Patronów: %(supporters_count)s / Średni ranking: "
+"%(avg_rank)s"
+msgstr ""
+
+#: templates/league/season_list.html:20 templates/league/season_prepare.html:5
+#: templates/league/season_prepare.html:17
+msgid "Stwórz Sezon"
+msgstr ""
+
+#: templates/league/season_list.html:35
+#, python-format
+msgid "%(number_of_players)s graczy w %(groups_count)s grupach"
+msgstr ""
+
+#: templates/league/season_prepare.html:21
+msgid "Stwórz"
+msgstr ""
+
+#: templates/misc/contact.html:11
+msgid "W sprawach dotyczących IGLO zapraszamy do kontaktu z:"
+msgstr ""
+
+#: templates/misc/contact.html:14
+msgid "Administrator Ligi"
+msgstr ""
+
+#: templates/misc/contact.html:16
+msgid ""
+"Kontakt w sprawach: <i>rezygnacja z gry w lidze, brak kontaktu z "
+"przeciwnikiem, podejrzenie dopingu elektronicznego, sporna sytuacja dot. "
+"gry, etc.</i>"
+msgstr ""
+
+#: templates/misc/contact.html:24
+msgid "Administrator Systemu"
+msgstr ""
+
+#: templates/misc/contact.html:26
+msgid ""
+"Kontakt w sprawach: <i>problemy i błędy związane ze stroną WWW, propozycje "
+"usprawnień, etc.</i>"
+msgstr ""
+
+#: templates/misc/contact.html:31
+msgid ""
+"Zarządcą IGLO jest stowarzyszenie <a href=\"https://www.szalenisamuraje.org/"
+"\" target=\"_blank\">Centrum Edukacyjne Gry Go \"Szaleni Samuraje\"</a>."
+msgstr ""
+
+#: templates/misc/home.html:5 templates/misc/home.html:17
 msgid "Internetowa Liga Go IGLO"
 msgstr "Internet Go League IGLO"
 
@@ -435,7 +646,7 @@ msgstr "Sign in!"
 msgid "Aktualny sezon"
 msgstr "Current season"
 
-#: templates/misc/home.html:46
+#: templates/misc/home.html:46 templates/review/teacher_detail.html:38
 msgid "Grupy"
 msgstr "Groups"
 
@@ -478,3 +689,81 @@ msgstr ""
 #: templates/misc/home.html:90
 msgid "Wsparcie"
 msgstr "Support"
+
+#: templates/misc/home.html:93
+msgid ""
+"Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić "
+"wykłady i komentarze korzystamy ze wsparcia naszych patronów. Jeśli również "
+"chcesz brać udział w rozwoju Ligi i wspierać jej dalszą rozbudowę zachęcamy "
+"do dołączenia!"
+msgstr ""
+
+#: templates/misc/home.html:100
+msgid "Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:"
+msgstr ""
+
+#: templates/misc/home.html:107
+#, python-format
+msgid ""
+"Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z "
+"profesjonalnych wykładów i komentarzy dostosowanych do każdej z grup (więcej "
+"w sekcji <a href=\"%(teacher_list_url)s\">Nauczyciele</a>)."
+msgstr ""
+
+#: templates/misc/home.html:114
+msgid ""
+"Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada "
+"własne konto, dzięki któremu może w łatwy sposób obsługiwać swoje gry."
+msgstr ""
+
+#: templates/misc/home.html:120
+msgid "Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową."
+msgstr ""
+
+#: templates/misc/home.html:126
+msgid ""
+"Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i "
+"sprawniej."
+msgstr ""
+
+#: templates/misc/home.html:131
+msgid "Wpłat można dokonywać na:"
+msgstr ""
+
+#: templates/review/teacher_detail.html:49
+msgid "Komentarze"
+msgstr ""
+
+#: templates/review/teacher_list.html:17
+msgid ""
+"Wszystkie archiwalne i bieżące wykłady przeprowadzone przez naszych "
+"nauczycieli możesz znaleźć na <a href=\"https://www.youtube.com/channel/"
+"UCXsGC1hVUqZ-JUjzfdSHYDQ\" target=\"_blank\">YouTube</a>. Jeśl z jakiś "
+"przyczyn nie mogłeś uczestniczyć w komentarzu, albo chcesz poszerzyć swoją "
+"wiedzę zachęcamy do obejrzenia materiałów i subskrypcji naszego kanału."
+msgstr ""
+
+#: templates/review/teacher_list.html:25
+msgid ""
+"Komentarze \"na żywo\" odbywają się na <a href=\"https://discord.gg/"
+"gBHsmMX796\" target=\"_blank\">serwerze Discord Szalonych Samurajów.</a>"
+msgstr ""
+
+#: templates/review/teacher_list.html:31
+msgid ""
+"Archiwalne wykłady i komentarze dla grup A i B prowadził Stanisław Frejlak i "
+"Lukáš Podpěra i są do obejrzenia na <a href=\"https://www.youtube.com/"
+"channel/UCXsGC1hVUqZ-JUjzfdSHYDQ\" target=\"_blank\">kanale IGLO</a>."
+msgstr ""
+
+#: templates/review/teacher_list.html:38
+msgid ""
+"Archiwalne wykłady i komentarze dla grup C oraz dalszych prowadzone były "
+"przez Cezarego Czerneckiego i innych uczestników Ligi i są do obejrzenia na "
+"kanale <a href=\"https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg\" "
+"target=\"_blank\">IGLO Plus</a>."
+msgstr ""
+
+#: templates/review/teacher_list.html:49
+msgid "Nasi nauczyciele"
+msgstr ""

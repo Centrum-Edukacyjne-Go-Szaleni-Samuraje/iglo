@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
-{% block page_title %}Brak strony{% endblock %}
+{% load i18n %}
+
+{% block page_title %}{% blocktrans %}Brak strony{% endblocktrans %}{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col">
-            <h2>Ta strona nie istnieje.</h2>
+            <h2>{% blocktrans %}Ta strona nie istnieje.{% endblocktrans %}</h2>
         </div>
     </div>
 {% endblock %}

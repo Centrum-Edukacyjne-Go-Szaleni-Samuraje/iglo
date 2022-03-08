@@ -1,26 +1,38 @@
 {% extends "base.html" %}
 
-{% block page_title %}Kontakt{% endblock %}
+{% load i18n %}
+
+{% block page_title %}{% translate "Kontakt" %}{% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col">
-            <h1>Kontakt</h1>
-            <p>W sprawach dotyczących IGLO zapraszamy do kontaktu z:</p>
+            <h1>{% translate "Kontakt" %}</h1>
+            <p>{% blocktrans %}W sprawach dotyczących IGLO zapraszamy do kontaktu z:{% endblocktrans %}</p>
             <p>
                 <strong>Oleksandr Yeroshkin</strong><br>
-                Administrator Ligi<br>
+                {% blocktrans %}Administrator Ligi{% endblocktrans %}<br>
                 <a href="mailto:internetowagoligao@gmail.com">internetowagoligao@gmail.com</a><br>
-                Kontakt w sprawach: <i>rezygnacja z gry w lidze, brak kontaktu z przeciwnikiem, podejrzenie dopingu elektronicznego, sporna sytuacja dot. gry, etc.</i>
+                {% blocktrans trimmed %}
+                    Kontakt w sprawach:
+                    <i>rezygnacja z gry w lidze, brak kontaktu z przeciwnikiem, podejrzenie dopingu elektronicznego,
+                        sporna sytuacja dot. gry, etc.</i>
+                {% endblocktrans %}
             </p>
             <p>
                 <strong>Konrad Hałas</strong><br>
-                Administrator Systemu<br>
+                {% blocktrans %}Administrator Systemu{% endblocktrans %}<br>
                 <a href="mailto:halas.konrad@gmail.com">halas.konrad@gmail.com</a><br>
-                Kontakt w sprawach: <i>problemy i błędy związane ze stroną WWW, propozycje usprawnień, etc.</i>
+                {% blocktrans trimmed %}
+                    Kontakt w sprawach: <i>problemy i błędy związane ze stroną WWW, propozycje usprawnień, etc.</i>
+                {% endblocktrans %}
             </p>
-            <p>Zarządcą IGLO jest stowarzyszenie <a href="https://www.szalenisamuraje.org/" target="_blank">Centrum
-                Edukacyjne Gry Go "Szaleni Samuraje"</a>.</p>
+            <p>
+                {% blocktrans trimmed %}
+                    Zarządcą IGLO jest stowarzyszenie <a href="https://www.szalenisamuraje.org/" target="_blank">Centrum
+                    Edukacyjne Gry Go "Szaleni Samuraje"</a>.
+                {% endblocktrans %}
+            </p>
         </div>
     </div>
 {% endblock %}

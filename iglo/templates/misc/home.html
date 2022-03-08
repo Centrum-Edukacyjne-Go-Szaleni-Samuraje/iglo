@@ -2,7 +2,7 @@
 
 {% load static i18n %}
 
-{% block page_title %}Internetowa Liga Go IGLO{% endblock %}
+{% block page_title %}{% blocktrans %}Internetowa Liga Go IGLO{% endblocktrans %}{% endblock %}
 
 {% block head %}
     <meta name="description"
@@ -89,22 +89,49 @@
             <div class="card h-100">
                 <div class="card-header">{% translate "Wsparcie" %}</div>
                 <div class="card-body">
-                    <p>Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić wykłady i komentarze
-                        korzystamy ze wsparcia naszych patronów. Jeśli również chcesz brać udział w rozwoju Ligi i
-                        wspierać jej dalszą rozbudowę zachęcamy do dołączenia!</p>
-                    <p>Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:</p>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić wykłady i komentarze
+                            korzystamy ze wsparcia naszych patronów. Jeśli również chcesz brać udział w rozwoju Ligi i
+                            wspierać jej dalszą rozbudowę zachęcamy do dołączenia!
+                        {% endblocktrans %}
+                    </p>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:
+                        {% endblocktrans %}
+                    </p>
                     <ul>
-                        <li>Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z profesjonalnych wykładów
-                            i komentarzy dostosowanych do każdej z grup (więcej w sekcji <a
-                                    href="{% url "teacher-list" %}">Nauczyciele</a>).
+                        <li>
+                            {% url "teacher-list"  as teacher_list_url %}
+                            {% blocktrans trimmed %}
+                                Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z profesjonalnych
+                                wykładów i komentarzy dostosowanych do każdej z grup (więcej w sekcji <a
+                                    href="{{ teacher_list_url }}">Nauczyciele</a>).
+                            {% endblocktrans %}
                         </li>
-                        <li>Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada własne konto,
-                            dzięki któremu może w łatwy sposób obsługiwać swoje gry.
+                        <li>
+                            {% blocktrans trimmed %}
+                                Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada własne konto,
+                                dzięki któremu może w łatwy sposób obsługiwać swoje gry.
+                            {% endblocktrans %}
                         </li>
-                        <li>Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową.</li>
+                        <li>
+                            {% blocktrans trimmed %}
+                                Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową.
+                            {% endblocktrans %}
+                        </li>
                     </ul>
-                    <p>Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i sprawniej.</p>
-                    <p> Wpłat można dokonywać na:</p>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i sprawniej.
+                        {% endblocktrans %}
+                    </p>
+                    <p>
+                        {% blocktrans trimmed %}
+                            Wpłat można dokonywać na:
+                        {% endblocktrans %}
+                    </p>
                     <div class="d-flex justify-content-center">
                         <a href="https://patronite.pl/iglo" target="_blank" class="btn btn-primary me-2">Patronite
                             (PLN)</a>

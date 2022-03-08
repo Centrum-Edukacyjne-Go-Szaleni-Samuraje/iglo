@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static i18n %}
 
 {% block page_title %}{{ object.first_name }} {{ object.last_name }} {% endblock %}
 
@@ -9,7 +9,9 @@
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url "teacher-list" %}">Nauczyciele</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "teacher-list" %}">{% translate "Nauczyciele" %}</a>
+                    </li>
                     <li class="breadcrumb-item active"
                         aria-current="page">{{ teacher.first_name }} {{ teacher.last_name }}</li>
                 </ol>
@@ -33,25 +35,28 @@
     {% endif %}
     <div class="row">
         <div class="col">
-            <h3>Grupy</h3>
+            <h3>{% translate "Grupy" %}</h3>
             <ul>
                 {% for group in teacher.groups.all %}
                     <li>
                         <a href="{{ group.get_absolute_url }}">
-                            Sezon #{{ group.season.number }} / Grupa {{ group.name }}
+                            {% translate "Sezon" %} #{{ group.season.number }}
+                            / {% translate "Grupa" %} {{ group.name }}
                         </a>
                     </li>
                 {% endfor %}
             </ul>
-            <h3>Komentarze</h3>
+            <h3>{% translate "Komentarze" %}</h3>
             <ul>
                 {% for game in teacher.get_reviews %}
                     <li>
                         <a href="{{ game.get_absolute_url }}">
-                            Sezon #{{ game.group.season.number }} / Grupa {{ game.group.name }} - {{ game.black }} - {{ game.white }}</a>
+                            {% translate "Sezon" %} #{{ game.group.season.number }}
+                            / {% translate "Grupa" %} {{ game.group.name }} - {{ game.black }} - {{ game.white }}
+                        </a>
                         &nbsp;/&nbsp;
                         <a href="{{ game.review_video_link }}" target="_blank">
-                            <i class="fab fa-youtube"></i> Komentarz
+                            <i class="fab fa-youtube"></i> {% translate "Komentarz" %}
                         </a>
                     </li>
                 {% endfor %}

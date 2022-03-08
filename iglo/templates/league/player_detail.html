@@ -14,8 +14,8 @@
                            title="Ten gracz jest patronem IGLO!"></i>{% endif %}{% if object.rank %}
                         <small class="text-muted">[{{ object.rank }}]</small>{% endif %}
                 </h2>
-                    <div>
-                        {% if user|has_role:'referee' and current_membership %}
+                <div>
+                    {% if user|has_role:'referee' and current_membership %}
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                 data-bs-target="#withdraw-modal">
                             <i class="fas fa-user-slash"></i>
@@ -35,12 +35,16 @@
                                                 aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        {% blocktrans trimmed %}Czy na pewno chcesz wycofać gracza z aktualnego sezonu? Ta
-                                        operacja jest nieodwracalna.{% endblocktrans %}
+                                        {% blocktrans trimmed %}
+                                            Czy na pewno chcesz wycofać gracza z aktualnego sezonu? Ta operacja jest
+                                            nieodwracalna.
+                                        {% endblocktrans %}
                                     </div>
                                     <div class="modal-footer">
                                         <form method="post">{% csrf_token %}
-                                            <button type="submit" class="btn btn-danger" name="action-withdraw">{% translate "Wycofaj" %}</button>
+                                            <button type="submit" class="btn btn-danger" name="action-withdraw">
+                                                {% translate "Wycofaj" %}
+                                            </button>
                                         </form>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                             {% translate "Zamknij" %}
@@ -49,22 +53,23 @@
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
-                        {% if user.is_admin %}
-                        <a href="{% url "player-settings" object.nick %}" class="btn btn-primary"><i
-                                class="fas fa-user"></i> Edytuj</a>
-                        {% endif %}
-                    </div>
+                    {% endif %}
+                    {% if user.is_admin %}
+                        <a href="{% url "player-settings" object.nick %}" class="btn btn-primary">
+                            <i class="fas fa-user"></i> {% translate "Edytuj" %}
+                        </a>
+                    {% endif %}
+                </div>
             </div>
             {% if current_membership %}
                 <div class="card mb-3">
-                    <div class="card-header">Aktualne rozgrywki</div>
+                    <div class="card-header">{% blocktrans %}Aktualne rozgrywki{% endblocktrans %}</div>
                     <div class="card-body">
                         <h5 class="card-title mb-3">
                             <a href="{% url "season-detail" number=current_membership.group.season.number %}">
-                                Sezon #{{ current_membership.group.season.number }}</a> /
+                                {% translate "Sezon" %} #{{ current_membership.group.season.number }}</a> /
                             <a href="{% url "group-detail" season_number=current_membership.group.season.number group_name=current_membership.group.name %}">
-                                Grupa {{ current_membership.group.name }}
+                                {% translate "Grupa" %} {{ current_membership.group.name }}
                             </a>
                         </h5>
                         {% if current_games %}
@@ -73,18 +78,28 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <span>Runda #{{ game.round.number }}</span>
                                         {% if upcoming_game == game %}
-                                            <span class="badge bg-warning text-dark">NASTĘPNA GRA</span>
+                                            <span class="badge bg-warning text-dark">
+                                                {% blocktrans %}NASTĘPNA GRA{% endblocktrans %}
+                                            </span>
                                         {% elif game.winner == current_membership %}
-                                            <span class="badge bg-success">WYGRANA</span>
+                                            <span class="badge bg-success">
+                                                {% blocktrans %}WYGRANA{% endblocktrans %}
+                                            </span>
                                         {% elif game.is_played %}
-                                            <span class="badge bg-danger">PRZEGRANA</span>
+                                            <span class="badge bg-danger">
+                                                {% blocktrans %}PRZEGRANA{% endblocktrans %}
+                                            </span>
                                         {% endif %}
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
                                         <div class="mb-2">
                                             {% if game.is_bye %}
                                                 <div class="fs-5 mb-2">BYE</div>
-                                                <small class="text-muted">Brak przeciwnika w tej rundzie.</small>
+                                                <small class="text-muted">
+                                                    {% blocktrans trimmed %}
+                                                        Brak przeciwnika w tej rundzie.
+                                                    {% endblocktrans %}
+                                                </small>
                                             {% else %}
                                                 <div class="fs-5 mb-2">
                                                     {% include "league/includes/game_players.html" with game=game %}
@@ -101,8 +116,10 @@
                                                 {% if user.player == game.black.player or user.player == game.white.player %}
                                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                                             data-bs-target="#contact-modal-{{ game.id }}">
-                                                        <i class="fas fa-envelope"></i> <span
-                                                            class="d-none d-md-inline">Kontakt</span>
+                                                        <i class="fas fa-envelope"></i>
+                                                        <span class="d-none d-md-inline">
+                                                            {% translate "Kontakt" %}
+                                                        </span>
                                                     </button>
                                                     <div class="modal fade" id="contact-modal-{{ game.id }}"
                                                          tabindex="-1"
@@ -110,8 +127,11 @@
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="contactModalLabel">Dane
-                                                                        kontaktowe</h5>
+                                                                    <h5 class="modal-title" id="contactModalLabel">
+                                                                        {% blocktrans trimmed %}
+                                                                            Dane kontaktowe
+                                                                        {% endblocktrans %}
+                                                                    </h5>
                                                                     <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"
                                                                             aria-label="Close"></button>
@@ -125,7 +145,8 @@
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-success"
-                                                                            data-bs-dismiss="modal">Zamknij
+                                                                            data-bs-dismiss="modal">
+                                                                        {% translate "Zamknij" %}
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -133,7 +154,10 @@
                                                     </div>
                                                     <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
                                                        class="btn btn-primary">
-                                                        <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edytuj</span>
+                                                        <i class="fas fa-edit"></i>
+                                                        <span class="d-none d-md-inline">
+                                                        {% translate "Edytuj" %}
+                                                    </span>
                                                     </a>
                                                 {% endif %}
                                             {% endif %}
@@ -144,47 +168,53 @@
                             {% endfor %}
                         {% elif current_membership.group.season.state == "draft" %}
                             <div class="alert alert-primary" role="alert">
-                                Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego rozpoczęciu.
+                                {% blocktrans trimmed %}
+                                    Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego
+                                    rozpoczęciu.
+                                {% endblocktrans %}
                             </div>
                         {% else %}
-                            Brak nadchodzących gier.
+                            {% blocktrans trimmed %}Brak nadchodzących gier.{% endblocktrans %}
                         {% endif %}
                     </div>
                 </div>
             {% else %}
                 {% if user.player == object %}
+                    {% url "player-settings" slug=user.player.nick as player_settings_url %}
                     {% if user.player.auto_join %}
                         <div class="alert alert-primary" role="alert">
-                            Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy sezon
-                            <strong>zostaniesz do niego automatycznie dołączony</strong>. Jeżeli nie chcesz brać w nim
-                            udziału
-                            <a href="{% url "player-settings" slug=user.player.nick %}">zmień swoje ustawienia</a>.
+                            {% blocktrans trimmed %}
+                                Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy sezon
+                                <strong>zostaniesz do niego automatycznie dołączony</strong>. Jeżeli nie chcesz brać w
+                                nim udziału <a href="{{ player_settings_url }}">zmień swoje ustawienia</a>.
+                            {% endblocktrans %}
                         </div>
                     {% else %}
                         <div class="alert alert-warning" role="alert">
-                            Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami Twojego konta
-                            <strong>nie
-                                zostaniesz automatycznie dołączony do nadchodzącego sezonu</strong>. Jeżeli chcesz wziąć
-                            w nim
-                            udział <a href="{% url "player-settings" slug=user.player.nick %}">zmień swoje
-                            ustawienia</a>.
+                            {% blocktrans trimmed %}
+                                Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami Twojego konta
+                                <strong>nie zostaniesz automatycznie dołączony do nadchodzącego sezonu</strong>. Jeżeli
+                                chcesz wziąć w nim udział <a href="{{ player_settings_url }}">zmień swoje ustawienia</a>
+                                .
+                            {% endblocktrans %}
                         </div>
                     {% endif %}
                 {% endif %}
             {% endif %}
             {% if memberships %}
-                <h3>Poprzednie sezony</h3>
+                <h3>{% blocktrans %}Poprzednie sezony{% endblocktrans %}</h3>
                 <ul>
                     {% for member in memberships %}
                         <li>
                             <a href="{% url "group-detail" season_number=member.group.season.number group_name=member.group.name %}">
-                                Sezon #{{ member.group.season.number }} / Grupa {{ member.group.name }}
+                                {% translate "Sezon" %} #{{ member.group.season.number }}
+                                / {% translate "Grupa" %} {{ member.group.name }}
                             </a>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>Brak rozegranych sezonów.</p>
+                <p>{% blocktrans %}Brak rozegranych sezonów.{% endblocktrans %}</p>
             {% endif %}
         </div>
     </div>

@@ -87,9 +87,7 @@ class MemberTestCase(TestCase):
 
     def test_withdraw(self):
         PlayerFactory.create_batch(size=4)
-        season = Season.objects.prepare_season(
-            start_date=datetime.date.today(), players_per_group=4, promotion_count=1
-        )
+        season = Season.objects.prepare_season(start_date=datetime.date.today(), players_per_group=4, promotion_count=1)
         season.start()
         group = season.groups.get()
         member_1 = group.members.get(order=1)
@@ -378,6 +376,45 @@ class SeasonTestCase(TestCase):
             .filter(Q(black=member_1, white=member_2) | Q(black=member_2, white=member_1))
             .exists()
         )
+
+    def test_all_games_to_play(self):
+        PlayerFactory.create_batch(size=6 + 5)
+
+        season = Season.objects.prepare_season(start_date=datetime.date.today(), players_per_group=6, promotion_count=1)
+
+        self.assertEqual(season.all_games_to_play, 15 + 10)
+
+    def test_played_games_when_not_played_any_game(self):
+        PlayerFactory.create_batch(size=6)
+
+        season = Season.objects.prepare_season(start_date=datetime.date.today(), players_per_group=6, promotion_count=1)
+
+        self.assertEqual(season.played_games, 0)
+
+    def test_played_games_when_played_some_games(self):
+        PlayerFactory.create_batch(size=5)
+
+        season = Season.objects.prepare_season(start_date=datetime.date.today(), players_per_group=6, promotion_count=1)
+        season.start()
+        Game.objects.filter(group__season=season, round__number=1).update(win_type=WinType.NOT_PLAYED)
+
+        self.assertEqual(season.played_games, 2)
+
+    def test_games_progress_when_not_played_any_game(self):
+        PlayerFactory.create_batch(size=6)
+
+        season = Season.objects.prepare_season(start_date=datetime.date.today(), players_per_group=6, promotion_count=1)
+
+        self.assertEqual(season.games_progress, 0)
+
+    def test_games_progress_when_played_some_games(self):
+        PlayerFactory.create_batch(size=5)
+
+        season = Season.objects.prepare_season(start_date=datetime.date.today(), players_per_group=6, promotion_count=1)
+        season.start()
+        Game.objects.filter(group__season=season, round__number=1).update(win_type=WinType.NOT_PLAYED)
+
+        self.assertEqual(season.games_progress, 20)
 
     def _create_group(self, season, name, rank=100):
         group = GroupFactory(season=season, name=name)

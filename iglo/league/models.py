@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Case, When, Value
+from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Sum
 from django.db.models.functions import Round as DjangoRound
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -51,23 +51,7 @@ class SeasonManager(models.Manager):
         return season
 
     def get_latest(self) -> Optional["Season"]:
-        return (
-            Season.objects.prefetch_related("groups", "groups__members")
-            .annotate(
-                games_per_round=(Count("groups__members", distinct=True) / 2),
-                rounds=(F("players_per_group") - 1),
-            )
-            .annotate(
-                all_games=F("games_per_round") * F("rounds"),
-                played_games=Count("groups__games", distinct=True, filter=Q(groups__games__win_type__isnull=False)),
-            )
-            .annotate(
-                games_progress=Case(
-                    When(all_games__gt=0, then=(F("played_games") * 100) / F("all_games")), default=Value(0)
-                )
-            )
-            .latest("number")
-        )
+        return Season.objects.prefetch_related("groups").latest("number")
 
 
 class WrongSeasonStateError(Exception):
@@ -221,6 +205,23 @@ class Season(models.Model):
                 avg_rank=DjangoRound(Avg("members__rank")),
             )
         )
+
+    @cached_property
+    def all_games_to_play(self) -> int:
+        return (
+            self.groups.annotate(games_per_round=(Count("members") / 2),).aggregate(
+                games_to_play=Sum("games_per_round")
+            )["games_to_play"]
+            * (self.players_per_group - 1)
+        )
+
+    @cached_property
+    def played_games(self) -> int:
+        return Game.objects.filter(group__season=self, win_type__isnull=False).exclude(win_type=WinType.BYE).count()
+
+    @property
+    def games_progress(self) -> int:
+        return int(100 * self.played_games / self.all_games_to_play)
 
 
 class GameResult(Enum):

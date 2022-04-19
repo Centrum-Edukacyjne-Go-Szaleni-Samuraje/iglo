@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-19 14:16+0200\n"
+"POT-Creation-Date: 2022-04-19 18:40+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -563,7 +563,8 @@ msgstr "Seasons"
 msgid "Nauczyciele"
 msgstr "Teachers"
 
-#: templates/base.html:47
+#: templates/base.html:47 templates/misc/rules.html:5
+#: templates/misc/rules.html:10
 msgid "Regulamin"
 msgstr "Rules"
 
@@ -1020,22 +1021,18 @@ msgid "Jedna gra tygodniowo z domyślnym terminem gry."
 msgstr "One game per week with a default game schedule."
 
 #: templates/misc/home.html:74
-msgid ""
-"Minimalny czas gry to 30m+3x30. Zalecany 40m+3x30. Zachęcamy do przedłużenia "
-"czasu."
-msgstr ""
-"The minimum playing time is 30m + 3x30. Recommended 40m + 3x30. We encourage "
-"you to extend the time."
+msgid "Rekomendowany czas gry to 40m+3x30."
+msgstr "The recommended playing time is 40m+3x30."
 
-#: templates/misc/home.html:76
+#: templates/misc/home.html:75
 msgid "Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć."
 msgstr "Player who can't attend the game has to reschedule it."
 
-#: templates/misc/home.html:78
+#: templates/misc/home.html:77
 msgid "Gramy na OGS (preferowany serwer) lub KGS."
 msgstr "We play on OGS (preferred server) or KGS."
 
-#: templates/misc/home.html:81
+#: templates/misc/home.html:80
 #, python-format
 msgid ""
 "Więcej informacji znajdziesz w <a href=\"%(rules_url)s\">regulaminie</a> ."
@@ -1043,11 +1040,11 @@ msgstr ""
 "For more information see the <a href=\"%(rules_url)s\"> terms of service </"
 "a>."
 
-#: templates/misc/home.html:90
+#: templates/misc/home.html:89
 msgid "Wsparcie"
 msgstr "Support"
 
-#: templates/misc/home.html:93
+#: templates/misc/home.html:92
 msgid ""
 "Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić "
 "wykłady i komentarze korzystamy ze wsparcia naszych patronów. Jeśli również "
@@ -1059,11 +1056,11 @@ msgstr ""
 "take part in the development of the League and support its further "
 "expansion, we encourage you to join!"
 
-#: templates/misc/home.html:100
+#: templates/misc/home.html:99
 msgid "Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:"
 msgstr "What we are able to do thanks to your support:"
 
-#: templates/misc/home.html:107
+#: templates/misc/home.html:106
 #, python-format
 msgid ""
 "Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z "
@@ -1074,7 +1071,7 @@ msgstr ""
 "lectures and commentaries tailored to each group (more in <a href="
 "\"%(teacher_list_url)s\"> Teachers </a>)."
 
-#: templates/misc/home.html:114
+#: templates/misc/home.html:113
 msgid ""
 "Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada "
 "własne konto, dzięki któremu może w łatwy sposób obsługiwać swoje gry."
@@ -1082,11 +1079,11 @@ msgstr ""
 "We pay for the server and domain of the website, so each player has their "
 "own account, thanks to which they can easily operate their games."
 
-#: templates/misc/home.html:120
+#: templates/misc/home.html:119
 msgid "Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową."
 msgstr "We are able to provide the necessary legal and accounting services."
 
-#: templates/misc/home.html:126
+#: templates/misc/home.html:125
 msgid ""
 "Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i "
 "sprawniej."
@@ -1094,7 +1091,7 @@ msgstr ""
 "It takes really little, and thanks to this we can act faster and more "
 "efficiently."
 
-#: templates/misc/home.html:131
+#: templates/misc/home.html:130
 msgid "Wpłat można dokonywać na:"
 msgstr "Payments can be made to:"
 

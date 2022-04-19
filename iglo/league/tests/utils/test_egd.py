@@ -110,9 +110,13 @@ class CreateTournamentTableTestCase(SimpleTestCase):
 class GorToRankTestCase(SimpleTestCase):
     def test_for_kyu(self):
         self.assertEqual(gor_to_rank(2000), "1k")
-        self.assertEqual(gor_to_rank(100), "20k")
         self.assertEqual(gor_to_rank(-900), "30k")
+        self.assertEqual(gor_to_rank(100), "20k")
+        self.assertEqual(gor_to_rank(149), "20k")
+        self.assertEqual(gor_to_rank(150), "19k")
 
     def test_for_dan(self):
         self.assertEqual(gor_to_rank(2100), "1d")
         self.assertEqual(gor_to_rank(2900), "9d")
+        self.assertEqual(gor_to_rank(2149), "1d")
+        self.assertEqual(gor_to_rank(2150), "2d")

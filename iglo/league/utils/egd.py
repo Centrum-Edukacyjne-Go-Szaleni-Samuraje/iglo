@@ -120,10 +120,10 @@ def _strip_local_chars(text: str) -> str:
 
 def gor_to_rank(gor: int) -> str:
     if gor < 2100:
-        result = -(gor // 100) + 21
+        result = -((gor - 50) // 100) + 20
         return f"{result}k"
     else:
-        result = (gor // 100) - 20
+        result = ((gor - 50) // 100) - 19
         return f"{result}d"
 
 

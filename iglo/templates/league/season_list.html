@@ -13,7 +13,7 @@
                 </ol>
             </nav>
             <div class="d-flex align-items-baseline justify-content-between">
-                <h2 class="mb-4">Sezony</h2>
+                <h2 class="mb-4">{% translate "Sezony" %}</h2>
                 {% if user|has_role:'referee' %}
                     <a href="{% url "seasons-prepare" %}"
                        class="btn btn-warning{% if not can_prepare_season %} disabled{% endif %}">

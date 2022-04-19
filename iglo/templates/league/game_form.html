@@ -16,7 +16,7 @@
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">Sezony</a></li>
+                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a></li>
                     <li class="breadcrumb-item">
                         <a href="{% url "season-detail" object.group.season.number %}">
                             {% translate "Sezon" %} #{{ object.group.season.number }}

@@ -565,7 +565,7 @@ msgstr "Teachers"
 
 #: templates/base.html:47
 msgid "Regulamin"
-msgstr "League regulations"
+msgstr "Rules"
 
 #: templates/base.html:52 templates/league/player_detail.html:121
 #: templates/misc/contact.html:5 templates/misc/contact.html:10

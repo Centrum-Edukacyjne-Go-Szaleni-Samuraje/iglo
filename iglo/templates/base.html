@@ -107,7 +107,6 @@
                 {% get_current_language as LANGUAGE_CODE %}
                 {% get_available_languages as LANGUAGES %}
                 {% get_language_info_list for LANGUAGES as languages %}
-                {% if user.is_admin %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="language-dropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,7 +124,6 @@
                         </form>
                     </ul>
                 </li>
-                {% endif %}
             </ul>
         </div>
     </div>

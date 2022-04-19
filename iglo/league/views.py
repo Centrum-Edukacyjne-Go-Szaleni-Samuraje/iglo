@@ -235,9 +235,9 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
                     EGDGame(
                         white=member_id_to_egd_player[game.white.id] if game.white else None,
                         black=member_id_to_egd_player[game.black.id] if game.black else None,
-                        winner=member_id_to_egd_player[game.winner.id]
+                        winner=member_id_to_egd_player[game.winner.id] if game.winner else None
                     )
-                    for game in round.games.filter(winner__isnull=False)
+                    for game in round.games.all()
                 ]
                 for round in group.rounds.all()
             ],

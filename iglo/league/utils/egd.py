@@ -95,6 +95,8 @@ def create_tournament_table(
                 if player in [game.black, game.white, game.winner]:
                     if not game.black and not game.white and game.winner == player:
                         results += "0+".ljust(result_width)
+                    elif game.winner is None:
+                        results += "0-".ljust(result_width)
                     else:
                         opponent = game.black if player == game.white else game.white
                         opponent_place = players.index(opponent) + 1

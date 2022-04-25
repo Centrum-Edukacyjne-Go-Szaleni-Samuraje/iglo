@@ -111,6 +111,10 @@ class Season(models.Model):
         self.validate_state(state=SeasonState.IN_PROGRESS)
         if Game.objects.filter(group__season=self, win_type__isnull=True).exists():
             raise GamesWithoutResultError()
+        for group in self.groups.all():
+            for position, member in enumerate(group.members_qualification, start=1):
+                member.final_order = position
+                member.save()
         self.state = SeasonState.FINISHED
         self.save()
 
@@ -320,9 +324,9 @@ class Group(models.Model):
                 .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
                 .all()
             ],
-            key=lambda member: (-member.points, -member.sodos, member.order)
+            key=lambda member: (member.final_order, -member.points, -member.sodos, member.order)
             if self.type == GroupType.ROUND_ROBIN
-            else (-member.score, -member.sos, -member.sosos),
+            else (member.final_order, -member.score, -member.sos, -member.sosos),
         )
 
     def delete_member(self, member_id: int) -> None:
@@ -512,6 +516,7 @@ class Member(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
+    final_order = models.SmallIntegerField(null=True)
     initial_score = models.SmallIntegerField(default=0)
 
     objects = MemberManager()

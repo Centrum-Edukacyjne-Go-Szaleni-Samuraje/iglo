@@ -1,5 +1,8 @@
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
+
+mark_safe_lazy = lazy(mark_safe, str)
 
 OGS_USERNAME_LABEL = _("Konto OGS")
 KGS_USERNAME_LABEL = _("Konto KGS")
@@ -10,9 +13,9 @@ AVAILABILITY_LABEL = _("Dostępność")
 COUNTRY_LABEL = _("Kraj")
 CLUB_LABEL = _("Klub")
 RANK_HELP_TEXT = _("W punktach GoR.")
-EGD_HELP_TEXT = mark_safe(_("Jeżeli posiadasz konto w EGD Twój pin znajdziesz na stronie swojego profilu. Aby znaleźć swój profil EGD użyj <a href='https://www.europeangodatabase.eu/EGD/Find_Player.php' target='blank'>wyszukiwarki</a>."))
+EGD_HELP_TEXT = mark_safe_lazy(_("Jeżeli posiadasz konto w EGD Twój pin znajdziesz na stronie swojego profilu. Aby znaleźć swój profil EGD użyj <a href='https://www.europeangodatabase.eu/EGD/Find_Player.php' target='blank'>wyszukiwarki</a>."))
 EGD_APPROVAL_HELP_TEXT = _("Jeżeli wszyscy gracze w Twojej grupie wyrażą zgodę, to gry z danej grupy będą raportowanie do EGD.")
-AVAILABILITY_HELP_TEXT = _("Twoja dostępność czasowa dot. rozgrywania gier. Informacja ta będzie dostępna dla Twoich przeciwników wraz z Twoimi danymi kontaktowymi. Ma ona na celu usprawnić umawianie terminu rozgrywki. Przykład: \"Mogę grać tylko po 18:00, od) 24.12 do 27.12 jestem niedostępny\". ")
+AVAILABILITY_HELP_TEXT = _("Twoja dostępność czasowa dot. rozgrywania gier. Informacja ta będzie dostępna dla Twoich przeciwników wraz z Twoimi danymi kontaktowymi. Ma ona na celu usprawnić umawianie terminu rozgrywki. Przykład: \"Mogę grać tylko po 18:00, od 24.12 do 27.12 jestem niedostępny\". ")
 CLUB_HELP_TEXT = _("4 literowe oznaczenie klubu/miasta używane w EGD")
 NICK_ERROR = _("Ten nick jest już zajęty.")
 PLAYER_UPDATE_SUCCESS = _("Twoje dane zostały zmienione.")
@@ -40,7 +43,7 @@ POINTS_DIFFERENCE_NEGATIVE_ERROR = _("Wartość musi być większa od 0.")
 SGF_OR_LINK_REQUIRED_ERROR = _("Uzupełnij plik SGF lub link do gry na OGS.")
 AUTO_JOIN_LABEL = _("Dołącz Automatycznie")
 AUTO_JOIN_HELP_TEXT = _("Jeżeli to pole jest zaznaczone zostaniesz automatycznie dołączona/y do następnego sezonu.")
-FIRST_NAME_LABEL = _("Imie")
+FIRST_NAME_LABEL = _("Imię")
 LAST_NAME_LABEL = _("Nazwisko")
 SEASON_STATE_DRAFT = _("W przygotowaniu")
 SEASON_STATE_IN_PROGRES = _("Trwa")

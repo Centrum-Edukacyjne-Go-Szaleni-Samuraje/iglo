@@ -752,10 +752,10 @@ msgstr "How to read the results table?"
 msgid ""
 "Z kolumny <b>Miejsce</b> można odczytać aktualną pozycję gracza w grupie."
 msgstr ""
-"From the <b>Place</b> column you can read the current position of the player "
+"From the <b>Position</b> column you can read the current position of the player "
 "in the group."
 
-#: templates/league/includes/result_table_modal.html:18
+#: templates/league/includes/re<sult_table_modal.html:18
 msgid "W kolumnie <b>Gracz</b> widzimy nick oraz rating gracza."
 msgstr ""
 "In the <b>Player</b> column we can see the nickname and rating of the player."
@@ -1063,7 +1063,7 @@ msgstr "We play on OGS (preferred server) or KGS."
 msgid ""
 "Więcej informacji znajdziesz w <a href=\"%(rules_url)s\">regulaminie</a> ."
 msgstr ""
-"For more information see the <a href=\"%(rules_url)s\"> terms of service </"
+"For more information see the <a href=\"%(rules_url)s\"> terms of service</"
 "a>."
 
 #: templates/misc/home.html:89
@@ -1095,7 +1095,7 @@ msgid ""
 msgstr ""
 "We sign contracts with Teachers, so you can benefit from professional "
 "lectures and commentaries tailored to each group (more in <a href="
-"\"%(teacher_list_url)s\"> Teachers </a>)."
+"\"%(teacher_list_url)s\">Teachers</a>)."
 
 #: templates/misc/home.html:113
 msgid ""

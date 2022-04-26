@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "bootstrap_pagination",
     "django_countries",
+    "utils",
 ]
 
 MIDDLEWARE = [

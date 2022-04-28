@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-25 22:59+0200\n"
+"POT-Creation-Date: 2022-04-28 13:46+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: POEditor.com\n"
 
-#: accounts/texts.py:4
+#: accounts/texts.py:7
 msgid ""
 "Twój adres e-mail będzie widoczny dla administratorów ligi oraz dla Twoich "
 "przeciwników. Będziesz używać go do logowania oraz bedziemy przesyłać na "
@@ -18,13 +18,13 @@ msgstr ""
 "Your email address will be visible to league administrators and your "
 "opponents. You will use it to log in and receive notifications."
 
-#: accounts/texts.py:5
+#: accounts/texts.py:8
 msgid ""
 "Twoje imię będzie widoczne dla administratorów ligi oraz Twoich przeciwników."
 msgstr ""
 "Your first name will be visible to league administrators and your opponents."
 
-#: accounts/texts.py:6
+#: accounts/texts.py:9
 msgid ""
 "Twoje nazwisko będzie widoczne dla administratorów ligi oraz Twoich "
 "przeciwników."
@@ -32,39 +32,39 @@ msgstr ""
 "Your last name will be visible to the league administrators and your "
 "opponents."
 
-#: accounts/texts.py:7
+#: accounts/texts.py:10
 msgid "Hasło"
 msgstr "Password"
 
-#: accounts/texts.py:8
+#: accounts/texts.py:11
 msgid "Stare hasło"
 msgstr "Old password"
 
-#: accounts/texts.py:9
+#: accounts/texts.py:12
 msgid "Nowe hasło"
 msgstr "New password"
 
-#: accounts/texts.py:10
+#: accounts/texts.py:13
 msgid "Nowy email"
 msgstr "New email address"
 
-#: accounts/texts.py:11
+#: accounts/texts.py:14
 msgid "Powtórz nowe hasło"
 msgstr "Retype your new password"
 
-#: accounts/texts.py:12
+#: accounts/texts.py:15
 msgid "Nowe hasło nie zostało powtórzone poprawnie"
 msgstr "New password does not match"
 
-#: accounts/texts.py:13
+#: accounts/texts.py:16
 msgid "Hasło jest niepoprawne"
 msgstr "Incorrect password"
 
-#: accounts/texts.py:14
+#: accounts/texts.py:17
 msgid "Pod tą nazwą będziesz widoczny jako gracz w lidze."
 msgstr "This is the username visible to other league players."
 
-#: accounts/texts.py:15
+#: accounts/texts.py:18
 msgid ""
 "Twoja aktualna siła w <a href=\"#\" data-bs-toggle=\"modal\" data-bs-target="
 "\"#gor-modal\">punktach GoR</a>. Jeżeli dopiero zaczynasz przygodę z Go "
@@ -74,92 +74,92 @@ msgstr ""
 "target=\"#gor-modal\">GoR points</a>. If you are just starting your "
 "adventure with Go enter 100."
 
-#: accounts/texts.py:16
+#: accounts/texts.py:19
 msgid "Ten e-mail jest już zajęty."
 msgstr "This email address is already taken."
 
-#: accounts/texts.py:17 league/texts.py:17
+#: accounts/texts.py:20 league/texts.py:20
 msgid "Ten nick jest już zajęty."
 msgstr "This username is already taken."
 
-#: accounts/texts.py:18
+#: accounts/texts.py:21
 msgid "Konto zostało utworzone. Możesz się zalogować."
 msgstr "Your account has been created. You can login now."
 
-#: accounts/texts.py:19
+#: accounts/texts.py:22
 msgid "Wybierz trudne hasło składające się z co najmniej 8 znaków."
 msgstr "Choose a hard password of at least 8 characters."
 
-#: accounts/texts.py:20
+#: accounts/texts.py:23
 msgid "Imie"
 msgstr "First name"
 
-#: accounts/texts.py:21 league/texts.py:44
+#: accounts/texts.py:24 league/texts.py:47
 msgid "Nazwisko"
 msgstr "Last name"
 
-#: accounts/texts.py:22
+#: accounts/texts.py:25
 msgid "Zapoznałem się i zgadzam się z <a href='/rules'>regulaminem ligi</a>"
 msgstr "I have read and accept the <a href='/rules'>league rules</a>"
 
-#: accounts/texts.py:23
+#: accounts/texts.py:26
 msgid "Hasło i/lub email zostały zmienione"
 msgstr "Password and/or email have been changed"
 
-#: accounts/texts.py:24
+#: accounts/texts.py:27
 msgid "Sędzia"
 msgstr "Arbiter"
 
-#: accounts/texts.py:25 templates/league/group_detail.html:32
+#: accounts/texts.py:28 templates/league/group_detail.html:32
 #: templates/league/season_detail.html:79
 msgid "Nauczyciel"
 msgstr "Teacher"
 
-#: league/models.py:234
+#: league/models.py:238
 msgid "Każdy z każdym"
 msgstr "Round robin"
 
-#: league/models.py:235
+#: league/models.py:239
 msgid "McMahon"
 msgstr "McMahon"
 
-#: league/texts.py:4
+#: league/texts.py:7
 msgid "Konto OGS"
 msgstr "OGS account"
 
-#: league/texts.py:5
+#: league/texts.py:8
 msgid "Konto KGS"
 msgstr "KGS account"
 
-#: league/texts.py:6
+#: league/texts.py:9
 msgid "Ranking"
 msgstr "Rank"
 
-#: league/texts.py:7
+#: league/texts.py:10
 msgid "Pin EGD"
 msgstr "EGD PIN"
 
-#: league/texts.py:8
+#: league/texts.py:11
 msgid "Chce raportować moje gry do EGD"
 msgstr "I want to report my games to EGD"
 
-#: league/texts.py:9 templates/league/includes/player_contact.html:12
+#: league/texts.py:12 templates/league/includes/player_contact.html:12
 msgid "Dostępność"
 msgstr "Availability"
 
-#: league/texts.py:10
+#: league/texts.py:13
 msgid "Kraj"
 msgstr "Country"
 
-#: league/texts.py:11
+#: league/texts.py:14
 msgid "Klub"
 msgstr "Club"
 
-#: league/texts.py:12
+#: league/texts.py:15
 msgid "W punktach GoR."
 msgstr "GoR points."
 
-#: league/texts.py:13
+#: league/texts.py:16
 msgid ""
 "Jeżeli posiadasz konto w EGD Twój pin znajdziesz na stronie swojego profilu. "
 "Aby znaleźć swój profil EGD użyj <a href='https://www.europeangodatabase.eu/"
@@ -169,7 +169,7 @@ msgstr ""
 "To find your EGD profile use the <a href='https://www.europeangodatabase.eu/"
 "EGD/Find_Player.php' target='blank'>search engine</a>."
 
-#: league/texts.py:14
+#: league/texts.py:17
 msgid ""
 "Jeżeli wszyscy gracze w Twojej grupie wyrażą zgodę, to gry z danej grupy "
 "będą raportowanie do EGD."
@@ -177,7 +177,7 @@ msgstr ""
 "If all players in your group agree the games in that group will be reported "
 "to EGD."
 
-#: league/texts.py:15
+#: league/texts.py:18
 msgid ""
 "Twoja dostępność czasowa dot. rozgrywania gier. Informacja ta będzie "
 "dostępna dla Twoich przeciwników wraz z Twoimi danymi kontaktowymi. Ma ona "
@@ -189,39 +189,39 @@ msgstr ""
 "the scheduling of the game. Example: \"I can only play after 6 p.m., from "
 "24/12 to 27/12 I am unavailable.\""
 
-#: league/texts.py:16
+#: league/texts.py:19
 msgid "4 literowe oznaczenie klubu/miasta używane w EGD"
 msgstr "4 letter code of the club/town used in EGD"
 
-#: league/texts.py:18
+#: league/texts.py:21
 msgid "Twoje dane zostały zmienione."
 msgstr "Your profile has been updated."
 
-#: league/texts.py:19
+#: league/texts.py:22
 msgid "Gracz o podanym nicku nie istnieje."
 msgstr "No player with this username."
 
-#: league/texts.py:20
+#: league/texts.py:23
 msgid "Zwycięzca"
 msgstr "Winner"
 
-#: league/texts.py:21 templates/misc/rules.html:117
+#: league/texts.py:24 templates/misc/rules.html:117
 msgid "Termin gry"
 msgstr "Game schedule"
 
-#: league/texts.py:22
+#: league/texts.py:25
 msgid "Typ zwycięstwa"
 msgstr "Win type"
 
-#: league/texts.py:23
+#: league/texts.py:26
 msgid "Różnica punktów"
 msgstr "Point difference"
 
-#: league/texts.py:24
+#: league/texts.py:27
 msgid "SGF"
 msgstr "SGF"
 
-#: league/texts.py:25
+#: league/texts.py:28
 msgid ""
 "Nie musisz uzupełniać pliku SGF jeżeli gra odbyła się na OGS. W innym "
 "przypadku prosimy o wgranie pliku z grą."
@@ -229,99 +229,99 @@ msgstr ""
 "You don't need to complete the SGF file if the game was played on OGS. "
 "Otherwise, please upload the game file."
 
-#: league/texts.py:26
+#: league/texts.py:29
 msgid "Link do gry na OGS"
 msgstr "OGS game link"
 
-#: league/texts.py:27
+#: league/texts.py:30
 msgid "Data rozpoczęcia"
 msgstr "Start date"
 
-#: league/texts.py:28
+#: league/texts.py:31
 msgid "Liczba graczy w grupie"
 msgstr "Number of players in the group"
 
-#: league/texts.py:29
+#: league/texts.py:32
 msgid "Liczba graczy awansujących/spadających"
 msgstr "Number of promoted/relegated players"
 
-#: league/texts.py:30 templates/league/group_detail.html:46
+#: league/texts.py:33 templates/league/group_detail.html:46
 msgid "Punkty"
 msgstr "Points"
 
-#: league/texts.py:31
+#: league/texts.py:34
 msgid "Rezygnacja"
 msgstr "Resignation"
 
-#: league/texts.py:32
+#: league/texts.py:35
 msgid "Czas"
 msgstr "Time"
 
-#: league/texts.py:33 templates/league/game_detail.html:8
+#: league/texts.py:36 templates/league/game_detail.html:8
 #: templates/league/game_detail.html:39 templates/league/game_detail.html:49
 #: templates/league/group_detail.html:159
 msgid "Bye"
 msgstr "Bye"
 
-#: league/texts.py:34
+#: league/texts.py:37
 msgid "Nierozegrana"
-msgstr "Not played"
+msgstr "Forfeit"
 
-#: league/texts.py:35 league/texts.py:37
+#: league/texts.py:38 league/texts.py:40
 msgid "To pole jest wymagane przy wybranym typie zwycięstwa."
 msgstr "This field is required with the selected win type."
 
-#: league/texts.py:36
+#: league/texts.py:39
 msgid "To pole jest wymagane gdy wybrany jest zwycięzca."
 msgstr "This field is required when a winner is picked."
 
-#: league/texts.py:38
+#: league/texts.py:41
 msgid "Wartość musi być zakończona 0,5 punkta."
 msgstr "The value must end with 0.5 point."
 
-#: league/texts.py:39
+#: league/texts.py:42
 msgid "Wartość musi być większa od 0."
 msgstr "The value must be greater than 0."
 
-#: league/texts.py:40
+#: league/texts.py:43
 msgid "Uzupełnij plik SGF lub link do gry na OGS."
 msgstr "Complete the SGF file or the link to the game on OGS."
 
-#: league/texts.py:41
+#: league/texts.py:44
 msgid "Dołącz Automatycznie"
 msgstr "Join automatically"
 
-#: league/texts.py:42
+#: league/texts.py:45
 msgid ""
 "Jeżeli to pole jest zaznaczone zostaniesz automatycznie dołączona/y do "
 "następnego sezonu."
 msgstr "If this box is checked you will automatically join the next season."
 
-#: league/texts.py:43
+#: league/texts.py:46
 msgid "Imię"
 msgstr "First name"
 
-#: league/texts.py:45
+#: league/texts.py:48
 msgid "W przygotowaniu"
 msgstr "Under preparation"
 
-#: league/texts.py:46
+#: league/texts.py:49
 msgid "Trwa"
 msgstr "In progress"
 
-#: league/texts.py:47
+#: league/texts.py:50
 msgid "Zakończony"
 msgstr "Finished"
 
-#: league/texts.py:48
+#: league/texts.py:51
 msgid "Poprzedni sezon nie został zamknięty."
 msgstr "Previous season has not been closed yet."
 
-#: league/texts.py:49
+#: league/texts.py:52
 msgid "Nie wszystkie gry zostały rozegrane."
 msgstr "Not all games have finished yet."
 
-#: league/texts.py:50
+#: league/texts.py:53
 msgid ""
 "To nie jest poprawny link do gry OGS - format linku to: https://online-go."
 "com/game/<NUMER_GRY>"
@@ -329,11 +329,11 @@ msgstr ""
 "This is not a valid OGS game link - the link format is: https://online-go."
 "com/game/<GAME_ID>"
 
-#: league/texts.py:51
+#: league/texts.py:54
 msgid "Pole zostanie wypełnione automatycznie jeżeli pozostawisz je puste."
 msgstr "The field will be filled in automatically if you leave it blank."
 
-#: league/texts.py:52
+#: league/texts.py:55
 msgid ""
 "Ranking są aktualizowane. O zakończeniu procesu zostaniesz poinformowany "
 "emailem."
@@ -341,19 +341,19 @@ msgstr ""
 "The rankings are being updated. You will be informed about the completion of "
 "the process by email."
 
-#: league/texts.py:53
+#: league/texts.py:56
 msgid "Aktualizacja GOR"
 msgstr "Update GoR"
 
-#: league/texts.py:54
+#: league/texts.py:57
 msgid "Aktualizacja rankingów graczy została zakończona"
 msgstr "The update of the player rankings has been completed"
 
-#: league/texts.py:55
+#: league/texts.py:58
 msgid "Gracz został wycofany z aktualnego sezonu."
 msgstr "Player has been withdrawn from current season."
 
-#: league/texts.py:56
+#: league/texts.py:59
 msgid "Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe."
 msgstr "Player has played games in actual season. Withdrawal is not possible."
 
@@ -374,7 +374,7 @@ msgid "Zoastaliśmy o tym poinformowani."
 msgstr "We have been informed about it."
 
 #: templates/accounts/login.html:5 templates/accounts/login.html:8
-#: templates/base.html:99
+#: templates/base.html:106
 msgid "Logowanie"
 msgstr "Login"
 
@@ -500,7 +500,7 @@ msgid "Resetowanie hasła na stronie IGLO"
 msgstr "Resetting password on the IGLO site"
 
 #: templates/accounts/registration.html:5
-#: templates/accounts/registration.html:8 templates/base.html:104
+#: templates/accounts/registration.html:8 templates/base.html:111
 msgid "Rejestracja"
 msgstr "Register"
 
@@ -576,42 +576,42 @@ msgstr ""
 msgid "Zamknij"
 msgstr "Close"
 
-#: templates/base.html:38 templates/league/game_detail.html:26
+#: templates/base.html:45 templates/league/game_detail.html:26
 #: templates/league/game_form.html:19 templates/league/group_detail.html:13
 #: templates/league/season_detail.html:12 templates/league/season_list.html:5
 #: templates/league/season_list.html:12 templates/league/season_list.html:16
 msgid "Sezony"
 msgstr "Seasons"
 
-#: templates/base.html:43 templates/review/teacher_detail.html:13
+#: templates/base.html:50 templates/review/teacher_detail.html:13
 #: templates/review/teacher_list.html:5 templates/review/teacher_list.html:12
 #: templates/review/teacher_list.html:15
 msgid "Nauczyciele"
 msgstr "Teachers"
 
-#: templates/base.html:47 templates/misc/rules.html:5
+#: templates/base.html:54 templates/misc/rules.html:5
 #: templates/misc/rules.html:10
 msgid "Regulamin"
-msgstr "Rules"
+msgstr "League regulations"
 
-#: templates/base.html:52 templates/league/player_detail.html:121
+#: templates/base.html:59 templates/league/player_detail.html:121
 #: templates/misc/contact.html:5 templates/misc/contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
 
-#: templates/base.html:61
+#: templates/base.html:68
 msgid "Twoje Gry"
 msgstr "Your games"
 
-#: templates/base.html:75
+#: templates/base.html:82
 msgid "Edytuj profil"
 msgstr "Edit profile"
 
-#: templates/base.html:82
+#: templates/base.html:89
 msgid "Zmień hasło/email"
 msgstr "Change password/email"
 
-#: templates/base.html:90
+#: templates/base.html:97
 msgid "Wyloguj"
 msgstr "Logout"
 
@@ -652,7 +652,7 @@ msgstr "Edit"
 
 #: templates/league/game_detail.html:78 templates/league/group_detail.html:172
 msgid "Gra jeszcze się nie odbyła."
-msgstr "The game has not yet taken place."
+msgstr "The game has not taken place yet."
 
 #: templates/league/game_form.html:36
 msgid "Edycja"
@@ -752,10 +752,10 @@ msgstr "How to read the results table?"
 msgid ""
 "Z kolumny <b>Miejsce</b> można odczytać aktualną pozycję gracza w grupie."
 msgstr ""
-"From the <b>Position</b> column you can read the current position of the player "
+"From the <b>Place</b> column you can read the current position of the player "
 "in the group."
 
-#: templates/league/includes/re<sult_table_modal.html:18
+#: templates/league/includes/result_table_modal.html:18
 msgid "W kolumnie <b>Gracz</b> widzimy nick oraz rating gracza."
 msgstr ""
 "In the <b>Player</b> column we can see the nickname and rating of the player."
@@ -991,13 +991,13 @@ msgid ""
 "\" target=\"_blank\">Centrum Edukacyjne Gry Go \"Szaleni Samuraje\"</a>."
 msgstr ""
 "The manager of IGLO is the <a href=\"https://www.szalenisamuraje.org/\" "
-"target=\"_blank\">Go Games Educational Center \"Szaleni Samuraje\"</a>."
+"target=\"_blank\">Go Game Educational Center \"Szaleni Samuraje\"</a>."
 
 #: templates/misc/home.html:5 templates/misc/home.html:17
 msgid "Internetowa Liga Go IGLO"
 msgstr "Internet Go League IGLO"
 
-#: templates/misc/home.html:18
+#: templates/misc/home.html:9 templates/misc/home.html:18
 msgid ""
 "IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie "
 "pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja "
@@ -1007,8 +1007,8 @@ msgstr ""
 "IGLO is a friendly League for Go enthusiasts. It aims to build positive "
 "relationships between players and increase the level of their game play. "
 "This is an opportunity to play longer games on a regular basis and get "
-"comments from stronger players. Thanks to that, it motivates to develop and "
-"deepen knowledge about Go."
+"comments from stronger players. The intention is to it motivate development "
+"and deepen the knowledge of Go."
 
 #: templates/misc/home.html:24
 msgid ""
@@ -1056,14 +1056,14 @@ msgstr "Player who can't attend the game has to reschedule it."
 
 #: templates/misc/home.html:77
 msgid "Gramy na OGS (preferowany serwer) lub KGS."
-msgstr "We play on OGS (preferred server) or KGS."
+msgstr "Games take place on OGS (preferred server) or KGS."
 
 #: templates/misc/home.html:80
 #, python-format
 msgid ""
 "Więcej informacji znajdziesz w <a href=\"%(rules_url)s\">regulaminie</a> ."
 msgstr ""
-"For more information see the <a href=\"%(rules_url)s\"> terms of service</"
+"For more information see the <a href=\"%(rules_url)s\"> terms of service </"
 "a>."
 
 #: templates/misc/home.html:89
@@ -1078,9 +1078,8 @@ msgid ""
 "do dołączenia!"
 msgstr ""
 "Participation in IGLO  is completely free! We use the support of our patrons "
-"to pay for lectures and comments. If you also want to take part in the "
-"development of the League and support its further expansion, we encourage "
-"you to join!"
+"to pay for lectures and comments. We encourage you to join if you want to "
+"take part in the development of the League and support its further expansion!"
 
 #: templates/misc/home.html:99
 msgid "Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:"
@@ -1095,7 +1094,7 @@ msgid ""
 msgstr ""
 "We sign contracts with Teachers, so you can benefit from professional "
 "lectures and commentaries tailored to each group (more in <a href="
-"\"%(teacher_list_url)s\">Teachers</a>)."
+"\"%(teacher_list_url)s\"> Teachers </a>)."
 
 #: templates/misc/home.html:113
 msgid ""
@@ -1140,12 +1139,12 @@ msgid ""
 "Każdy gracz gra sam, bez dodatkowego wsparcia. Podczas gry obowiązuje zakaz "
 "korzystania z pomocy innych graczy, programów, książek, itp."
 msgstr ""
-"Each player plays alone, without any additional support. It is forbidden to "
-"use the help of other players, programs, books, etc. during the game."
+"Every player plays alone and without any additional support. It is forbidden "
+"to use the help of other players, programs, books, etc. during the game."
 
 #: templates/misc/rules.html:29
 msgid "Rejestracja i udział w Lidze są darmowe."
-msgstr "Registration and participation in the League are free."
+msgstr "Registration and participation in the League is free."
 
 #: templates/misc/rules.html:34
 msgid ""
@@ -1181,7 +1180,7 @@ msgid ""
 msgstr ""
 "You can resign from playing in the League at any time by contacting the "
 "League Administrator, but by resigning during the season the participant "
-"agrees to forfeit the remaining games."
+"agrees to forfeit all remaining games."
 
 #: templates/misc/rules.html:63
 msgid ""
@@ -1201,8 +1200,8 @@ msgid ""
 "Gramy w grę Go na zasadach Japońskich, plansza 19x19, komi 6.5, kolor "
 "zostanie przydzielony automatycznie przed rozpoczęciem sezonu."
 msgstr ""
-"We play using Japanese rules, 19x19 board, komi 6.5, the color will be "
-"assigned automatically before the start of the season."
+"We play using Japanese rules, 19x19 board, 6.5 komi, the colors are assigned "
+"automatically before the start of the season."
 
 #: templates/misc/rules.html:82
 msgid ""
@@ -1212,7 +1211,7 @@ msgid ""
 msgstr ""
 "The games are played online on the OGS server or on the KGS server in the "
 "Polish Room. The OGS is the preferred game portal. The game can also be "
-"played \"live\" with the obligation to save the game record (kifu)."
+"played \"live\" with the obligation to save the game record."
 
 #: templates/misc/rules.html:89
 msgid "Czas gry to 40min i 3x30s japońskiego niedoczasu (byō-yomi)."
@@ -1255,7 +1254,7 @@ msgid ""
 "każdego gracza na stronie WWW."
 msgstr ""
 "With the consent of both players, the date of the game can be changed, but "
-"not later than the last day of the round until 8 PM . The participant who "
+"no later than the last day of the round until 8 PM. The participant who "
 "would like to change the date informs the other player about it at least "
 "three days before the default date of the game by the preferred form of "
 "contact specified in each player's business card on the website."
@@ -1269,7 +1268,7 @@ msgstr ""
 
 #: templates/misc/rules.html:143
 msgid "Zgłoszenie wyniku gry, przegrana"
-msgstr "Report the result of the game, loss"
+msgstr "Reporting the game result, loss"
 
 #: templates/misc/rules.html:148
 msgid ""
@@ -1288,8 +1287,8 @@ msgid ""
 "Wyniki gier zgłaszamy w swoim koncie na stronie WWW. Wynik zgłasza gracz, "
 "który wygrał."
 msgstr ""
-"The results are reported using the website. It should be reported by the "
-"winning player in their profile."
+"The results are reported using the website. The winner should report it in "
+"their profile."
 
 #: templates/misc/rules.html:166
 msgid "Gry w EGD"
@@ -1330,8 +1329,8 @@ msgid ""
 "partia, tak aby była ona rozpoznawalna, a jakość nagrania musi to umożliwiać."
 msgstr ""
 "The recording should include the player and the screen on which the game is "
-"played, so that it is clearly identifiable, and the quality of the recording "
-"must allow it."
+"played, in a way that the game is clearly identifiable, and the quality of "
+"the recording must allow it."
 
 #: templates/misc/rules.html:200
 msgid ""
@@ -1360,7 +1359,7 @@ msgid ""
 "Ligi."
 msgstr ""
 "If there is a disagreement between players or any suspicion of using "
-"electronic doping, immediately report to the League Administrator."
+"electronic doping, immediately report it to the League Administrator."
 
 #: templates/misc/rules.html:225
 msgid ""
@@ -1399,11 +1398,11 @@ msgstr "Breakers:"
 msgid ""
 "dla grupy \"Każdy z każdym\": Liczba zwycięstw, SODOS, Pozycja startowa,"
 msgstr ""
-"for the \"round-robin\" group: Number of wins, SODOS, Starting position,"
+"for the \"round-robin\" group: number of wins, SODOS, starting position,"
 
 #: templates/misc/rules.html:260
 msgid "dla grupy McMahon: McMahon Score, SOS, SOSOS, Pozycja startowa."
-msgstr "for the McMahon group: McMahon Score, SOS, SOSOS, Starting position."
+msgstr "for the McMahon group: McMahon score, SOS, SOSOS, starting position."
 
 #: templates/misc/rules.html:267
 msgid "Spadki i awanse:"
@@ -1482,9 +1481,9 @@ msgid ""
 msgstr ""
 "You can find all archived and current lectures given by our teachers on <a "
 "href=\"https://www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ\" target="
-"\"_blank\">YouTube</a>. If for some reason you could not participate in the "
-"live commentary, or you want to broaden your knowledge, we encourage you to "
-"watch the materials and subscribe to our channel."
+"\"_blank\">YouTube</a>. If you are unable to participate in the live "
+"commentary or you want to broaden your knowledge we encourage you to watch "
+"the materials and subscribe to our channel."
 
 #: templates/review/teacher_list.html:25
 msgid ""
@@ -1501,7 +1500,7 @@ msgid ""
 "channel/UCXsGC1hVUqZ-JUjzfdSHYDQ\" target=\"_blank\">kanale IGLO</a>."
 msgstr ""
 "Archival lectures and comments for groups A and B were conducted by "
-"Stanisław Frejlak and Lukáš Podpěra and can be viewed at <a href=\"https://"
+"Stanisław Frejlak and Lukáš Podpěra and can be found at <a href=\"https://"
 "www.youtube.com/channel/UCXsGC1hVUqZ-JUjzfdSHYDQ\" target=\"_blank\">the "
 "IGLO channel</a>."
 
@@ -1513,7 +1512,7 @@ msgid ""
 "target=\"_blank\">IGLO Plus</a>."
 msgstr ""
 "Archival lectures and comments for groups C and others were conducted by "
-"Cezary Czernecki and other League participants and can be seen on the "
+"Cezary Czernecki and other League participants and can be found on the "
 "channel <a href=\"https://www.youtube.com/channel/UCMgifrUqkfO58qVdvfs4xkg\" "
 "target=\"_blank\">IGLO Plus</a>."
 

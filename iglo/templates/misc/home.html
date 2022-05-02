@@ -9,27 +9,42 @@
           content="{% blocktrans trimmed %}IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja do regularnego grania dłuższych gier oraz uzyskiwania komentarzy od silnych graczy. Dzięki czemu motywuje do rozwoju i pogłębiania wiedzy o Go.{% endblocktrans %}">
 {% endblock %}
 
-{% block content %}
-    <div class="row">
-        <div class="col">
-            <div class="card text-center mb-3">
-                <div class="card-body">
-                    <h1 class="card-title">{% translate "Internetowa Liga Go IGLO" %}</h1>
-                    <p class="card-text">{% blocktrans trimmed %}IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na
-                        celu
-                        budowanie pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja do
-                        regularnego grania dłuższych gier oraz uzyskiwania komentarzy od silnych graczy. Dzięki czemu
-                        motywuje do rozwoju i pogłębiania wiedzy o Go.{% endblocktrans %}</p>
-                    {% if not user.is_authenticated %}
-                        <p class="card-text">{% blocktrans trimmed %}Każdy gracz może znaleźć grupę odpowiadającą jego
-                            poziomowi, dlatego nie czekaj tylko dołącz do nas!{% endblocktrans %}</p>
-                        <a href="{% url "accounts:registration" %}"
-                           class="btn btn-success">{% translate "Zapisz się!" %}</a>
-                    {% endif %}
+{% block top %}
+    <div class="home-top">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center home-top__card">
+                        <div class="card-body">
+                            <h1 class="card-title">{% translate "Internetowa Liga Go IGLO" %}</h1>
+                            <p class="card-text">
+                                {% blocktrans trimmed %}
+                                    IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie pozytywnych
+                                    relacji między graczami i zwiększeniu poziomu ich gry. To okazja do regularnego
+                                    grania dłuższych gier oraz uzyskiwania komentarzy od silnych graczy. Dzięki czemu
+                                    motywuje do rozwoju i pogłębiania wiedzy o Go.
+                                {% endblocktrans %}
+                            </p>
+                            {% if not user.is_authenticated %}
+                                <p class="card-text">
+                                    {% blocktrans trimmed %}
+                                        Każdy gracz może znaleźć grupę odpowiadającą jego poziomowi, dlatego nie czekaj
+                                        tylko dołącz do nas!
+                                    {% endblocktrans %}
+                                </p>
+                                <a href="{% url "accounts:registration" %}" class="btn btn-primary">
+                                    {% translate "Zapisz się!" %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block content %}
     <div class="row">
         {% if latest_season %}
             <div class="col">
@@ -79,6 +94,24 @@
                     {% url "rules" as rules_url %}
                     <p>{% blocktrans trimmed %}Więcej informacji znajdziesz w <a href="{{ rules_url }}">regulaminie</a>
                         .{% endblocktrans %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body d-flex flex-lg-row flex-column justify-content-between align-items-center">
+                    <p class="me-lg-3">
+                        {% blocktrans trimmed %}
+                            <strong>Dołącz do naszego serwera Discord!</strong> Bądź na bierząco ze wszystkimi
+                            ogłoszeniami organizatorów. Uczestnicz w dyskusjach dotyczących ligi, rozegranych gier oraz
+                            komentarzy nauczycieli. Zapraszamy do kanału <code>#iglo</code>.
+                        {% endblocktrans %}
+                    </p>
+                    <a href="https://discord.gg/gBHsmMX796" class="btn btn-primary text-nowrap" target="_blank">
+                        <i class="fab fa-discord"></i>&nbsp;{% trans "Dołącz" %}
+                    </a>
                 </div>
             </div>
         </div>

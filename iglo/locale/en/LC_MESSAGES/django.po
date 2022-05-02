@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 13:46+0200\n"
+"POT-Creation-Date: 2022-05-02 19:58+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -470,6 +470,7 @@ msgstr ""
 "SPAM folder in your account."
 
 #: templates/accounts/password_reset_email.html:2
+#, python-format
 msgid ""
 "Otrzymujesz tę wiadomość, gdyż skorzystano z opcji resetu hasła dla Twojego "
 "konta na stronie %(site_name)s."
@@ -621,7 +622,7 @@ msgstr "Logout"
 #: templates/league/player_detail.html:210
 #: templates/league/season_detail.html:5 templates/league/season_detail.html:14
 #: templates/league/season_detail.html:20 templates/league/season_list.html:28
-#: templates/misc/home.html:42 templates/review/teacher_detail.html:43
+#: templates/misc/home.html:57 templates/review/teacher_detail.html:43
 #: templates/review/teacher_detail.html:54
 msgid "Sezon"
 msgstr "Season"
@@ -993,11 +994,11 @@ msgstr ""
 "The manager of IGLO is the <a href=\"https://www.szalenisamuraje.org/\" "
 "target=\"_blank\">Go Game Educational Center \"Szaleni Samuraje\"</a>."
 
-#: templates/misc/home.html:5 templates/misc/home.html:17
+#: templates/misc/home.html:5 templates/misc/home.html:19
 msgid "Internetowa Liga Go IGLO"
 msgstr "Internet Go League IGLO"
 
-#: templates/misc/home.html:9 templates/misc/home.html:18
+#: templates/misc/home.html:9 templates/misc/home.html:21
 msgid ""
 "IGLO jest koleżeńską Ligą dla entuzjastów gry Go. Ma na celu budowanie "
 "pozytywnych relacji między graczami i zwiększeniu poziomu ich gry. To okazja "
@@ -1010,7 +1011,7 @@ msgstr ""
 "comments from stronger players. The intention is to it motivate development "
 "and deepen the knowledge of Go."
 
-#: templates/misc/home.html:24
+#: templates/misc/home.html:30
 msgid ""
 "Każdy gracz może znaleźć grupę odpowiadającą jego poziomowi, dlatego nie "
 "czekaj tylko dołącz do nas!"
@@ -1018,47 +1019,47 @@ msgstr ""
 "Each player can find a group corresponding to their level, so don't wait and "
 "join us!"
 
-#: templates/misc/home.html:27
+#: templates/misc/home.html:36
 msgid "Zapisz się!"
 msgstr "Sign up!"
 
-#: templates/misc/home.html:38
+#: templates/misc/home.html:53
 msgid "Aktualny sezon"
 msgstr "Current season"
 
-#: templates/misc/home.html:46 templates/review/teacher_detail.html:38
+#: templates/misc/home.html:61 templates/review/teacher_detail.html:38
 msgid "Grupy"
 msgstr "Groups"
 
-#: templates/misc/home.html:53
+#: templates/misc/home.html:68
 msgid "Rozegranych gier"
 msgstr "Finished games"
 
-#: templates/misc/home.html:69
+#: templates/misc/home.html:84
 msgid "Zasady"
 msgstr "Rules"
 
-#: templates/misc/home.html:71
+#: templates/misc/home.html:86
 msgid "Skrócone zasady IGLO"
 msgstr "Abbreviated IGLO rules"
 
-#: templates/misc/home.html:73
+#: templates/misc/home.html:88
 msgid "Jedna gra tygodniowo z domyślnym terminem gry."
 msgstr "One game per week with a default game schedule."
 
-#: templates/misc/home.html:74
+#: templates/misc/home.html:89
 msgid "Rekomendowany czas gry to 40m+3x30."
 msgstr "The recommended playing time is 40m+3x30."
 
-#: templates/misc/home.html:75
+#: templates/misc/home.html:90
 msgid "Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć."
 msgstr "Player who can't attend the game has to reschedule it."
 
-#: templates/misc/home.html:77
+#: templates/misc/home.html:92
 msgid "Gramy na OGS (preferowany serwer) lub KGS."
 msgstr "Games take place on OGS (preferred server) or KGS."
 
-#: templates/misc/home.html:80
+#: templates/misc/home.html:95
 #, python-format
 msgid ""
 "Więcej informacji znajdziesz w <a href=\"%(rules_url)s\">regulaminie</a> ."
@@ -1066,11 +1067,26 @@ msgstr ""
 "For more information see the <a href=\"%(rules_url)s\"> terms of service </"
 "a>."
 
-#: templates/misc/home.html:89
+#: templates/misc/home.html:106
+msgid ""
+"<strong>Dołącz do naszego serwera Discord!</strong> Bądź na bierząco ze "
+"wszystkimi ogłoszeniami organizatorów. Uczestnicz w dyskusjach dotyczących "
+"ligi, rozegranych gier oraz komentarzy nauczycieli. Zapraszamy do kanału "
+"<code>#iglo</code>."
+msgstr ""
+"<strong>Join our Discord server!</strong> Stay up to date with all the "
+"organizers announcements. Participate in discussions about the league, "
+"games and teachers comments. We invite you to the <code>#iglo</code> channel."
+
+#: templates/misc/home.html:113
+msgid "Dołącz"
+msgstr "Join"
+
+#: templates/misc/home.html:122
 msgid "Wsparcie"
 msgstr "Support"
 
-#: templates/misc/home.html:92
+#: templates/misc/home.html:125
 msgid ""
 "Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić "
 "wykłady i komentarze korzystamy ze wsparcia naszych patronów. Jeśli również "
@@ -1081,11 +1097,11 @@ msgstr ""
 "to pay for lectures and comments. We encourage you to join if you want to "
 "take part in the development of the League and support its further expansion!"
 
-#: templates/misc/home.html:99
+#: templates/misc/home.html:132
 msgid "Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:"
 msgstr "What we are able to do thanks to your support:"
 
-#: templates/misc/home.html:106
+#: templates/misc/home.html:139
 #, python-format
 msgid ""
 "Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z "
@@ -1096,7 +1112,7 @@ msgstr ""
 "lectures and commentaries tailored to each group (more in <a href="
 "\"%(teacher_list_url)s\"> Teachers </a>)."
 
-#: templates/misc/home.html:113
+#: templates/misc/home.html:146
 msgid ""
 "Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada "
 "własne konto, dzięki któremu może w łatwy sposób obsługiwać swoje gry."
@@ -1104,11 +1120,11 @@ msgstr ""
 "We pay for the server and the website domain so each player has their own "
 "account and can easily manage their games."
 
-#: templates/misc/home.html:119
+#: templates/misc/home.html:152
 msgid "Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową."
 msgstr "We are able to provide the necessary legal and accounting services."
 
-#: templates/misc/home.html:125
+#: templates/misc/home.html:158
 msgid ""
 "Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i "
 "sprawniej."
@@ -1116,7 +1132,7 @@ msgstr ""
 "It takes really little and thanks to this we can act faster and more "
 "efficiently."
 
-#: templates/misc/home.html:130
+#: templates/misc/home.html:163
 msgid "Wpłat można dokonywać na:"
 msgstr "Payments can be made to:"
 

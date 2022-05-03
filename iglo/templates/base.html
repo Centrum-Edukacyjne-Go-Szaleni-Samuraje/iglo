@@ -15,7 +15,6 @@
     <link href="{% static 'fontawesome/css/all.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static "main.css" %}">
     <title>IGLO | {% block page_title %}{% endblock %}</title>
-    <meta property="og:title" content="IGLO | {% block page_title %}{% endblock %}" />
     <meta property="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static "imgs/cover.jpg" %}" />
     {% block head %}
     {% endblock %}

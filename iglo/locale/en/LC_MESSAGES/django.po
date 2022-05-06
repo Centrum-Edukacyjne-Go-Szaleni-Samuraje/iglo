@@ -1069,7 +1069,7 @@ msgstr ""
 
 #: templates/misc/home.html:106
 msgid ""
-"<strong>Dołącz do naszego serwera Discord!</strong> Bądź na bierząco ze "
+"<strong>Dołącz do naszego serwera Discord!</strong> Bądź na bieżąco ze "
 "wszystkimi ogłoszeniami organizatorów. Uczestnicz w dyskusjach dotyczących "
 "ligi, rozegranych gier oraz komentarzy nauczycieli. Zapraszamy do kanału "
 "<code>#iglo</code>."

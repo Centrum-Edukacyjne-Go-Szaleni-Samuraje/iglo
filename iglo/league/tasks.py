@@ -124,4 +124,3 @@ def send_delayed_games_reminder():
             to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
             context={"game": game},
         )
-        return

@@ -2,7 +2,9 @@ import re
 
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import BLANK_CHOICE_DASH
+from django.utils.translation import gettext_lazy as _
 
 from league import texts
 from league.models import Game, Member, Player, WinType
@@ -74,6 +76,13 @@ class GameResultUpdateForm(forms.ModelForm):
         ):
             self.add_error(field=None, error=texts.SGF_OR_LINK_REQUIRED_ERROR)
         return cleaned_data
+
+    def clean_date(self):
+        value = self.cleaned_data["date"]
+        season = self.instance.group.season
+        if not (season.start_date <= value.date() <= season.end_date):
+            raise ValidationError(_("Gra musi zostać rozegrana w trakcie trwania sezonu."))
+        return value
 
 
 class GameResultUpdateRefereeForm(GameResultUpdateForm):

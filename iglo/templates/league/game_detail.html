@@ -78,7 +78,14 @@
                         {% blocktrans %}Gra jeszcze się nie odbyła.{% endblocktrans %}
                     {% endif %}
                 </h5>
-                {% if object.date %}<i class="fas fa-calendar-day"></i> {{ object.date }}{% endif %}
+                {% if object.date %}
+                    <i class="fas fa-calendar-day"></i> {{ object.date }}
+                    {% if object.is_delayed %}
+                        <i class="fas fa-exclamation-triangle text-danger"
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="{% translate "Ta gra jest opóźniona" %}"></i>
+                    {% endif %}
+                {% endif %}
                 {% if object.sgf_link %}
                     <div class="sgf-container">
                         <div data-wgo="{{ object.sgf_link }}"

@@ -527,3 +527,17 @@ class GroupTestCase(TestCase):
         game_2.refresh_from_db()
         self.assertEqual(game_1.black, new_member)
         self.assertEqual(game_2.white, new_member)
+
+
+class GameTestCase(TestCase):
+    def test_is_delayed_when_not_delayed(self):
+        now = datetime.datetime.now()
+        game = GameFactory(date=now + datetime.timedelta(days=1), win_type=None)
+
+        self.assertFalse(game.is_delayed)
+
+    def test_is_delayed_when_delayed(self):
+        now = datetime.datetime.now()
+        game = GameFactory(date=now - datetime.timedelta(days=1), win_type=None)
+
+        self.assertTrue(game.is_delayed)

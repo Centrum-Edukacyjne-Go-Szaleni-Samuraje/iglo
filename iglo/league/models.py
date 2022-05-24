@@ -804,6 +804,10 @@ class Game(models.Model):
             return self.external_sgf_link
         return None
 
+    @property
+    def is_delayed(self):
+        return not self.win_type and self.date.date() < datetime.date.today()
+
 
 class GameAIAnalyseUploadStatus(TextChoices):
     IN_PROGRESS = "in_progress", "in_progress"

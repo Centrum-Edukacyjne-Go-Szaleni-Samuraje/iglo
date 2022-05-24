@@ -2,7 +2,7 @@ import datetime
 from unittest import mock
 
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from league.models import GameAIAnalyseUploadStatus, SeasonState
 from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder
@@ -10,6 +10,7 @@ from league.tests.factories import GameFactory, SeasonFactory
 from league.utils.aisensei import AISenseiException
 
 
+@override_settings(ENABLE_AI_ANALYSE_UPLOAD=True)
 class GameAIAnalyseUploadTaskTestCase(TestCase):
 
     def test_task_succeed(self):
@@ -42,6 +43,7 @@ class GameAIAnalyseUploadTaskTestCase(TestCase):
         self.assertEqual(upload.error, "error message")
 
 
+@override_settings(ENABLE_DELAYED_GAMES_REMINDER=True)
 class SendDelayedGamesRemindersTask(TestCase):
 
     def test_task(self):

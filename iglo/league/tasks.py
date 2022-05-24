@@ -20,8 +20,8 @@ logger = logging.getLogger("league")
 
 @shared_task(time_limit=20)
 def game_ai_analyse_upload_task(game_id: int) -> None:
-    if not settings.AI_SENSEI["AUTH_URL"]:
-        logger.info("AI analyse upload skipped for game %d - AI Sensei is not configured", game_id)
+    if not settings.ENABLE_AI_ANALYSE_UPLOAD:
+        logger.info("AI analyse upload skipped for game %d - this feature is disabled", game_id)
         return
     logger.info("AI analyse upload started for game %d", game_id)
     game = Game.objects.get(id=game_id)
@@ -110,6 +110,9 @@ def update_gor(triggering_user_email: Optional[str] = None):
 
 @shared_task()
 def send_delayed_games_reminder():
+    if not settings.ENABLE_DELAYED_GAMES_REMINDER:
+        logger.info("Send delayed games reminder skipped - this feature is disabled")
+        return
     games = Game.objects.get_delayed_games()
     logger.info("Sending %d delayed games reminders", games.count())
     for game in games:

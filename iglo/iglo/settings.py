@@ -222,13 +222,12 @@ COUNTRIES_FIRST = [
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
 
-if not DEBUG:
-    CELERY_BEAT_SCHEDULE = {
-        "send-delayed-games-reminder": {
-            "task": "league.tasks.send_delayed_games_reminder",
-            "schedule": crontab(hour="10", minute="0"),
-        }
+CELERY_BEAT_SCHEDULE = {
+    "send-delayed-games-reminder": {
+        "task": "league.tasks.send_delayed_games_reminder",
+        "schedule": crontab(hour="10", minute="0"),
     }
+}
 
 AI_SENSEI = {
     "AUTH_URL": env("AI_SENSEI_AUTH_URL", required=False),
@@ -263,3 +262,6 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / "locale",
 ]
+
+ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default=False)
+ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)

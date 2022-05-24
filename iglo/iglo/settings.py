@@ -5,6 +5,7 @@ from pathlib import Path
 
 import dj_database_url
 import sentry_sdk
+from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -44,6 +45,8 @@ SECRET_KEY = env("SECRET_KEY", default="secret-key")
 DEBUG = env("DEBUG", as_bool=True, default=True)
 
 ALLOWED_HOSTS = [env("DOMAIN", default="*")]
+
+DOMAIN = env("DOMAIN", default="127.0.0.1:8000")
 
 # Application definition
 
@@ -191,7 +194,6 @@ if "EMAIL_HOST" in os.environ and "EMAIL_HOST_USER" in os.environ and "EMAIL_HOS
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
@@ -219,6 +221,14 @@ COUNTRIES_FIRST = [
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
+
+if not DEBUG:
+    CELERY_BEAT_SCHEDULE = {
+        "send-delayed-games-reminder": {
+            "task": "league.tasks.send_delayed_games_reminder",
+            "schedule": crontab(hour="10", minute="0"),
+        }
+    }
 
 AI_SENSEI = {
     "AUTH_URL": env("AI_SENSEI_AUTH_URL", required=False),

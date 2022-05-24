@@ -541,3 +541,16 @@ class GameTestCase(TestCase):
         game = GameFactory(date=now - datetime.timedelta(days=1), win_type=None)
 
         self.assertTrue(game.is_delayed)
+
+    def test_get_delayed_games(self):
+        now = datetime.datetime.now()
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+        game_1 = GameFactory(date=now - datetime.timedelta(days=1), win_type=None, group__season=season)
+        game_2 = GameFactory(date=now + datetime.timedelta(days=1), win_type=None, group__season=season)
+        game_3 = GameFactory(date=now - datetime.timedelta(days=1), win_type=WinType.NOT_PLAYED, group__season=season)
+
+        result = Game.objects.get_delayed_games()
+
+        self.assertIn(game_1, result)
+        self.assertNotIn(game_2, result)
+        self.assertNotIn(game_3, result)

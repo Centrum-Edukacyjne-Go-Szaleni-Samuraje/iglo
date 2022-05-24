@@ -1,10 +1,12 @@
+import datetime
 from unittest import mock
 
+from django.core import mail
 from django.test import TestCase
 
-from league.models import GameAIAnalyseUploadStatus
-from league.tasks import game_ai_analyse_upload_task
-from league.tests.factories import GameFactory
+from league.models import GameAIAnalyseUploadStatus, SeasonState
+from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder
+from league.tests.factories import GameFactory, SeasonFactory
 from league.utils.aisensei import AISenseiException
 
 
@@ -38,3 +40,17 @@ class GameAIAnalyseUploadTaskTestCase(TestCase):
         self.assertEqual(upload.status, GameAIAnalyseUploadStatus.FAILED)
         self.assertIsNone(upload.result)
         self.assertEqual(upload.error, "error message")
+
+
+class SendDelayedGamesRemindersTask(TestCase):
+
+    def test_task(self):
+        now = datetime.datetime.now()
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+        game = GameFactory(date=now - datetime.timedelta(days=1), win_type=None, group__season=season)
+
+        send_delayed_games_reminder()
+
+        game.refresh_from_db()
+        self.assertIsNotNone(game.delayed_reminder_sent)
+        self.assertEqual(len(mail.outbox), 1)

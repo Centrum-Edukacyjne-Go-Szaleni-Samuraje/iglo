@@ -117,7 +117,7 @@ msgstr "Teacher"
 
 #: league/forms.py:84
 msgid "Gra musi zostać rozegrana w trakcie trwania sezonu."
-msgstr ""
+msgstr "You have to play this game during the season."
 
 #: league/models.py:238
 msgid "Każdy z każdym"

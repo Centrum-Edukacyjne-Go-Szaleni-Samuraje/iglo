@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-02 19:58+0200\n"
+"POT-Creation-Date: 2022-05-24 16:11+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -114,6 +114,10 @@ msgstr "Arbiter"
 #: templates/league/season_detail.html:79
 msgid "Nauczyciel"
 msgstr "Teacher"
+
+#: league/forms.py:84
+msgid "Gra musi zostać rozegrana w trakcie trwania sezonu."
+msgstr ""
 
 #: league/models.py:238
 msgid "Każdy z każdym"
@@ -245,7 +249,7 @@ msgstr "Number of players in the group"
 msgid "Liczba graczy awansujących/spadających"
 msgstr "Number of promoted/relegated players"
 
-#: league/texts.py:33 templates/league/group_detail.html:46
+#: league/texts.py:33 templates/league/group_detail.html:47
 msgid "Punkty"
 msgstr "Points"
 
@@ -259,7 +263,7 @@ msgstr "Time"
 
 #: league/texts.py:36 templates/league/game_detail.html:8
 #: templates/league/game_detail.html:39 templates/league/game_detail.html:49
-#: templates/league/group_detail.html:159
+#: templates/league/group_detail.html:160
 msgid "Bye"
 msgstr "Bye"
 
@@ -374,7 +378,7 @@ msgid "Zoastaliśmy o tym poinformowani."
 msgstr "We have been informed about it."
 
 #: templates/accounts/login.html:5 templates/accounts/login.html:8
-#: templates/base.html:106
+#: templates/base.html:107
 msgid "Logowanie"
 msgstr "Login"
 
@@ -493,6 +497,7 @@ msgid "Dziękujemy za korzystanie naszej strony."
 msgstr "Thanks for using our site."
 
 #: templates/accounts/password_reset_email.html:12
+#: templates/league/emails/delayed_game_reminder/body.html:15
 msgid "Zespół IGLO"
 msgstr "The IGLO Team"
 
@@ -501,7 +506,7 @@ msgid "Resetowanie hasła na stronie IGLO"
 msgstr "Resetting password on the IGLO site"
 
 #: templates/accounts/registration.html:5
-#: templates/accounts/registration.html:8 templates/base.html:111
+#: templates/accounts/registration.html:8 templates/base.html:112
 msgid "Rejestracja"
 msgstr "Register"
 
@@ -573,53 +578,76 @@ msgstr ""
 #: templates/accounts/registration.html:61
 #: templates/league/includes/result_table_modal.html:57
 #: templates/league/player_detail.html:50
-#: templates/league/player_detail.html:149
+#: templates/league/player_detail.html:156
 msgid "Zamknij"
 msgstr "Close"
 
-#: templates/base.html:45 templates/league/game_detail.html:26
+#: templates/base.html:46 templates/league/game_detail.html:26
 #: templates/league/game_form.html:19 templates/league/group_detail.html:13
 #: templates/league/season_detail.html:12 templates/league/season_list.html:5
 #: templates/league/season_list.html:12 templates/league/season_list.html:16
 msgid "Sezony"
 msgstr "Seasons"
 
-#: templates/base.html:50 templates/review/teacher_detail.html:13
+#: templates/base.html:51 templates/review/teacher_detail.html:13
 #: templates/review/teacher_list.html:5 templates/review/teacher_list.html:12
 #: templates/review/teacher_list.html:15
 msgid "Nauczyciele"
 msgstr "Teachers"
 
-#: templates/base.html:54 templates/misc/rules.html:5
+#: templates/base.html:55 templates/misc/rules.html:5
 #: templates/misc/rules.html:10
 msgid "Regulamin"
 msgstr "League regulations"
 
-#: templates/base.html:59 templates/league/player_detail.html:121
+#: templates/base.html:60 templates/league/player_detail.html:128
 #: templates/misc/contact.html:5 templates/misc/contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
 
-#: templates/base.html:68
+#: templates/base.html:69
 msgid "Twoje Gry"
 msgstr "Your games"
 
-#: templates/base.html:82
+#: templates/base.html:83
 msgid "Edytuj profil"
 msgstr "Edit profile"
 
-#: templates/base.html:89
+#: templates/base.html:90
 msgid "Zmień hasło/email"
 msgstr "Change password/email"
 
-#: templates/base.html:97
+#: templates/base.html:98
 msgid "Wyloguj"
 msgstr "Logout"
+
+#: templates/league/emails/delayed_game_reminder/body.html:3
+#, python-format
+msgid ""
+"Twoja gra <b>%(black)s vs. %(white)s</b> nie została rozegrana w terminie. "
+"Prosimy o jak najszybsze rozegranie gry i uzupełnienie jej wyniku."
+msgstr ""
+"Your game <b>%(black)s vs. %(white)s</b> is delayed. "
+"Please finish this game as soon as possible and report the result."
+
+#: templates/league/emails/delayed_game_reminder/body.html:9
+#, python-format
+msgid ""
+"Gre możesz edytować pod adresem:<br> <a href=\"%(domain)s%(path)s\">"
+"%(domain)s%(path)s</a>"
+msgstr ""
+"You can edit this game here:<br> <a href=\"%(domain)s%(path)s\">"
+"%(domain)s%(path)s</a>"
+
+#: templates/league/emails/delayed_game_reminder/subject.txt:2
+#, python-format
+msgid "Twoja gra %(black)s vs. %(white)s nie została rozegrana w terminie"
+msgstr "Your game %(black)s vs. %(white)s is delayed"
 
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:29
 #: templates/league/game_form.html:22 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:17 templates/league/player_detail.html:70
-#: templates/league/player_detail.html:210
+#: templates/league/player_detail.html:217
 #: templates/league/season_detail.html:5 templates/league/season_detail.html:14
 #: templates/league/season_detail.html:20 templates/league/season_list.html:28
 #: templates/misc/home.html:57 templates/review/teacher_detail.html:43
@@ -631,7 +659,7 @@ msgstr "Season"
 #: templates/league/game_form.html:27 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:21 templates/league/group_detail.html:26
 #: templates/league/player_detail.html:72
-#: templates/league/player_detail.html:211
+#: templates/league/player_detail.html:218
 #: templates/league/season_detail.html:56
 #: templates/review/teacher_detail.html:44
 #: templates/review/teacher_detail.html:55
@@ -647,13 +675,18 @@ msgid "Brak przeciwnika w tej rundzie."
 msgstr "No opponent this round."
 
 #: templates/league/game_detail.html:68 templates/league/player_detail.html:59
-#: templates/league/player_detail.html:159
+#: templates/league/player_detail.html:166
 msgid "Edytuj"
 msgstr "Edit"
 
-#: templates/league/game_detail.html:78 templates/league/group_detail.html:172
+#: templates/league/game_detail.html:78 templates/league/group_detail.html:182
 msgid "Gra jeszcze się nie odbyła."
 msgstr "The game has not taken place yet."
+
+#: templates/league/game_detail.html:86 templates/league/group_detail.html:172
+#: templates/league/player_detail.html:115
+msgid "Ta gra nie została rozegrana w terminie"
+msgstr "This game is delayed"
 
 #: templates/league/game_form.html:36
 msgid "Edycja"
@@ -663,72 +696,72 @@ msgstr "Edit"
 msgid "Zapisz"
 msgstr "Save"
 
-#: templates/league/group_detail.html:43 templates/league/group_detail.html:74
+#: templates/league/group_detail.html:43 templates/league/group_detail.html:75
 msgid "Pozycja"
 msgstr "Position"
 
-#: templates/league/group_detail.html:44 templates/league/group_detail.html:75
+#: templates/league/group_detail.html:44 templates/league/group_detail.html:76
 msgid "Gracz"
 msgstr "Player"
 
-#: templates/league/group_detail.html:45 templates/league/group_detail.html:77
+#: templates/league/group_detail.html:46 templates/league/group_detail.html:78
 msgid "Rundy"
 msgstr "Rounds"
 
-#: templates/league/group_detail.html:47
+#: templates/league/group_detail.html:48
 msgid "SODOS"
 msgstr "SODOS"
 
-#: templates/league/group_detail.html:48 templates/league/group_detail.html:87
+#: templates/league/group_detail.html:49 templates/league/group_detail.html:88
 msgid "Start"
 msgstr "Start"
 
-#: templates/league/group_detail.html:80
+#: templates/league/group_detail.html:81
 msgid "Score"
 msgstr "Score"
 
-#: templates/league/group_detail.html:83
+#: templates/league/group_detail.html:84
 msgid "SOS"
 msgstr "SOS"
 
-#: templates/league/group_detail.html:86
+#: templates/league/group_detail.html:87
 msgid "SOSOS"
 msgstr "SOSOS"
 
-#: templates/league/group_detail.html:110
+#: templates/league/group_detail.html:111
 msgid "Nieznany typ grupy"
 msgstr "Group type unknown"
 
-#: templates/league/group_detail.html:114
+#: templates/league/group_detail.html:115
 msgid "Jak czytać wyniki?"
 msgstr "How to read results?"
 
-#: templates/league/group_detail.html:124
+#: templates/league/group_detail.html:125
 msgid "Nowa runda"
 msgstr "New round"
 
-#: templates/league/group_detail.html:131
+#: templates/league/group_detail.html:132
 msgid "Eksport EGD"
 msgstr "Export EDG"
 
-#: templates/league/group_detail.html:141
+#: templates/league/group_detail.html:142
 msgid "Runda"
 msgstr "Round"
 
-#: templates/league/group_detail.html:186
+#: templates/league/group_detail.html:196
 #: templates/league/season_detail.html:64
 msgid "Gracze"
 msgstr "Players"
 
-#: templates/league/group_detail.html:191
+#: templates/league/group_detail.html:201
 msgid "Dodaj"
 msgstr "Add"
 
-#: templates/league/group_detail.html:204
+#: templates/league/group_detail.html:214
 msgid "Punkty początkowe"
 msgstr "Starting points"
 
-#: templates/league/group_detail.html:219
+#: templates/league/group_detail.html:229
 msgid "Usuń"
 msgstr "Remove"
 
@@ -861,22 +894,22 @@ msgstr "WIN"
 msgid "PRZEGRANA"
 msgstr "LOSS"
 
-#: templates/league/player_detail.html:131
+#: templates/league/player_detail.html:138
 msgid "Dane kontaktowe"
 msgstr "Contact details"
 
-#: templates/league/player_detail.html:171
+#: templates/league/player_detail.html:178
 msgid ""
 "Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego "
 "rozpoczęciu."
 msgstr ""
 "The season has not yet started. Your games will appear here once it starts."
 
-#: templates/league/player_detail.html:177
+#: templates/league/player_detail.html:184
 msgid "Brak nadchodzących gier."
 msgstr "No upcoming games."
 
-#: templates/league/player_detail.html:186
+#: templates/league/player_detail.html:193
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy "
@@ -888,7 +921,7 @@ msgstr ""
 "starts <strong>you will automatically join</strong>. If you don't want to "
 "participate, <a href=\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:194
+#: templates/league/player_detail.html:201
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami "
@@ -901,11 +934,11 @@ msgstr ""
 "season</strong>. If you want to participate, <a href="
 "\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:205
+#: templates/league/player_detail.html:212
 msgid "Poprzednie sezony"
 msgstr "Past seasons"
 
-#: templates/league/player_detail.html:217
+#: templates/league/player_detail.html:224
 msgid "Brak rozegranych sezonów."
 msgstr "No seasons played."
 
@@ -1075,8 +1108,8 @@ msgid ""
 "<code>#iglo</code>."
 msgstr ""
 "<strong>Join our Discord server!</strong> Stay up to date with all the "
-"organizers announcements. Participate in discussions about the league, "
-"games and teachers comments. We invite you to the <code>#iglo</code> channel."
+"organizers announcements. Participate in discussions about the league, games "
+"and teachers comments. We invite you to the <code>#iglo</code> channel."
 
 #: templates/misc/home.html:113
 msgid "Dołącz"

@@ -183,6 +183,7 @@ if "SENTRY_DSN" in os.environ:
 DEFAULT_GAME_TIME = datetime.time(16, 0)
 
 DEFAULT_FROM_EMAIL = "IGLO <no-reply@szalenisamuraje.org>"
+REPLY_TO_EMAIL = "internetowagoligao@gmail.com"
 
 if "EMAIL_HOST" in os.environ and "EMAIL_HOST_USER" in os.environ and "EMAIL_HOST_PASSWORD" in os.environ:
     EMAIL_HOST = env("EMAIL_HOST")

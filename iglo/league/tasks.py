@@ -123,4 +123,5 @@ def send_delayed_games_reminder():
             body_template="league/emails/delayed_game_reminder/body.html",
             to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
             context={"game": game},
+            reply_to=[settings.REPLY_TO_EMAIL]
         )

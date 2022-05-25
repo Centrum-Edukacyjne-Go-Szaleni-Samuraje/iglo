@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-24 16:11+0200\n"
+"POT-Creation-Date: 2022-05-25 16:38+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -624,11 +624,13 @@ msgstr "Logout"
 #: templates/league/emails/delayed_game_reminder/body.html:3
 #, python-format
 msgid ""
-"Twoja gra <b>%(black)s vs. %(white)s</b> nie została rozegrana w terminie. "
-"Prosimy o jak najszybsze rozegranie gry i uzupełnienie jej wyniku."
+"Twoja gra <b>%(black)s vs. %(white)s</b> (sezon #%(season)s, grupa "
+"%(group)s) nie została rozegrana w terminie. Prosimy o jak najszybsze "
+"rozegranie gry i uzupełnienie jej wyniku."
 msgstr ""
-"Your game <b>%(black)s vs. %(white)s</b> is delayed. "
-"Please finish this game as soon as possible and report the result."
+"Your game <b>%(black)s vs. %(white)s</b> (season #%(season)s, group "
+"%(group)s) is delayed. Please finish this game as soon as possible and "
+"report the result."
 
 #: templates/league/emails/delayed_game_reminder/body.html:9
 #, python-format
@@ -636,13 +638,17 @@ msgid ""
 "Gre możesz edytować pod adresem:<br> <a href=\"%(domain)s%(path)s\">"
 "%(domain)s%(path)s</a>"
 msgstr ""
-"You can edit this game here:<br> <a href=\"%(domain)s%(path)s\">"
-"%(domain)s%(path)s</a>"
+"You can edit this game here:<br> <a href=\"%(domain)s%(path)s\">%(domain)s"
+"%(path)s</a>"
 
 #: templates/league/emails/delayed_game_reminder/subject.txt:2
 #, python-format
-msgid "Twoja gra %(black)s vs. %(white)s nie została rozegrana w terminie"
-msgstr "Your game %(black)s vs. %(white)s is delayed"
+msgid ""
+"Twoja gra %(black)s vs. %(white)s (sezon #%(season)s, grupa %(group)s) nie "
+"została rozegrana w terminie"
+msgstr ""
+"Your game %(black)s vs. %(white)s (season #%(season)s, group %(group)s) is "
+"delayed"
 
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:29
 #: templates/league/game_form.html:22 templates/league/group_detail.html:5

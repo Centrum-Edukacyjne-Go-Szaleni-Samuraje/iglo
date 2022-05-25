@@ -1,8 +1,8 @@
 {% load i18n %}
 <p>
-    {% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick %}
-        Twoja gra <b>{{ black }} vs. {{ white }}</b> nie została rozegrana w terminie. Prosimy
-        o jak najszybsze rozegranie gry i uzupełnienie jej wyniku.
+    {% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick season=game.group.season.number group=game.group.name %}
+        Twoja gra <b>{{ black }} vs. {{ white }}</b> (sezon #{{ season }}, grupa {{ group }}) nie została rozegrana w
+        terminie. Prosimy o jak najszybsze rozegranie gry i uzupełnienie jej wyniku.
     {% endblocktrans %}
 </p>
 <p>

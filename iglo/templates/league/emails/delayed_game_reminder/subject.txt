@@ -1,4 +1,4 @@
 {% load i18n %}
-{% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick %}
-Twoja gra {{ black }} vs. {{ white }} nie została rozegrana w terminie
+{% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick season=game.group.season.number group=game.group.name %}
+Twoja gra {{ black }} vs. {{ white }} (sezon #{{ season }}, grupa {{ group }}) nie została rozegrana w terminie
 {% endblocktrans %}

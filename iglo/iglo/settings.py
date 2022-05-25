@@ -223,10 +223,11 @@ COUNTRIES_FIRST = [
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
 
+# Periodic task schedules uses the UTC time zone
 CELERY_BEAT_SCHEDULE = {
     "send-delayed-games-reminder": {
         "task": "league.tasks.send_delayed_games_reminder",
-        "schedule": crontab(hour="15", minute="40"),
+        "schedule": crontab(hour="8", minute="0"),
     }
 }
 
@@ -258,7 +259,6 @@ LANGUAGES = [
     ("pl", "Polski"),
     ("en", "English"),
 ]
-
 
 LOCALE_PATHS = [
     BASE_DIR / "locale",

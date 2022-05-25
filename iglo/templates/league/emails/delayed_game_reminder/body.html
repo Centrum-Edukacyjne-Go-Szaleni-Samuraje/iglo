@@ -1,16 +1,25 @@
-{% load i18n %}
 <p>
-    {% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick season=game.group.season.number group=game.group.name %}
-        Twoja gra <b>{{ black }} vs. {{ white }}</b> (sezon #{{ season }}, grupa {{ group }}) nie została rozegrana w
-        terminie. Prosimy o jak najszybsze rozegranie gry i uzupełnienie jej wyniku.
-    {% endblocktrans %}
+    Twoja gra <b>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</b> (sezon
+    #{{ game.group.season.number }}, grupa {{ game.group.name }}) nie została rozegrana w
+    terminie. Prosimy o jak najszybsze rozegranie gry i uzupełnienie jej wyniku.
 </p>
 <p>
-    {% blocktrans trimmed with domain=domain path=game.get_absolute_url %}
-        Gre możesz edytować pod adresem:<br>
-        <a href="{{ domain }}{{ path }}">{{ domain }}{{ path }}</a>
-    {% endblocktrans %}
+    Gre możesz edytować pod adresem:<br>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
 </p>
 <p>
-    {% blocktrans %}Zespół IGLO{% endblocktrans %}
+    Zespół IGLO
+</p>
+<p><b>[ENGLISH]</b><br></p>
+<p>
+    Your game <b>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</b> (season
+    #{{ game.group.season.number }}, group {{ game.group.name }}) is delayed. Please finish this game as soon as
+    possible and report the result.
+</p>
+<p>
+    You can edit this game here:<br>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    The IGLO Team
 </p>

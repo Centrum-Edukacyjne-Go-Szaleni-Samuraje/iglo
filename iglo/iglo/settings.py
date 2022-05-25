@@ -226,7 +226,7 @@ CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool
 CELERY_BEAT_SCHEDULE = {
     "send-delayed-games-reminder": {
         "task": "league.tasks.send_delayed_games_reminder",
-        "schedule": crontab(hour="10", minute="0"),
+        "schedule": crontab(hour="17", minute="20"),
     }
 }
 

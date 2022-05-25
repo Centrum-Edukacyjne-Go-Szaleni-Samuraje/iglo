@@ -527,3 +527,30 @@ class GroupTestCase(TestCase):
         game_2.refresh_from_db()
         self.assertEqual(game_1.black, new_member)
         self.assertEqual(game_2.white, new_member)
+
+
+class GameTestCase(TestCase):
+    def test_is_delayed_when_not_delayed(self):
+        now = datetime.datetime.now()
+        game = GameFactory(date=now + datetime.timedelta(days=1), win_type=None)
+
+        self.assertFalse(game.is_delayed)
+
+    def test_is_delayed_when_delayed(self):
+        now = datetime.datetime.now()
+        game = GameFactory(date=now - datetime.timedelta(days=1), win_type=None)
+
+        self.assertTrue(game.is_delayed)
+
+    def test_get_delayed_games(self):
+        now = datetime.datetime.now()
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+        game_1 = GameFactory(date=now - datetime.timedelta(days=1), win_type=None, group__season=season)
+        game_2 = GameFactory(date=now + datetime.timedelta(days=1), win_type=None, group__season=season)
+        game_3 = GameFactory(date=now - datetime.timedelta(days=1), win_type=WinType.NOT_PLAYED, group__season=season)
+
+        result = Game.objects.get_delayed_games()
+
+        self.assertIn(game_1, result)
+        self.assertNotIn(game_2, result)
+        self.assertNotIn(game_3, result)

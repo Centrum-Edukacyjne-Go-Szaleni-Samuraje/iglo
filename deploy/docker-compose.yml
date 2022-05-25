@@ -79,5 +79,38 @@ services:
       - "${DATA_PATH}/static:/data/static"
       - "${DATA_PATH}/media:/data/media"
       - "${DATA_PATH}/fixtures:/data/fixtures"
+  scheduler:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: /app/deploy/scheduler.sh
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 100M
+    environment:
+      DEBUG: $DEBUG
+      SECRET_KEY: $SECRET_KEY
+      DATABASE_URL: $DATABASE_URL
+      DOMAIN: $DOMAIN
+      SENTRY_DSN: $SENTRY_DSN
+      EMAIL_HOST: $EMAIL_HOST
+      EMAIL_HOST_USER: $EMAIL_HOST_USER
+      EMAIL_HOST_PASSWORD: $EMAIL_HOST_PASSWORD
+      CELERY_BROKER_URL: $CELERY_BROKER_URL
+      CELERY_TASK_ALWAYS_EAGER: $CELERY_TASK_ALWAYS_EAGER
+      AI_SENSEI_AUTH_URL: $AI_SENSEI_AUTH_URL
+      AI_SENSEI_SERVICE: $AI_SENSEI_SERVICE
+      AI_SENSEI_EMAIL: $AI_SENSEI_EMAIL
+      AI_SENSEI_PASSWORD: $AI_SENSEI_PASSWORD
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - "${DATA_PATH}/static:/data/static"
+      - "${DATA_PATH}/media:/data/media"
+      - "${DATA_PATH}/fixtures:/data/fixtures"
   redis:
     image: redis:6.2.6

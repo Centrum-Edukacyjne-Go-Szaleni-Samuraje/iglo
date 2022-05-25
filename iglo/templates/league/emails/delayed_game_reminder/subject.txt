@@ -1,0 +1,4 @@
+{% load i18n %}
+{% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick %}
+Twoja gra {{ black }} vs. {{ white }} nie została rozegrana w terminie
+{% endblocktrans %}

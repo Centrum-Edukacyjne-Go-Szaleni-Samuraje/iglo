@@ -50,6 +50,11 @@
         </div>
     </div>
     <script type="text/javascript">
-        flatpickr("#id_date", { enableTime: true, locale: "pl" });
+        flatpickr("#id_date", {
+            enableTime: true,
+            locale: "pl",
+            minDate: "{{ object.group.season.start_date | date:"Y-m-d" }}",
+            maxDate: "{{ object.group.season.end_date | date:"Y-m-d" }}",
+        });
     </script>
 {% endblock %}

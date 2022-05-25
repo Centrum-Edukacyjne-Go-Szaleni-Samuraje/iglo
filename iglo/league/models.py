@@ -667,6 +667,14 @@ class GameManager(models.Manager):
             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
         )
 
+    def get_delayed_games(self):
+        return self.filter(
+            win_type__isnull=True,
+            group__season__state=SeasonState.IN_PROGRESS,
+            delayed_reminder_sent__isnull=True,
+            date__lt=datetime.date.today(),
+        )
+
 
 def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
     if value is not None:
@@ -718,6 +726,7 @@ class Game(models.Model):
 
     review_video_link = models.URLField(null=True, blank=True)
     ai_analyse_link = models.URLField(null=True, blank=True)
+    delayed_reminder_sent = models.DateTimeField(null=True)
 
     objects = GameManager()
 
@@ -803,6 +812,10 @@ class Game(models.Model):
         elif self.external_sgf_link:
             return self.external_sgf_link
         return None
+
+    @property
+    def is_delayed(self):
+        return not self.win_type and self.date.date() < datetime.date.today()
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

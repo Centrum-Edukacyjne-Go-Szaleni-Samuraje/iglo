@@ -107,7 +107,14 @@
                                                 {% if game.is_played %}
                                                     <h6>{{ game.result }}</h6>
                                                 {% elif game.date %}
-                                                    <div><i class="fas fa-calendar-day"></i> {{ game.date }}</div>
+                                                    <div>
+                                                        <i class="fas fa-calendar-day"></i> {{ game.date }}
+                                                        {% if game.is_delayed %}
+                                                            <i class="fas fa-exclamation-triangle text-danger"
+                                                               data-bs-toggle="tooltip" data-bs-placement="top"
+                                                               title="{% translate "Ta gra nie została rozegrana w terminie" %}"></i>
+                                                        {% endif %}
+                                                    </div>
                                                 {% endif %}
                                             {% endif %}
                                         </div>

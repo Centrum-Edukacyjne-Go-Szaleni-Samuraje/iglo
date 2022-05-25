@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import logging
 from typing import Optional
@@ -12,12 +13,16 @@ from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, 
 from league.utils.aisensei import upload_sgf, AISenseiConfig, AISenseiException
 from league.utils.egd import get_gor_by_pin, EGDException
 from league.utils.ogs import fetch_sgf, OGSException
+from utils.emails import send_email
 
 logger = logging.getLogger("league")
 
 
 @shared_task(time_limit=20)
 def game_ai_analyse_upload_task(game_id: int) -> None:
+    if not settings.ENABLE_AI_ANALYSE_UPLOAD:
+        logger.info("AI analyse upload skipped for game %d - this feature is disabled", game_id)
+        return
     logger.info("AI analyse upload started for game %d", game_id)
     game = Game.objects.get(id=game_id)
     if not game.sgf:
@@ -100,4 +105,22 @@ def update_gor(triggering_user_email: Optional[str] = None):
             message=texts.UPDATE_GOR_MAIL_CONTENT,
             from_email=None,
             recipient_list=[triggering_user_email],
+        )
+
+
+@shared_task()
+def send_delayed_games_reminder():
+    if not settings.ENABLE_DELAYED_GAMES_REMINDER:
+        logger.info("Send delayed games reminder skipped - this feature is disabled")
+        return
+    games = Game.objects.get_delayed_games()
+    logger.info("Sending %d delayed games reminders", games.count())
+    for game in games:
+        game.delayed_reminder_sent = datetime.datetime.now()
+        game.save()
+        send_email(
+            subject_template="league/emails/delayed_game_reminder/subject.txt",
+            body_template="league/emails/delayed_game_reminder/body.html",
+            to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
+            context={"game": game},
         )

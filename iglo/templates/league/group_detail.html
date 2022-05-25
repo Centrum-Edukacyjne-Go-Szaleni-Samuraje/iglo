@@ -39,34 +39,35 @@
                         <table class="group-table">
                             {% if object.type == "round_robin" %}
                                 <thead>
-                                    <tr>
-                                        <th class="group-table__header">{% translate "Pozycja" %}</th>
-                                        <th class="group-table__header">{% translate "Gracz" %}</th>
-                                        <th colspan="{{ object.rounds_number }}" class="group-table__header d-none d-lg-table-cell">{% translate "Rundy" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "Punkty" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "SODOS" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "Start" %}</th>
-                                    </tr>
+                                <tr>
+                                    <th class="group-table__header">{% translate "Pozycja" %}</th>
+                                    <th class="group-table__header">{% translate "Gracz" %}</th>
+                                    <th colspan="{{ object.rounds_number }}"
+                                        class="group-table__header d-none d-lg-table-cell">{% translate "Rundy" %}</th>
+                                    <th class="group-table__header d-none d-lg-table-cell">{% translate "Punkty" %}</th>
+                                    <th class="group-table__header d-none d-lg-table-cell">{% translate "SODOS" %}</th>
+                                    <th class="group-table__header d-none d-lg-table-cell">{% translate "Start" %}</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {% for position, member, results in object.results_table %}
-                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
-                                            data-position="{{ position }}">
-                                            <td>{{ position }}</td>
-                                            <td class="group-table__header group-table__cell-name">
-                                                {% include "league/includes/player_badge.html" with member=member %}
+                                {% for position, member, results in object.results_table %}
+                                    <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
+                                        data-position="{{ position }}">
+                                        <td>{{ position }}</td>
+                                        <td class="group-table__header group-table__cell-name">
+                                            {% include "league/includes/player_badge.html" with member=member %}
+                                        </td>
+                                        {% for result, url in results %}
+                                            <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
+                                                <a class="group-table__result-link" data-result="{{ result }}"
+                                                   href="{{ url }}">{{ result }}</a>
                                             </td>
-                                            {% for result, url in results %}
-                                                <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
-                                                    <a class="group-table__result-link" data-result="{{ result }}"
-                                                       href="{{ url }}">{{ result }}</a>
-                                                </td>
-                                            {% endfor %}
-                                            <td class="d-none d-lg-table-cell">{{ member.points }}</td>
-                                            <td class="d-none d-lg-table-cell">{{ member.sodos }}</td>
-                                            <td class="d-none d-lg-table-cell">{{ member.order }}</td>
-                                        </tr>
-                                    {% endfor %}
+                                        {% endfor %}
+                                        <td class="d-none d-lg-table-cell">{{ member.points }}</td>
+                                        <td class="d-none d-lg-table-cell">{{ member.sodos }}</td>
+                                        <td class="d-none d-lg-table-cell">{{ member.order }}</td>
+                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             {% elif object.type == "mcmahon" %}
                                 <thead>
@@ -162,7 +163,16 @@
                                             {% include "league/includes/game_players.html" with game=game %}
                                         {% endif %}
                                     </span>
-                                        {% if game.date and not game.is_bye %}<span>{{ game.date }}</span>{% endif %}
+                                        {% if game.date and not game.is_bye %}
+                                            <span>
+                                                {{ game.date }}
+                                                {% if game.is_delayed %}
+                                                    <i class="fas fa-exclamation-triangle text-danger"
+                                                       data-bs-toggle="tooltip" data-bs-placement="top"
+                                                       title="{% translate "Ta gra nie została rozegrana w terminie" %}"></i>
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-baseline flex-wrap">
                                         <p>

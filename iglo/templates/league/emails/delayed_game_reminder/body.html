@@ -1,0 +1,16 @@
+{% load i18n %}
+<p>
+    {% blocktrans trimmed with black=game.black.player.nick white=game.white.player.nick %}
+        Twoja gra <b>{{ black }} vs. {{ white }}</b> nie została rozegrana w terminie. Prosimy
+        o jak najszybsze rozegranie gry i uzupełnienie jej wyniku.
+    {% endblocktrans %}
+</p>
+<p>
+    {% blocktrans trimmed with domain=domain path=game.get_absolute_url %}
+        Gre możesz edytować pod adresem:<br>
+        <a href="{{ domain }}{{ path }}">{{ domain }}{{ path }}</a>
+    {% endblocktrans %}
+</p>
+<p>
+    {% blocktrans %}Zespół IGLO{% endblocktrans %}
+</p>

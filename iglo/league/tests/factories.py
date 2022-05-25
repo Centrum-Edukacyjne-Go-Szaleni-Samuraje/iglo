@@ -4,13 +4,14 @@ import string
 import factory
 from django.db.models.signals import post_save
 
+from accounts.factories import UserFactory
 from league.models import Member, Player, Group, Season, Game, Round
 
 
 class PlayerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Player
-
+    user = factory.SubFactory(UserFactory)
     nick = factory.Sequence(lambda n: f"player-{n}")
     rank = 1000
 

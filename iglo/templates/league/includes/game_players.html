@@ -1,9 +1,9 @@
 <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
     <i class="fas fa-circle"></i>
-    {% include "league/includes/player_badge.html" with member=game.black %}
+    {% include "league/includes/player_badge.html" with player=game.black.player member=game.black %}
 </span>
 <span class="text-muted">-</span>
 <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
     <i class="far fa-circle"></i>
-    {% include "league/includes/player_badge.html" with member=game.white %}
+    {% include "league/includes/player_badge.html" with player=game.white.player member=game.white %}
 </span>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load bootstrap_pagination i18n %}
+
+{% block page_title %}{% translate "Gracze" %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">{% translate "Gracze" %}</li>
+                </ol>
+            </nav>
+            <div class="d-sm-flex align-items-baseline justify-content-between mb-3">
+                <h2>{% translate "Gracze" %} ({{ paginator.count }})</h2>
+                <form class="d-flex" method="get">
+                    <div class="input-group">
+                        <input type="text" name="keyword" class="form-control" placeholder="Nick" value="{{ keyword }}">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+            {% if paginator.count == 0 %}
+                <p>{% trans "Brak graczy o podanych kryteriach." %}</p>
+            {% else %}
+                <p>{% trans "Kolejność graczy na liście wyznacza liczba rozegranych sezonów." %}</p>
+            {% endif %}
+            <ul>
+                {% for player in page_obj %}
+                    <li>{% include "league/includes/player_badge.html" with player=player %}</li>
+                {% endfor %}
+            </ul>
+            <div class="d-flex justify-content-center">
+                {% bootstrap_paginate page_obj %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 16:59+0200\n"
+"POT-Creation-Date: 2022-06-07 13:32+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -378,7 +378,7 @@ msgid "Zoastaliśmy o tym poinformowani."
 msgstr "We have been informed about it."
 
 #: templates/accounts/login.html:5 templates/accounts/login.html:8
-#: templates/base.html:107
+#: templates/base.html:112
 msgid "Logowanie"
 msgstr "Login"
 
@@ -505,7 +505,7 @@ msgid "Resetowanie hasła na stronie IGLO"
 msgstr "Resetting password on the IGLO site"
 
 #: templates/accounts/registration.html:5
-#: templates/accounts/registration.html:8 templates/base.html:112
+#: templates/accounts/registration.html:8 templates/base.html:117
 msgid "Rejestracja"
 msgstr "Register"
 
@@ -576,54 +576,61 @@ msgstr ""
 
 #: templates/accounts/registration.html:61
 #: templates/league/includes/result_table_modal.html:57
-#: templates/league/player_detail.html:50
-#: templates/league/player_detail.html:156
+#: templates/league/player_detail.html:58
+#: templates/league/player_detail.html:164
 msgid "Zamknij"
 msgstr "Close"
 
-#: templates/base.html:46 templates/league/game_detail.html:26
+#: templates/base.html:47 templates/league/game_detail.html:26
 #: templates/league/game_form.html:19 templates/league/group_detail.html:13
-#: templates/league/season_detail.html:12 templates/league/season_list.html:5
-#: templates/league/season_list.html:12 templates/league/season_list.html:16
+#: templates/league/player_list.html:5 templates/league/season_detail.html:12
+#: templates/league/season_list.html:5 templates/league/season_list.html:12
+#: templates/league/season_list.html:16
 msgid "Sezony"
 msgstr "Seasons"
 
-#: templates/base.html:51 templates/review/teacher_detail.html:13
+#: templates/base.html:51 templates/league/group_detail.html:196
+#: templates/league/player_detail.html:13 templates/league/player_list.html:12
+#: templates/league/player_list.html:16 templates/league/season_detail.html:64
+msgid "Gracze"
+msgstr "Players"
+
+#: templates/base.html:56 templates/review/teacher_detail.html:13
 #: templates/review/teacher_list.html:5 templates/review/teacher_list.html:12
 #: templates/review/teacher_list.html:15
 msgid "Nauczyciele"
 msgstr "Teachers"
 
-#: templates/base.html:55 templates/misc/rules.html:5
+#: templates/base.html:60 templates/misc/rules.html:5
 #: templates/misc/rules.html:10
 msgid "Regulamin"
 msgstr "Rules"
 
-#: templates/base.html:60 templates/league/player_detail.html:128
+#: templates/base.html:65 templates/league/player_detail.html:136
 #: templates/misc/contact.html:5 templates/misc/contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
 
-#: templates/base.html:69
+#: templates/base.html:74
 msgid "Twoje Gry"
 msgstr "Your games"
 
-#: templates/base.html:83
+#: templates/base.html:88
 msgid "Edytuj profil"
 msgstr "Edit profile"
 
-#: templates/base.html:90
+#: templates/base.html:95
 msgid "Zmień hasło/email"
 msgstr "Change password/email"
 
-#: templates/base.html:98
+#: templates/base.html:103
 msgid "Wyloguj"
 msgstr "Logout"
 
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:29
 #: templates/league/game_form.html:22 templates/league/group_detail.html:5
-#: templates/league/group_detail.html:17 templates/league/player_detail.html:70
-#: templates/league/player_detail.html:217
+#: templates/league/group_detail.html:17 templates/league/player_detail.html:78
+#: templates/league/player_detail.html:225
 #: templates/league/season_detail.html:5 templates/league/season_detail.html:14
 #: templates/league/season_detail.html:20 templates/league/season_list.html:28
 #: templates/misc/home.html:57 templates/review/teacher_detail.html:43
@@ -634,8 +641,8 @@ msgstr "Season"
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:34
 #: templates/league/game_form.html:27 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:21 templates/league/group_detail.html:26
-#: templates/league/player_detail.html:72
-#: templates/league/player_detail.html:218
+#: templates/league/player_detail.html:80
+#: templates/league/player_detail.html:226
 #: templates/league/season_detail.html:56
 #: templates/review/teacher_detail.html:44
 #: templates/review/teacher_detail.html:55
@@ -646,12 +653,12 @@ msgstr "Group"
 msgid "Gra"
 msgstr "Game"
 
-#: templates/league/game_detail.html:52 templates/league/player_detail.html:99
+#: templates/league/game_detail.html:52 templates/league/player_detail.html:107
 msgid "Brak przeciwnika w tej rundzie."
 msgstr "No opponent this round."
 
-#: templates/league/game_detail.html:68 templates/league/player_detail.html:59
-#: templates/league/player_detail.html:166
+#: templates/league/game_detail.html:68 templates/league/player_detail.html:67
+#: templates/league/player_detail.html:174
 msgid "Edytuj"
 msgstr "Edit"
 
@@ -660,7 +667,7 @@ msgid "Gra jeszcze się nie odbyła."
 msgstr "The game has not taken place yet."
 
 #: templates/league/game_detail.html:86 templates/league/group_detail.html:172
-#: templates/league/player_detail.html:115
+#: templates/league/player_detail.html:123
 msgid "Ta gra nie została rozegrana w terminie"
 msgstr "This game is delayed"
 
@@ -723,11 +730,6 @@ msgstr "Export EDG"
 #: templates/league/group_detail.html:142
 msgid "Runda"
 msgstr "Round"
-
-#: templates/league/group_detail.html:196
-#: templates/league/season_detail.html:64
-msgid "Gracze"
-msgstr "Players"
 
 #: templates/league/group_detail.html:201
 msgid "Dodaj"
@@ -837,16 +839,16 @@ msgstr "Update the rankings (GoR) of all players who entered their EGD PIN."
 msgid "Zaktualizuj rankingi"
 msgstr "Update the rankings"
 
-#: templates/league/player_detail.html:23
-#: templates/league/player_detail.html:46
+#: templates/league/player_detail.html:31
+#: templates/league/player_detail.html:54
 msgid "Wycofaj"
 msgstr "Withdraw"
 
-#: templates/league/player_detail.html:32
+#: templates/league/player_detail.html:40
 msgid "Wycofaj gracza"
 msgstr "Withdraw player"
 
-#: templates/league/player_detail.html:38
+#: templates/league/player_detail.html:46
 msgid ""
 "Czy na pewno chcesz wycofać gracza z aktualnego sezonu? Ta operacja jest "
 "nieodwracalna."
@@ -854,38 +856,38 @@ msgstr ""
 "Are you sure you want to withdraw the player from the current season? This "
 "operation cannot be undone."
 
-#: templates/league/player_detail.html:66
+#: templates/league/player_detail.html:74
 msgid "Aktualne rozgrywki"
 msgstr "Current games"
 
-#: templates/league/player_detail.html:82
+#: templates/league/player_detail.html:90
 msgid "NASTĘPNA GRA"
 msgstr "NEXT GAME"
 
-#: templates/league/player_detail.html:86
+#: templates/league/player_detail.html:94
 msgid "WYGRANA"
 msgstr "WIN"
 
-#: templates/league/player_detail.html:90
+#: templates/league/player_detail.html:98
 msgid "PRZEGRANA"
 msgstr "LOSS"
 
-#: templates/league/player_detail.html:138
+#: templates/league/player_detail.html:146
 msgid "Dane kontaktowe"
 msgstr "Contact details"
 
-#: templates/league/player_detail.html:178
+#: templates/league/player_detail.html:186
 msgid ""
 "Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego "
 "rozpoczęciu."
 msgstr ""
 "The season has not yet started. Your games will appear here once it starts."
 
-#: templates/league/player_detail.html:184
+#: templates/league/player_detail.html:192
 msgid "Brak nadchodzących gier."
 msgstr "No upcoming games."
 
-#: templates/league/player_detail.html:193
+#: templates/league/player_detail.html:201
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy "
@@ -897,7 +899,7 @@ msgstr ""
 "starts <strong>you will automatically join</strong>. If you don't want to "
 "participate, <a href=\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:201
+#: templates/league/player_detail.html:209
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami "
@@ -910,11 +912,11 @@ msgstr ""
 "season</strong>. If you want to participate, <a href="
 "\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:212
+#: templates/league/player_detail.html:220
 msgid "Poprzednie sezony"
 msgstr "Past seasons"
 
-#: templates/league/player_detail.html:224
+#: templates/league/player_detail.html:232
 msgid "Brak rozegranych sezonów."
 msgstr "No seasons played."
 
@@ -925,6 +927,14 @@ msgstr "Settings"
 #: templates/league/player_form.html:12
 msgid "Tutaj możesz zmienić informacje o sobie."
 msgstr "Here you can change information about yourself."
+
+#: templates/league/player_list.html:25
+msgid "Brak graczy o podanych kryteriach."
+msgstr "There are no players with the given criteria."
+
+#: templates/league/player_list.html:27
+msgid "Kolejność graczy na liście wyznacza liczba rozegranych sezonów."
+msgstr "The order of players on the list is determined by the number of seasons played."
 
 #: templates/league/season_detail.html:27
 msgid "Eksport CSV"

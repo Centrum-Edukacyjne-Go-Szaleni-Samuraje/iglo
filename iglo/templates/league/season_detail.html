@@ -64,7 +64,7 @@
                                 <h5>{% translate "Gracze" %}</h5>
                                 <p>
                                     {% for member in group.members.all %}
-                                        {% include "league/includes/player_badge.html" with member=member %}
+                                        {% include "league/includes/player_badge.html" with player=member.player member=member %}
                                     {% endfor %}
                                 </p>
                             </div>

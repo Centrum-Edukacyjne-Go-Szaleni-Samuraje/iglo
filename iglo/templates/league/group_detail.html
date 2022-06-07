@@ -55,7 +55,7 @@
                                         data-position="{{ position }}">
                                         <td>{{ position }}</td>
                                         <td class="group-table__header group-table__cell-name">
-                                            {% include "league/includes/player_badge.html" with member=member %}
+                                            {% include "league/includes/player_badge.html" with player=member.player member=member %}
                                         </td>
                                         {% for result, url in results %}
                                             <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
@@ -93,7 +93,7 @@
                                         <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}" data-position="{{ position }}">
                                             <td>{{ forloop.counter }}</td>
                                             <td class="group-table__header group-table__cell-name">
-                                                {% include "league/includes/player_badge.html" with member=member %}
+                                                {% include "league/includes/player_badge.html" with player=member.player member=member %}
                                             </td>
                                             {% for result, url in results %}
                                                 <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
@@ -158,7 +158,7 @@
                                     <span>
                                         {% if game.is_bye %}
                                             {% translate "Bye" %}:
-                                            {% include "league/includes/player_badge.html" with member=game.winner %}
+                                            {% include "league/includes/player_badge.html" with player=game.winner.player member=game.winner %}
                                         {% else %}
                                             {% include "league/includes/game_players.html" with game=game %}
                                         {% endif %}

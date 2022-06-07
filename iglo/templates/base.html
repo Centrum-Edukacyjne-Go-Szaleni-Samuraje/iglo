@@ -31,6 +31,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% url "home" as home_url %}
                 {% url "seasons-list" as seasons_url %}
+                {% url "players-list" as players_url %}
                 {% url "rules" as rules_url %}
                 {% url "accounts:login" as login_url %}
                 {% url "accounts:registration" as registration_url %}
@@ -44,6 +45,10 @@
                 <li class="nav-item">
                     <a class="nav-link {% if seasons_url in request.get_full_path %}active{% endif %}"
                        aria-current="page" href="{{ seasons_url }}">{% translate "Sezony" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if players_url in request.get_full_path %}active{% endif %}"
+                       aria-current="page" href="{{ players_url }}">{% translate "Gracze" %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if teachers_url in request.get_full_path %}active{% endif %}"

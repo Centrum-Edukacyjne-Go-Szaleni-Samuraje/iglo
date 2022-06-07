@@ -45,19 +45,10 @@ class SeasonsListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
-        return context | {
-            "can_prepare_season": not Season.objects.exclude(
-                state=SeasonState.FINISHED
-            ).exists()
-        }
+        return context | {"can_prepare_season": not Season.objects.exclude(state=SeasonState.FINISHED).exists()}
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .annotate(number_of_players=Count("groups__members"))
-            .order_by("-number")
-        )
+        return super().get_queryset().annotate(number_of_players=Count("groups__members")).order_by("-number")
 
 
 class SeasonDetailView(UserRoleRequiredForModify, DetailView):
@@ -68,8 +59,7 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(
-            queryset.prefetch_related("groups__members__player",
-                                      "groups__teacher"),
+            queryset.prefetch_related("groups__members__player", "groups__teacher"),
             number=self.kwargs["number"],
         )
 
@@ -98,9 +88,7 @@ class SeasonExportCSVView(UserRoleRequired, View):
     def get(self, request, number):
         response = HttpResponse(
             content_type="text/csv",
-            headers={
-                "Content-Disposition": f'attachment; filename="season-{number}.csv"'
-            },
+            headers={"Content-Disposition": f'attachment; filename="season-{number}.csv"'},
         )
         writer = csv.DictWriter(
             f=response,
@@ -151,11 +139,8 @@ class GroupObjectMixin(SingleObjectMixin):
                 "members__player",
                 "teacher",
             ).annotate(
-                all_games_finished=~Exists(Game.objects.filter(
-                    group=OuterRef('id'),
-                    win_type__isnull=True
-                )),
-                rounds_number=Count('rounds', distinct=True)
+                all_games_finished=~Exists(Game.objects.filter(group=OuterRef("id"), win_type__isnull=True)),
+                rounds_number=Count("rounds", distinct=True),
             ),
             season__number=self.kwargs["season_number"],
             name__iexact=self.kwargs["group_name"],
@@ -203,9 +188,7 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
         filename = f"iglo_season_{group.season.number}_group_{group.name}.txt"
         response = HttpResponse(
             content_type="text/plain",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}"'
-            },
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )
         member_id_to_egd_player = {
             member.id: EGDPlayer(
@@ -235,7 +218,7 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
                     EGDGame(
                         white=member_id_to_egd_player[game.white.id] if game.white else None,
                         black=member_id_to_egd_player[game.black.id] if game.black else None,
-                        winner=member_id_to_egd_player[game.winner.id] if game.winner else None
+                        winner=member_id_to_egd_player[game.winner.id] if game.winner else None,
                     )
                     for game in round.games.all()
                 ]
@@ -250,7 +233,7 @@ class GameDetailRedirectView(RedirectView):
     permanent = True
 
     def get_redirect_url(self, *args, **kwargs):
-        if 'bye_player' in kwargs.keys():
+        if "bye_player" in kwargs.keys():
             return reverse(
                 "bye-game-detail",
                 kwargs=kwargs,
@@ -314,12 +297,34 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
             return GameResultUpdateRefereeForm
         if self.request.user.has_role(UserRole.TEACHER):
             game = self.get_object()
-            if hasattr(self.request.user, "player") and game.is_participant(
-                self.request.user.player
-            ):
+            if hasattr(self.request.user, "player") and game.is_participant(self.request.user.player):
                 return GameResultUpdateForm
             return GameResultUpdateTeacherForm
         return GameResultUpdateForm
+
+
+class PlayersListView(ListView):
+    model = Player
+    paginate_by = 30
+
+    def get_queryset(self):
+        queryset = (
+            super()
+            .get_queryset()
+            .filter(memberships__isnull=False)
+            .annotate(seasons=Count("memberships"))
+            .order_by("-seasons", "-rank", "nick")
+            .distinct()
+        )
+        keyword = self.request.GET.get("keyword")
+        if keyword:
+            queryset = queryset.filter(nick__icontains=keyword)
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return super().get_context_data(object_list=object_list, **kwargs) | {
+            "keyword": self.request.GET.get("keyword", "")
+        }
 
 
 class PlayerDetailView(UserRoleRequiredForModify, DetailView):
@@ -329,9 +334,7 @@ class PlayerDetailView(UserRoleRequiredForModify, DetailView):
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
-        memberships = self.object.memberships.order_by(
-            "-group__season__number"
-        ).select_related("group__season")
+        memberships = self.object.memberships.order_by("-group__season__number").select_related("group__season")
         if current_membership:
             current_games = Game.objects.get_for_member(member=current_membership)
             upcoming_game = Game.objects.get_upcoming_game(member=current_membership)

@@ -53,8 +53,8 @@
         flatpickr("#id_date", {
             enableTime: true,
             locale: "pl",
-            minDate: "{{ object.group.season.start_date | date:"Y-m-d" }}",
-            maxDate: "{{ object.group.season.end_date | date:"Y-m-d" }}",
+            minDate: "{% if object.group.type == "mcmahon" %}{{ object.round.start_date | date:"Y-m-d" }}{% else %}{{ object.group.season.start_date | date:"Y-m-d" }}{% endif %}",
+            maxDate: "{% if object.group.type == "mcmahon" %}{{ object.round.end_date | date:"Y-m-d" }}{% else %}{{ object.group.season.end_date | date:"Y-m-d" }}{% endif %}",
         });
     </script>
 {% endblock %}

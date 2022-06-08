@@ -75,7 +75,6 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
         if "action-start-season" in request.POST:
             self.object.start()
         elif "action-reset-groups" in request.POST:
@@ -89,6 +88,7 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
                     level=messages.WARNING,
                     message=texts.GAMES_WITHOUT_RESULT_ERROR,
                 )
+        context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
 
@@ -168,7 +168,6 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
         if "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
             self.object.set_initial_score()
@@ -189,6 +188,8 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
                 )
         elif "action-pairing" in request.POST:
             self.object.start_macmahon_round()
+            self.object.refresh_from_db()
+        context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
 

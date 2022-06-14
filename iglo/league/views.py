@@ -153,7 +153,6 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
         if "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
             self.object.set_initial_score()
@@ -174,7 +173,7 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
                 )
         elif "action-pairing" in request.POST:
             self.object.start_macmahon_round()
-        return self.render_to_response(context)
+        return super().get(request, *args, **kwargs)
 
 
 class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
@@ -289,7 +288,7 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
             self.request.user.is_authenticated
             and hasattr(self.request.user, "player")
             and game.is_participant(self.request.user.player)
-            and game.group.season.state == SeasonState.IN_PROGRESS
+            and game.is_editable_by_player
         )
 
     def get_form_class(self):

@@ -622,6 +622,11 @@ class Round(models.Model):
             return False
         return self.start_date <= datetime.date.today() <= self.end_date
 
+    def is_closed(self) -> bool:
+        if self.group.type != GroupType.MCMAHON:
+            return False
+        return self.number != self.group.rounds.last().number
+
     def is_completed(self) -> bool:
         return all(game.is_played for game in self.games.all())
 
@@ -816,6 +821,10 @@ class Game(models.Model):
     @property
     def is_delayed(self):
         return not self.win_type and self.date.date() < datetime.date.today()
+
+    @property
+    def is_editable_by_player(self):
+        return not self.round.is_closed() and self.group.season.state == SeasonState.IN_PROGRESS
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

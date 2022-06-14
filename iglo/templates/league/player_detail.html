@@ -167,6 +167,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {% if game.is_editable_by_player %}
                                                     <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
                                                        class="btn btn-primary">
                                                         <i class="fas fa-edit"></i>
@@ -174,6 +175,7 @@
                                                         {% translate "Edytuj" %}
                                                     </span>
                                                     </a>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                             {% include "league/includes/game_actions.html" with show_link=True %}

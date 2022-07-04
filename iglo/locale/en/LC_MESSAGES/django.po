@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-07 13:32+0200\n"
+"POT-Creation-Date: 2022-07-04 16:14+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -583,15 +583,15 @@ msgstr "Close"
 
 #: templates/base.html:47 templates/league/game_detail.html:26
 #: templates/league/game_form.html:19 templates/league/group_detail.html:13
-#: templates/league/player_list.html:5 templates/league/season_detail.html:12
-#: templates/league/season_list.html:5 templates/league/season_list.html:12
-#: templates/league/season_list.html:16
+#: templates/league/season_detail.html:12 templates/league/season_list.html:5
+#: templates/league/season_list.html:12 templates/league/season_list.html:16
 msgid "Sezony"
 msgstr "Seasons"
 
 #: templates/base.html:51 templates/league/group_detail.html:196
-#: templates/league/player_detail.html:13 templates/league/player_list.html:12
-#: templates/league/player_list.html:16 templates/league/season_detail.html:64
+#: templates/league/player_detail.html:13 templates/league/player_list.html:5
+#: templates/league/player_list.html:12 templates/league/player_list.html:16
+#: templates/league/season_detail.html:64
 msgid "Gracze"
 msgstr "Players"
 
@@ -630,10 +630,10 @@ msgstr "Logout"
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:29
 #: templates/league/game_form.html:22 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:17 templates/league/player_detail.html:78
-#: templates/league/player_detail.html:225
+#: templates/league/player_detail.html:227
 #: templates/league/season_detail.html:5 templates/league/season_detail.html:14
 #: templates/league/season_detail.html:20 templates/league/season_list.html:28
-#: templates/misc/home.html:57 templates/review/teacher_detail.html:43
+#: templates/misc/home.html:72 templates/review/teacher_detail.html:43
 #: templates/review/teacher_detail.html:54
 msgid "Sezon"
 msgstr "Season"
@@ -642,7 +642,7 @@ msgstr "Season"
 #: templates/league/game_form.html:27 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:21 templates/league/group_detail.html:26
 #: templates/league/player_detail.html:80
-#: templates/league/player_detail.html:226
+#: templates/league/player_detail.html:228
 #: templates/league/season_detail.html:56
 #: templates/review/teacher_detail.html:44
 #: templates/review/teacher_detail.html:55
@@ -658,7 +658,7 @@ msgid "Brak przeciwnika w tej rundzie."
 msgstr "No opponent this round."
 
 #: templates/league/game_detail.html:68 templates/league/player_detail.html:67
-#: templates/league/player_detail.html:174
+#: templates/league/player_detail.html:175
 msgid "Edytuj"
 msgstr "Edit"
 
@@ -876,18 +876,18 @@ msgstr "LOSS"
 msgid "Dane kontaktowe"
 msgstr "Contact details"
 
-#: templates/league/player_detail.html:186
+#: templates/league/player_detail.html:188
 msgid ""
 "Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego "
 "rozpoczęciu."
 msgstr ""
 "The season has not yet started. Your games will appear here once it starts."
 
-#: templates/league/player_detail.html:192
+#: templates/league/player_detail.html:194
 msgid "Brak nadchodzących gier."
 msgstr "No upcoming games."
 
-#: templates/league/player_detail.html:201
+#: templates/league/player_detail.html:203
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy "
@@ -899,7 +899,7 @@ msgstr ""
 "starts <strong>you will automatically join</strong>. If you don't want to "
 "participate, <a href=\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:209
+#: templates/league/player_detail.html:211
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami "
@@ -912,11 +912,11 @@ msgstr ""
 "season</strong>. If you want to participate, <a href="
 "\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:220
+#: templates/league/player_detail.html:222
 msgid "Poprzednie sezony"
 msgstr "Past seasons"
 
-#: templates/league/player_detail.html:232
+#: templates/league/player_detail.html:234
 msgid "Brak rozegranych sezonów."
 msgstr "No seasons played."
 
@@ -934,7 +934,9 @@ msgstr "There are no players with the given criteria."
 
 #: templates/league/player_list.html:27
 msgid "Kolejność graczy na liście wyznacza liczba rozegranych sezonów."
-msgstr "The order of players on the list is determined by the number of seasons played."
+msgstr ""
+"The order of players on the list is determined by the number of seasons "
+"played."
 
 #: templates/league/season_detail.html:27
 msgid "Eksport CSV"
@@ -1043,42 +1045,56 @@ msgid "Zapisz się!"
 msgstr "Sign up!"
 
 #: templates/misc/home.html:53
+msgid ""
+"Bardzo dziękujemy wszystkim graczom za udział w ostatnim sezonie IGLO przed "
+"przerwą wakacyjną. Kolejny sezon rozpocznie się <strong>19 września 2022</"
+"strong>. Zachęcamy już teraz do rejestracji poprzez założenie konta w na "
+"naszej stronie lub zaznaczenie opcji <em>\"Dołącz automatycznie\"</em> w "
+"ustawieniach swojego profilu."
+msgstr ""
+"We would like to thank all players for participating in the last season of "
+"IGLO before the summer break. The next season will start on "
+"<strong>September 19, 2022</strong>. We encourage you to register now by "
+"creating an account on our website or selecting the <em>\"Join automatically"
+"\"</em> option in your profile settings."
+
+#: templates/misc/home.html:68
 msgid "Aktualny sezon"
 msgstr "Current season"
 
-#: templates/misc/home.html:61 templates/review/teacher_detail.html:38
+#: templates/misc/home.html:76 templates/review/teacher_detail.html:38
 msgid "Grupy"
 msgstr "Groups"
 
-#: templates/misc/home.html:68
+#: templates/misc/home.html:83
 msgid "Rozegranych gier"
 msgstr "Finished games"
 
-#: templates/misc/home.html:84
+#: templates/misc/home.html:99
 msgid "Zasady"
 msgstr "Rules"
 
-#: templates/misc/home.html:86
+#: templates/misc/home.html:101
 msgid "Skrócone zasady IGLO"
 msgstr "Abbreviated IGLO rules"
 
-#: templates/misc/home.html:88
+#: templates/misc/home.html:103
 msgid "Jedna gra tygodniowo z domyślnym terminem gry."
 msgstr "One game per week with a default game schedule."
 
-#: templates/misc/home.html:89
+#: templates/misc/home.html:104
 msgid "Rekomendowany czas gry to 40m+3x30."
 msgstr "The recommended playing time is 40m+3x30."
 
-#: templates/misc/home.html:90
+#: templates/misc/home.html:105
 msgid "Gracz, któremu wyznaczony termin nie odpowiada, musi grę przełożyć."
 msgstr "Player who can't attend the game has to reschedule it."
 
-#: templates/misc/home.html:92
+#: templates/misc/home.html:107
 msgid "Gramy na OGS (preferowany serwer) lub KGS."
 msgstr "Games take place on OGS (preferred server) or KGS."
 
-#: templates/misc/home.html:95
+#: templates/misc/home.html:110
 #, python-format
 msgid ""
 "Więcej informacji znajdziesz w <a href=\"%(rules_url)s\">regulaminie</a> ."
@@ -1086,7 +1102,7 @@ msgstr ""
 "For more information see the <a href=\"%(rules_url)s\"> terms of service </"
 "a>."
 
-#: templates/misc/home.html:106
+#: templates/misc/home.html:121
 msgid ""
 "<strong>Dołącz do naszego serwera Discord!</strong> Bądź na bieżąco ze "
 "wszystkimi ogłoszeniami organizatorów. Uczestnicz w dyskusjach dotyczących "
@@ -1097,15 +1113,15 @@ msgstr ""
 "organizers announcements. Participate in discussions about the league, games "
 "and teachers comments. We invite you to the <code>#iglo</code> channel."
 
-#: templates/misc/home.html:113
+#: templates/misc/home.html:128
 msgid "Dołącz"
 msgstr "Join"
 
-#: templates/misc/home.html:122
+#: templates/misc/home.html:137
 msgid "Wsparcie"
 msgstr "Support"
 
-#: templates/misc/home.html:125
+#: templates/misc/home.html:140
 msgid ""
 "Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić "
 "wykłady i komentarze korzystamy ze wsparcia naszych patronów. Jeśli również "
@@ -1116,11 +1132,11 @@ msgstr ""
 "to pay for lectures and comments. We encourage you to join if you want to "
 "take part in the development of the League and support its further expansion!"
 
-#: templates/misc/home.html:132
+#: templates/misc/home.html:147
 msgid "Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:"
 msgstr "What we are able to do thanks to your support:"
 
-#: templates/misc/home.html:139
+#: templates/misc/home.html:154
 #, python-format
 msgid ""
 "Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z "
@@ -1131,7 +1147,7 @@ msgstr ""
 "lectures and commentaries tailored to each group (more in <a href="
 "\"%(teacher_list_url)s\"> Teachers </a>)."
 
-#: templates/misc/home.html:146
+#: templates/misc/home.html:161
 msgid ""
 "Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada "
 "własne konto, dzięki któremu może w łatwy sposób obsługiwać swoje gry."
@@ -1139,11 +1155,11 @@ msgstr ""
 "We pay for the server and the website domain so each player has their own "
 "account and can easily manage their games."
 
-#: templates/misc/home.html:152
+#: templates/misc/home.html:167
 msgid "Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową."
 msgstr "We are able to provide the necessary legal and accounting services."
 
-#: templates/misc/home.html:158
+#: templates/misc/home.html:173
 msgid ""
 "Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i "
 "sprawniej."
@@ -1151,7 +1167,7 @@ msgstr ""
 "It takes really little and thanks to this we can act faster and more "
 "efficiently."
 
-#: templates/misc/home.html:163
+#: templates/misc/home.html:178
 msgid "Wpłat można dokonywać na:"
 msgstr "Payments can be made to:"
 

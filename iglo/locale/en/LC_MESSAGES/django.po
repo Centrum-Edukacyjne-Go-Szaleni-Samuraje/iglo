@@ -680,8 +680,8 @@ msgid "Zapisz"
 msgstr "Save"
 
 #: templates/league/group_detail.html:43 templates/league/group_detail.html:75
-msgid "Pozycja"
-msgstr "Position"
+msgid "Miejsce"
+msgstr "Place"
 
 #: templates/league/group_detail.html:44 templates/league/group_detail.html:76
 msgid "Gracz"

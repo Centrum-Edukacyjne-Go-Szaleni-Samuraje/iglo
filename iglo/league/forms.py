@@ -55,6 +55,7 @@ class GameResultUpdateForm(forms.ModelForm):
         win_type_choices = [wt for wt in WinType.choices if wt[0] != WinType.BYE.value]
         self.fields["win_type"].choices = BLANK_CHOICE_DASH + win_type_choices
         self.fields["link"].validators = [ogs_game_link_validator]
+        self.fields["date"].required = True
 
     def clean(self):
         cleaned_data = super().clean()

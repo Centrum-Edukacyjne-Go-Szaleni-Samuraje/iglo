@@ -6,7 +6,7 @@ authors = ["Szaleni Samuraje"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 Django = "^3.2.7"
 uWSGI = "^2.0.19"
 requests = "^2.26.0"

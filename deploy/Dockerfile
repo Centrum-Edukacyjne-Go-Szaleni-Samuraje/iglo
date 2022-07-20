@@ -1,8 +1,8 @@
-FROM python:3.9.7-buster
+FROM python:3.10.5-buster
 
 RUN apt-get update && apt-get install -y gettext
 
-RUN pip install poetry==1.1.9
+RUN pip install poetry==1.1.14
 
 ADD poetry.lock pyproject.toml /app/
 

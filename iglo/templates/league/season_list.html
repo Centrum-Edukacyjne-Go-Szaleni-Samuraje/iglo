@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap_pagination i18n %}
+{% load i18n %}
 
 {% block page_title %}{% translate "Sezony" %}{% endblock %}
 
@@ -44,7 +44,7 @@
                 </div>
             {% endfor %}
             <div class="d-flex justify-content-center">
-                {% bootstrap_paginate page_obj %}
+                {% include "includes/pagination.html" %}
             </div>
         </div>
     </div>

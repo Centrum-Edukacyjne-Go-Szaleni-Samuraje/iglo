@@ -123,5 +123,17 @@ def send_delayed_games_reminder():
             body_template="league/emails/delayed_game_reminder/body.html",
             to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
             context={"game": game},
-            reply_to=[settings.REPLY_TO_EMAIL]
+            reply_to=[settings.REPLY_TO_EMAIL],
         )
+
+
+@shared_task()
+def send_game_rescheduled_notification(game_id: int, old_date: datetime.datetime) -> None:
+    game = Game.objects.get(id=game_id)
+    send_email(
+        subject_template="league/emails/game_rescheduled/subject.txt",
+        body_template="league/emails/game_rescheduled/body.html",
+        to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
+        context={"game": game, "old_date": old_date},
+        reply_to=[settings.REPLY_TO_EMAIL],
+    )

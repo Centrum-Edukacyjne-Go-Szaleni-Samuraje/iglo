@@ -7,6 +7,7 @@ from django.db.models import Count, Exists, OuterRef
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView, RedirectView, TemplateView
 from django.views.generic.detail import SingleObjectMixin
@@ -18,6 +19,7 @@ from league.forms import (
     PlayerUpdateForm,
     GameResultUpdateRefereeForm,
     GameResultUpdateTeacherForm,
+    RescheduleGameForm,
 )
 from league.forms import PrepareSeasonForm
 from league.models import (
@@ -29,12 +31,14 @@ from league.models import (
     GamesWithoutResultError,
     WinType,
     AlreadyPlayedGamesError,
+    CanNotRescheduleGameError,
 )
 from league.models import SeasonState
 from league.permissions import (
     AdminPermissionRequired,
     UserRoleRequiredForModify,
     UserRoleRequired,
+    GameOwnerRequired,
 )
 from league.utils.egd import create_tournament_table, DatesRange, Player as EGDPlayer, Game as EGDGame, gor_to_rank
 
@@ -300,6 +304,48 @@ class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
                 return GameResultUpdateForm
             return GameResultUpdateTeacherForm
         return GameResultUpdateForm
+
+
+class RescheduleGameView(GameOwnerRequired, FormView):
+    form_class = RescheduleGameForm
+    template_name = "league/game_reschedule.html"
+
+    @cached_property
+    def game(self) -> Game:
+        return Game.objects.get(
+            group__season__number=self.kwargs["season_number"],
+            group__name=self.kwargs["group_name"],
+            black__player__nick=self.kwargs["black_player"],
+            white__player__nick=self.kwargs["white_player"],
+        )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"object": self.game}
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs()
+
+    def get_initial(self):
+        return {"date": self.game.date}
+
+    def form_valid(self, form):
+        try:
+            self.game.reschedule(date=form.cleaned_data["date"])
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                texts.GAME_RESCHEDULED_SUCCESS,
+            )
+        except CanNotRescheduleGameError:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                texts.CAN_NOT_RESCHEDULE_ERROR,
+            )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.game.get_absolute_url()
 
 
 class PlayersListView(ListView):

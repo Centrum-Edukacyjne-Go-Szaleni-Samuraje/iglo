@@ -115,6 +115,10 @@ class GameResultUpdateTeacherForm(GameResultUpdateRefereeForm):
                 field.disabled = True
 
 
+class RescheduleGameForm(forms.Form):
+    date = forms.DateTimeField()
+
+
 class PlayerUpdateForm(forms.ModelForm):
     class Meta:
         model = Player

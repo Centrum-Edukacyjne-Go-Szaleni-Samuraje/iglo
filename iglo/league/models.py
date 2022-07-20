@@ -8,6 +8,7 @@ from enum import Enum
 from statistics import mean
 from typing import Optional
 
+from django import dispatch
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
@@ -689,6 +690,13 @@ def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
             raise ValidationError(texts.POINTS_DIFFERENCE_HALF_POINT_ERROR)
 
 
+game_rescheduled = dispatch.Signal()
+
+
+class CanNotRescheduleGameError(Exception):
+    pass
+
+
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
@@ -825,6 +833,20 @@ class Game(models.Model):
     @property
     def is_editable_by_player(self):
         return not self.round.is_closed() and self.group.season.state == SeasonState.IN_PROGRESS
+
+    def reschedule(self, date: datetime.datetime) -> None:
+        if not self.can_reschedule:
+            raise CanNotRescheduleGameError()
+        # TODO: check if date is valid (within season, not in past, etc)
+        old_date = self.date
+        self.date = date
+        self.save()
+        game_rescheduled.send(sender=self.__class__, old_date=old_date, game=self)
+
+    @property
+    def can_reschedule(self) -> bool:
+        # TODO: add more constraints (season in progress, round in progress [McMahon])
+        return self.win_type is None
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

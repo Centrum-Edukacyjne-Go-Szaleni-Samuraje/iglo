@@ -15,6 +15,7 @@ from league.views import (
     GameDetailRedirectView,
     LeagueAdminView,
     PlayersListView,
+    RescheduleGameView,
 )
 
 
@@ -54,6 +55,11 @@ urlpatterns = [
         "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/edit",
         GameUpdateView.as_view(),
         name="game-update",
+    ),
+    path(
+        "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/reschedule",
+        RescheduleGameView.as_view(),
+        name="game-reschedule",
     ),
     path("players", PlayersListView.as_view(), name="players-list"),
     path("players/<slug>", PlayerDetailView.as_view(), name="player-detail"),

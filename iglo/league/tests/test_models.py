@@ -554,3 +554,12 @@ class GameTestCase(TestCase):
         self.assertIn(game_1, result)
         self.assertNotIn(game_2, result)
         self.assertNotIn(game_3, result)
+
+    def test_reschedule(self):
+        game = GameFactory(date=datetime.datetime(2022, 1, 1, 12, 0))
+
+        game.reschedule(date=datetime.datetime(2022, 1, 10, 18, 0))
+
+        self.assertEqual(game.date, datetime.datetime(2022, 1, 10, 18, 0))
+
+        # TODO: add more tests about reschedule

@@ -29,3 +29,10 @@ class UserRoleRequiredForModify(UserRoleRequired):
         if self.request.method in ["POST", "PUT", "PATCH", "DELETE"]:
             return super().test_func()
         return True
+
+
+class GameOwnerRequired(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and (
+            self.request.user.is_admin or self.game.is_participant(self.request.user.player)
+        )

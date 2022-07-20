@@ -6,7 +6,7 @@
       </a>
     </li>
     {% for page_number in page_obj.paginator.page_range %}
-    <li class="page-item"><a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a></li>
+    <li class="page-item {% if page_number == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a></li>
     {% endfor %}
     <li class="page-item  {% if not page_obj.has_next %}disabled{% endif %}">
       <a class="page-link" {% if page_obj.has_next %}href="?page={{ page_obj.next_page_number }}"{% endif %} aria-label="Next">

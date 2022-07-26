@@ -58,4 +58,5 @@ UPDATE_GOR_MAIL_CONTENT = _("Aktualizacja rankingów graczy została zakończona
 MEMBER_WITHDRAW_SUCCESS = _("Gracz został wycofany z aktualnego sezonu.")
 ALREADY_PLAYED_GAMES_ERROR = _("Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe.")
 CAN_NOT_RESCHEDULE_ERROR = _("Nie można zmienić terminu gry.")
+WRONG_RESCHEDULE_DATE_ERROR = _("Gra nie może zostać zaplanowana w podanym terminie.")
 GAME_RESCHEDULED_SUCCESS = _("Termin gry został zmieniony.")

@@ -116,7 +116,7 @@ class GameResultUpdateTeacherForm(GameResultUpdateRefereeForm):
 
 
 class RescheduleGameForm(forms.Form):
-    date = forms.DateTimeField()
+    date = forms.DateTimeField(label=texts.DATE_LABEL)
 
 
 class PlayerUpdateForm(forms.ModelForm):

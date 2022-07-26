@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from league import texts
+from league.exceptions import CanNotRescheduleGameError, WrongRescheduleDateError
 from league.utils.paring import round_robin, shuffle_colors
 from macmahon import macmahon as mm
 
@@ -693,10 +694,6 @@ def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
 game_rescheduled = dispatch.Signal()
 
 
-class CanNotRescheduleGameError(Exception):
-    pass
-
-
 class Game(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="games")
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name="games")
@@ -837,7 +834,8 @@ class Game(models.Model):
     def reschedule(self, date: datetime.datetime) -> None:
         if not self.can_reschedule:
             raise CanNotRescheduleGameError()
-        # TODO: check if date is valid (within season, not in past, etc)
+        if (date < datetime.datetime.now()) or (date.date() > self.group.season.end_date):
+            raise WrongRescheduleDateError()
         old_date = self.date
         self.date = date
         self.save()
@@ -845,8 +843,7 @@ class Game(models.Model):
 
     @property
     def can_reschedule(self) -> bool:
-        # TODO: add more constraints (season in progress, round in progress [McMahon])
-        return self.win_type is None
+        return self.win_type is None and self.group.season.state == SeasonState.IN_PROGRESS
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

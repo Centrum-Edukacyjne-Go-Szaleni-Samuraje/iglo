@@ -33,7 +33,7 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item active">
-                        {% translate "Zmiana Daty" %}
+                        {% translate "Zmiana Terminu" %}
                     </li>
                 </ol>
             </nav>
@@ -41,6 +41,13 @@
                 <div class="fs-2 mb-3">
                     {% include "league/includes/game_players.html" with game=object %}
                 </div>
+                <p class="alert alert-info">
+                    {% blocktrans trimmed %}
+                        <strong>Uwaga!</strong> Wprowadź nowy termin gry, tylko jeżeli wcześniej ustailłeś jego zmiane z
+                        przeciwnikiem. Nowy termin nie może przekraczać daty końca sezonu. Twój przeciwnik zostanie
+                        poinformowany o zmianie drogą mailową.
+                    {% endblocktrans %}
+                </p>
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form|crispy }}
@@ -50,9 +57,9 @@
         </div>
     </div>
     <script type="text/javascript">
-        flatpickr("#id_date", {
+        flatpickr('#id_date', {
             enableTime: true,
-            locale: "pl",
+            locale: 'pl',
             minDate: "{% if object.group.type == "mcmahon" %}{{ object.round.start_date | date:"Y-m-d" }}{% else %}{{ object.group.season.start_date | date:"Y-m-d" }}{% endif %}",
             maxDate: "{% if object.group.type == "mcmahon" %}{{ object.round.end_date | date:"Y-m-d" }}{% else %}{{ object.group.season.end_date | date:"Y-m-d" }}{% endif %}",
         });

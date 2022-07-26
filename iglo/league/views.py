@@ -14,6 +14,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
 from league import texts, tasks
+from league.exceptions import CanNotRescheduleGameError, WrongRescheduleDateError
 from league.forms import (
     GameResultUpdateForm,
     PlayerUpdateForm,
@@ -31,7 +32,6 @@ from league.models import (
     GamesWithoutResultError,
     WinType,
     AlreadyPlayedGamesError,
-    CanNotRescheduleGameError,
 )
 from league.models import SeasonState
 from league.permissions import (
@@ -342,7 +342,15 @@ class RescheduleGameView(GameOwnerRequired, FormView):
                 messages.ERROR,
                 texts.CAN_NOT_RESCHEDULE_ERROR,
             )
-        return super().form_valid(form)
+        except WrongRescheduleDateError:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                texts.WRONG_RESCHEDULE_DATE_ERROR,
+            )
+        else:
+            return super().form_valid(form)
+        return self.form_invalid(form)
 
     def get_success_url(self):
         return self.game.get_absolute_url()

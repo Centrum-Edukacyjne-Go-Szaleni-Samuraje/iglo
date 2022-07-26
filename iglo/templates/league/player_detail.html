@@ -128,7 +128,7 @@
                                         </div>
                                         <div>
                                             {% if not game.is_bye %}
-                                                {% if user.player == game.black.player or user.player == game.white.player %}
+                                                {% if user.player == game.black.player or user.player == game.white.player or user.is_admin %}
                                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                                             data-bs-target="#contact-modal-{{ game.id }}">
                                                         <i class="fas fa-envelope"></i>
@@ -176,15 +176,13 @@
                                                     </span>
                                                     </a>
                                                     {% endif %}
-                                                    {% if game.can_reschedule %}
-                                                        <a href="{% url "game-reschedule" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
-                                                       class="btn btn-primary">
-                                                            <i class="fas fa-calendar-day"></i>
-                                                            <span class="d-none d-md-inline">
-                                                            {% translate "Termin" %}
-                                                            </span>
-                                                        </a>
-                                                    {% endif %}
+                                                    <a href="{% url "game-reschedule" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
+                                                   class="btn btn-primary{% if not game.can_reschedule %} disabled{% endif %}">
+                                                        <i class="fas fa-calendar-day"></i>
+                                                        <span class="d-none d-md-inline">
+                                                        {% translate "Termin" %}
+                                                        </span>
+                                                    </a>
                                                 {% endif %}
                                             {% endif %}
                                             {% include "league/includes/game_actions.html" with show_link=True %}

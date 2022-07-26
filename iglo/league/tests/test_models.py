@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.test import TestCase
 
+from league.exceptions import CanNotRescheduleGameError, WrongRescheduleDateError
 from league.models import (
     MemberResult,
     Season,
@@ -562,4 +563,18 @@ class GameTestCase(TestCase):
 
         self.assertEqual(game.date, datetime.datetime(2022, 1, 10, 18, 0))
 
-        # TODO: add more tests about reschedule
+    def test_reschedule_when_can_not_reschedule(self):
+        game = GameFactory(win_type=WinType.NOT_PLAYED)
+
+        with self.assertRaises(CanNotRescheduleGameError):
+            game.reschedule(date=datetime.datetime(2022, 1, 10, 18, 0))
+
+    def test_reschedule_when_date_is_wrong(self):
+        today = datetime.date.today()
+        season = SeasonFactory(
+            start_date=today, end_date=today + datetime.timedelta(days=7), state=SeasonState.IN_PROGRESS,
+        )
+        game = GameFactory(group__season=season)
+
+        with self.assertRaises(WrongRescheduleDateError):
+            game.reschedule(date=datetime.datetime.now() + datetime.timedelta(days=8))

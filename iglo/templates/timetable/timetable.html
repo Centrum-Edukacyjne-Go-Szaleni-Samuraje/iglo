@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block page_title %}{% translate "Kalendarz" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">{% translate "Kalendarz" %}</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-baseline justify-content-between">
+            <h2 class="mb-4">{% translate "Kalendarz" %}</h2>
+        </div>
+        <table class="table table-striped table-borderless table-sm">
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td class="col-2">{{ event.date }} {% if event.time %} {{ event.time|time }} {% endif %}</td>
+                    <td>
+                        {% if event.beginningOrEnding == "beginning" %}{% translate "Rozpoczęcie" %}: {% endif %}
+                        {% if event.beginningOrEnding == "ending" %}{% translate "Zakończenie" %}: {% endif %}
+                        <strong>{{ event.title }}</strong>
+                    </td>
+                    <td class="text-muted">{% for lang in event.language %} {{ lang }}{% endfor %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

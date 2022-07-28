@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "misc",
     "league",
     "review",
+    "timetable",
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
@@ -158,6 +159,7 @@ MEDIA_ROOT = BASE_DIR / "../../data/media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+TIME_FORMAT = "H:i"  # maybe we should set USE_L10N=True?
 DATE_FORMAT = "d/m/Y"
 DATETIME_FORMAT = "d/m/Y H:i"
 

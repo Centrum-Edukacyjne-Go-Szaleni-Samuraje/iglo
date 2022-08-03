@@ -12,7 +12,7 @@
                     <li class="breadcrumb-item" aria-current="page">
                         <a href="{% url "players-list" %}">{% translate "Gracze" %}</a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ object.nick}}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ object.nick }}</li>
                 </ol>
             </nav>
             <div class="d-flex justify-content-between align-items-baseline">
@@ -86,7 +86,7 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <span>Runda #{{ game.round.number }}</span>
                                         {% if upcoming_game == game %}
-                                            <span class="badge bg-warning text-dark">
+                                            <span class="badge bg-info text-dark">
                                                 {% blocktrans %}NASTĘPNA GRA{% endblocktrans %}
                                             </span>
                                         {% elif game.winner == current_membership %}
@@ -129,6 +129,16 @@
                                         <div>
                                             {% if not game.is_bye %}
                                                 {% if user.player == game.black.player or user.player == game.white.player or user.is_admin %}
+                                                    <a href="{% url "game-reschedule" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
+                                                       class="btn btn-warning{% if not game.can_reschedule %} disabled{% endif %}">
+                                                        <i class="fas fa-calendar-day"></i>
+                                                        <span class="d-none d-md-inline">{% translate "Zmień termin" %}</span>
+                                                    </a>
+                                                    <a href="{% url "game-report-result" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
+                                                       class="btn btn-warning{% if not game.can_report_result %} disabled{% endif %}">
+                                                        <i class="fas fa-edit"></i>
+                                                        <span class="d-none d-md-inline">{% translate "Wprowadź wynik" %}</span>
+                                                    </a>
                                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                                             data-bs-target="#contact-modal-{{ game.id }}">
                                                         <i class="fas fa-envelope"></i>
@@ -152,9 +162,10 @@
                                                                             aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    {% if user.player == game.black.player %}
+                                                                    {% if user.player == game.black.player or user.is_admin %}
                                                                         {% include "league/includes/player_contact.html" with player=game.white.player %}
-                                                                    {% else %}
+                                                                    {% endif %}
+                                                                    {% if user.player == game.white.player or user.is_admin %}
                                                                         {% include "league/includes/player_contact.html" with player=game.black.player %}
                                                                     {% endif %}
                                                                 </div>
@@ -167,22 +178,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {% if game.is_editable_by_player %}
-                                                    <a href="{% url "game-update" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
-                                                       class="btn btn-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                        <span class="d-none d-md-inline">
-                                                        {% translate "Edytuj" %}
-                                                    </span>
-                                                    </a>
-                                                    {% endif %}
-                                                    <a href="{% url "game-reschedule" season_number=game.group.season.number group_name=game.group.name black_player=game.black.player.nick white_player=game.white.player.nick %}"
-                                                   class="btn btn-primary{% if not game.can_reschedule %} disabled{% endif %}">
-                                                        <i class="fas fa-calendar-day"></i>
-                                                        <span class="d-none d-md-inline">
-                                                        {% translate "Termin" %}
-                                                        </span>
-                                                    </a>
                                                 {% endif %}
                                             {% endif %}
                                             {% include "league/includes/game_actions.html" with show_link=True %}

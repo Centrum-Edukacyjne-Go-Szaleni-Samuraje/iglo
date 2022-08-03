@@ -2,12 +2,10 @@ import re
 
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db.models import BLANK_CHOICE_DASH
-from django.utils.translation import gettext_lazy as _
 
 from league import texts
-from league.models import Game, Member, Player, WinType
+from league.models import Member, Player, WinType
 
 
 class PrepareSeasonForm(forms.Form):
@@ -21,41 +19,25 @@ def ogs_game_link_validator(value: str) -> None:
         raise forms.ValidationError(texts.OGS_GAME_LINK_ERROR)
 
 
-class GameResultUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Game
-        fields = [
-            "date",
-            "winner",
-            "win_type",
-            "points_difference",
-            "link",
-            "sgf",
-        ]
-        labels = {
-            "date": texts.DATE_LABEL,
-            "winner": texts.WINNER_LABEL,
-            "win_type": texts.WIN_TYPE_LABEL,
-            "points_difference": texts.POINTS_DIFFERENCE_LABEL,
-            "sgf": texts.SGF_LABEL,
-            "link": texts.LINK_LABEL,
-        }
-        help_texts = {
-            "sgf": texts.SGF_HELP_TEXT,
-        }
-        widgets = {
-            "points_difference": forms.NumberInput(attrs={"step": 1, "min": 0.5}),
-        }
+class GameRescheduleForm(forms.Form):
+    date = forms.DateTimeField(label=texts.DATE_LABEL)
 
-    def __init__(self, *args, **kwargs) -> None:
+
+class GameReportResultForm(forms.Form):
+    winner = forms.ModelChoiceField(queryset=Member.objects.all(), label=texts.WINNER_LABEL)
+    win_type = forms.ChoiceField(
+        choices=BLANK_CHOICE_DASH + [wt for wt in WinType.choices if wt[0] != WinType.BYE.value],
+        label=texts.WIN_TYPE_LABEL,
+    )
+    points_difference = forms.DecimalField(
+        widget=forms.NumberInput(attrs={"step": 1, "min": 0.5}), required=False, label=texts.POINTS_DIFFERENCE_LABEL
+    )
+    link = forms.URLField(validators=[ogs_game_link_validator], required=False, label=texts.LINK_LABEL)
+    sgf = forms.FileField(required=False, label=texts.SGF_LABEL, help_text=texts.SGF_HELP_TEXT)
+
+    def __init__(self, game, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["winner"].queryset = Member.objects.filter(
-            id__in=[self.instance.black.id, self.instance.white.id]
-        )
-        win_type_choices = [wt for wt in WinType.choices if wt[0] != WinType.BYE.value]
-        self.fields["win_type"].choices = BLANK_CHOICE_DASH + win_type_choices
-        self.fields["link"].validators = [ogs_game_link_validator]
-        self.fields["date"].required = True
+        self.fields["winner"].queryset = self.fields["winner"].queryset.filter(id__in=[game.black.id, game.white.id])
 
     def clean(self):
         cleaned_data = super().clean()
@@ -67,56 +49,14 @@ class GameResultUpdateForm(forms.ModelForm):
         if winner and not win_type:
             self.add_error(field="win_type", error=texts.WIN_TYPE_REQUIRED_ERROR)
         if win_type == WinType.POINTS and not points_difference:
-            self.add_error(
-                field="points_difference", error=texts.POINTS_DIFFERENCE_REQUIRED_ERROR
-            )
-        if (
-            win_type
-            and win_type != WinType.NOT_PLAYED
-            and not (cleaned_data.get("sgf") or cleaned_data.get("link"))
-        ):
+            self.add_error(field="points_difference", error=texts.POINTS_DIFFERENCE_REQUIRED_ERROR)
+        if win_type and win_type != WinType.NOT_PLAYED and not (cleaned_data.get("sgf") or cleaned_data.get("link")):
             self.add_error(field=None, error=texts.SGF_OR_LINK_REQUIRED_ERROR)
         return cleaned_data
 
-    def clean_date(self):
-        value = self.cleaned_data["date"]
-        season = self.instance.group.season
-        if not (season.start_date <= value.date() <= season.end_date):
-            raise ValidationError(_("Gra musi zostać rozegrana w trakcie trwania sezonu."))
-        return value
 
-
-class GameResultUpdateRefereeForm(GameResultUpdateForm):
-    class Meta(GameResultUpdateForm.Meta):
-        model = Game
-        fields = GameResultUpdateForm.Meta.fields + [
-            "review_video_link",
-            "ai_analyse_link",
-        ]
-        labels = GameResultUpdateForm.Meta.labels | {
-            "review_video_link": "Komentarz na YouTube",
-            "ai_analyse_link": "Analiza AI Sensei",
-        }
-        help_texts = GameResultUpdateForm.Meta.labels | {
-            "ai_analyse_link": texts.AI_ANALYSE_LINK_HELP_TEXT,
-        }
-
-
-class GameResultUpdateTeacherForm(GameResultUpdateRefereeForm):
-    enabled_fields = [
-        "review_video_link",
-        "ai_analyse_link",
-    ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            if field_name not in self.enabled_fields:
-                field.disabled = True
-
-
-class RescheduleGameForm(forms.Form):
-    date = forms.DateTimeField(label=texts.DATE_LABEL)
+class GameSubmitReviewForm(forms.Form):
+    link = forms.URLField()
 
 
 class PlayerUpdateForm(forms.ModelForm):
@@ -163,10 +103,6 @@ class PlayerUpdateForm(forms.ModelForm):
 
     def clean_nick(self):
         nick = self.cleaned_data["nick"]
-        if (
-            Player.objects.exclude(id=self.instance.id)
-            .filter(nick__iexact=nick)
-            .exists()
-        ):
+        if Player.objects.exclude(id=self.instance.id).filter(nick__iexact=nick).exists():
             raise forms.ValidationError(texts.NICK_ERROR)
         return nick

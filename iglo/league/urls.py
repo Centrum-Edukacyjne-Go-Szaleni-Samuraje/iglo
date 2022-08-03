@@ -9,15 +9,15 @@ from league.views import (
     PlayerDetailView,
     PlayerUpdateView,
     PrepareSeasonView,
-    GameUpdateView,
     SeasonExportCSVView,
     GroupEGDExportView,
     GameDetailRedirectView,
     LeagueAdminView,
     PlayersListView,
-    RescheduleGameView,
+    GameActionRescheduleView,
+    GameActionReportResultView,
+    GameActionSubmitReviewView,
 )
-
 
 urlpatterns = [
     path("seasons", SeasonsListView.as_view(), name="seasons-list"),
@@ -52,14 +52,19 @@ urlpatterns = [
         name="deprecated-bye-game-detail",
     ),
     path(
-        "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/edit",
-        GameUpdateView.as_view(),
-        name="game-update",
+        "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/reschedule",
+        GameActionRescheduleView.as_view(),
+        name="game-reschedule",
     ),
     path(
-        "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/reschedule",
-        RescheduleGameView.as_view(),
-        name="game-reschedule",
+        "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/report-result",
+        GameActionReportResultView.as_view(),
+        name="game-report-result",
+    ),
+    path(
+        "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>/submit-review",
+        GameActionSubmitReviewView.as_view(),
+        name="game-submit-review",
     ),
     path("players", PlayersListView.as_view(), name="players-list"),
     path("players/<slug>", PlayerDetailView.as_view(), name="player-detail"),

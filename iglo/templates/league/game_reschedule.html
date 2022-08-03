@@ -1,8 +1,6 @@
-{% extends "base.html" %}
+{% extends "league/game_action_base.html" %}
 
 {% load static crispy_forms_filters i18n %}
-
-{% block page_title %}{{ object.black.player.nick }} vs {{ object.white.player.nick }}{% endblock %}
 
 {% block head %}
     {{ block.super }}
@@ -11,57 +9,31 @@
     <link href="{% static "flatpickr/flatpickr.min.css" %}" rel="stylesheet">
 {% endblock %}
 
-{% block content %}
-    <div class="row">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a></li>
-                    <li class="breadcrumb-item">
-                        <a href="{% url "season-detail" object.group.season.number %}">
-                            {% translate "Sezon" %} #{{ object.group.season.number }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
-                            {% translate "Grupa" %} {{ object.group.name }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{{ object.get_absolute_url }}">
-                            {% translate "Gra" %} {{ object.black.player.nick }} vs {{ object.white.player.nick }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">
-                        {% translate "Zmiana Terminu" %}
-                    </li>
-                </ol>
-            </nav>
-            <div>
-                <div class="fs-2 mb-3">
-                    {% include "league/includes/game_players.html" with game=object %}
-                </div>
-                <p class="alert alert-info">
-                    {% blocktrans trimmed %}
-                        <strong>Uwaga!</strong> Wprowadź nowy termin gry, tylko jeżeli wcześniej ustailłeś jego zmiane z
-                        przeciwnikiem. Nowy termin nie może przekraczać daty końca sezonu. Twój przeciwnik zostanie
-                        poinformowany o zmianie drogą mailową.
-                    {% endblocktrans %}
-                </p>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <button type="submit" class="btn btn-success">{% translate "Zapisz" %}</button>
-                </form>
-            </div>
-        </div>
-    </div>
+{% block page_title %}{% translate "Zmiana Terminu" %}{% endblock %}
+
+{% block breadcrumb %}
+    {% translate "Zmiana Terminu" %}
+{% endblock %}
+
+{% block subcontent %}
+    <p class="alert alert-info">
+        {% blocktrans trimmed %}
+            <strong>Uwaga!</strong> Wprowadź nowy termin gry, tylko jeżeli wcześniej ustailłeś jego zmiane z
+            przeciwnikiem. Nowy termin nie może przekraczać daty końca sezonu. Twój przeciwnik zostanie
+            poinformowany o zmianie drogą mailową.
+        {% endblocktrans %}
+    </p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">{% translate "Zapisz" %}</button>
+    </form>
     <script type="text/javascript">
         flatpickr('#id_date', {
             enableTime: true,
             locale: 'pl',
-            minDate: "{% if object.group.type == "mcmahon" %}{{ object.round.start_date | date:"Y-m-d" }}{% else %}{{ object.group.season.start_date | date:"Y-m-d" }}{% endif %}",
-            maxDate: "{% if object.group.type == "mcmahon" %}{{ object.round.end_date | date:"Y-m-d" }}{% else %}{{ object.group.season.end_date | date:"Y-m-d" }}{% endif %}",
+            minDate: "{{ object.min_date | date:"Y-m-d" }}",
+            maxDate: "{{ object.max_date | date:"Y-m-d" }}",
         });
     </script>
 {% endblock %}

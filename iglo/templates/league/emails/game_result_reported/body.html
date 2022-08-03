@@ -1,0 +1,37 @@
+<p>
+    Wprowadzono wynik Twojej gry <strong>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</strong> (sezon
+    #{{ game.group.season.number }}, grupa {{ game.group.name }}).
+</p>
+<p>
+    Wynik: <strong>{{ game.result }}</strong><br>
+    {% if game.sgf %}SGF: <a href="{{ domain }}{{ game.sgf.url }}">{{ domain }}{{ game.sgf.url }}</a><br>{% endif %}
+    {% if game.ai_analyse_link %}Analiza AI: <a href="{{ game.ai_analyse_link }}">{{ game.ai_analyse_link }}</a><br>{% endif %}
+</p>
+<p>
+    Szczegóły gry znajdziesz pod adresem:
+</p>
+<p>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    Zespół IGLO
+</p>
+<p><b>[ENGLISH]</b><br></p>
+<p>
+    The result of your game <b>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</b> (season
+    #{{ game.group.season.number }}, group {{ game.group.name }}) has been submitted.
+</p>
+<p>
+    Result: <strong>{{ game.result }}</strong><br>
+    {% if game.sgf %}SGF: <a href="{{ domain }}{{ game.sgf.url }}">{{ domain }}{{ game.sgf.url }}</a><br>{% endif %}
+    {% if game.ai_analyse_link %}AI analyse: <a href="{{ game.ai_analyse_link }}">{{ game.ai_analyse_link }}</a><br>{% endif %}
+</p>
+<p>
+    You can find more details here:
+</p>
+<p>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    The IGLO Team
+</p>

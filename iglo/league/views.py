@@ -14,13 +14,11 @@ from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
 from league import texts, tasks
-from league.exceptions import CanNotRescheduleGameError, WrongRescheduleDateError
 from league.forms import (
-    GameResultUpdateForm,
     PlayerUpdateForm,
-    GameResultUpdateRefereeForm,
-    GameResultUpdateTeacherForm,
-    RescheduleGameForm,
+    GameRescheduleForm,
+    GameReportResultForm,
+    GameSubmitReviewForm,
 )
 from league.forms import PrepareSeasonForm
 from league.models import (
@@ -29,9 +27,7 @@ from league.models import (
     Game,
     Player,
     Member,
-    GamesWithoutResultError,
     WinType,
-    AlreadyPlayedGamesError,
 )
 from league.models import SeasonState
 from league.permissions import (
@@ -41,6 +37,7 @@ from league.permissions import (
     GameOwnerRequired,
 )
 from league.utils.egd import create_tournament_table, DatesRange, Player as EGDPlayer, Game as EGDGame, gor_to_rank
+from utils.exceptions import BusinessError
 
 
 class SeasonsListView(ListView):
@@ -77,11 +74,11 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
         elif "action-finish-season" in request.POST:
             try:
                 self.object.finish()
-            except GamesWithoutResultError:
+            except BusinessError as err:
                 messages.add_message(
                     request=request,
-                    level=messages.WARNING,
-                    message=texts.GAMES_WITHOUT_RESULT_ERROR,
+                    level=messages.ERROR,
+                    message=err.message,
                 )
         return self.render_to_response(context)
 
@@ -172,7 +169,7 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
             except Player.DoesNotExist:
                 messages.add_message(
                     self.request,
-                    messages.WARNING,
+                    messages.ERROR,
                     texts.MISSING_PLAYER_ERROR,
                 )
         elif "action-pairing" in request.POST:
@@ -271,45 +268,7 @@ class GameDetailView(DetailView):
         )
 
 
-class GameUpdateView(UserRoleRequired, GameDetailView, UpdateView):
-    model = Game
-    required_roles = [UserRole.REFEREE, UserRole.TEACHER]
-
-    def get_success_url(self):
-        return self.object.get_absolute_url()
-
-    def form_valid(self, form):
-        messages.add_message(
-            request=self.request,
-            level=messages.SUCCESS,
-            message="Gra została zaktualizowana pomyślnie.",
-        )
-        return super().form_valid(form)
-
-    def test_func(self):
-        game = self.get_object()  # TODO: this is not prefect
-        return super().test_func() or (
-            self.request.user.is_authenticated
-            and hasattr(self.request.user, "player")
-            and game.is_participant(self.request.user.player)
-            and game.is_editable_by_player
-        )
-
-    def get_form_class(self):
-        if self.request.user.has_role(UserRole.REFEREE):
-            return GameResultUpdateRefereeForm
-        if self.request.user.has_role(UserRole.TEACHER):
-            game = self.get_object()
-            if hasattr(self.request.user, "player") and game.is_participant(self.request.user.player):
-                return GameResultUpdateForm
-            return GameResultUpdateTeacherForm
-        return GameResultUpdateForm
-
-
-class RescheduleGameView(GameOwnerRequired, FormView):
-    form_class = RescheduleGameForm
-    template_name = "league/game_reschedule.html"
-
+class GameActionView(FormView):
     @cached_property
     def game(self) -> Game:
         return Game.objects.get(
@@ -322,38 +281,87 @@ class RescheduleGameView(GameOwnerRequired, FormView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"object": self.game}
 
-    def get_form_kwargs(self):
-        return super().get_form_kwargs()
-
-    def get_initial(self):
-        return {"date": self.game.date}
-
     def form_valid(self, form):
         try:
-            self.game.reschedule(date=form.cleaned_data["date"])
-            messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                texts.GAME_RESCHEDULED_SUCCESS,
-            )
-        except CanNotRescheduleGameError:
+            self.perform_action(form.cleaned_data)
+        except BusinessError as err:
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                texts.CAN_NOT_RESCHEDULE_ERROR,
-            )
-        except WrongRescheduleDateError:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                texts.WRONG_RESCHEDULE_DATE_ERROR,
+                err.message,
             )
         else:
             return super().form_valid(form)
         return self.form_invalid(form)
 
     def get_success_url(self):
+        if hasattr(self.request.user, "player") and self.game.is_participant(self.request.user.player):
+            return self.request.user.player.get_absolute_url()
         return self.game.get_absolute_url()
+
+    def perform_action(self, data):
+        pass
+
+
+class GameActionRescheduleView(GameOwnerRequired, GameActionView):
+    form_class = GameRescheduleForm
+    template_name = "league/game_reschedule.html"
+
+    def get_initial(self):
+        return {"date": self.game.date}
+
+    def perform_action(self, data):
+        self.game.reschedule(date=data["date"])
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            texts.GAME_RESCHEDULED_SUCCESS,
+        )
+
+
+class GameActionReportResultView(GameOwnerRequired, GameActionView):
+    form_class = GameReportResultForm
+    template_name = "league/game_report_result.html"
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"game": self.game}
+
+    def get_initial(self):
+        return {
+            "win_type": self.game.win_type,
+            "winner": self.game.winner,
+            "link": self.game.link,
+            "sgf": self.game.sgf,
+            "points_difference": self.game.points_difference,
+        }
+
+    def perform_action(self, data):
+        self.game.report_result(
+            winner=data["winner"],
+            win_type=data["win_type"],
+            points_difference=data["points_difference"],
+            link=data["link"],
+            sgf=data["sgf"],
+        )
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            texts.GAME_REPORT_RESULT_SUCCESS,
+        )
+
+
+class GameActionSubmitReviewView(UserRoleRequired, GameActionView):
+    form_class = GameSubmitReviewForm
+    template_name = "league/game_submit_review.html"
+    required_roles = [UserRole.TEACHER]
+
+    def perform_action(self, data):
+        self.game.submit_review(link=data["link"])
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            texts.GAME_REVIEW_SUBMITTED_SUCCESS,
+        )
 
 
 class PlayersListView(ListView):
@@ -413,11 +421,11 @@ class PlayerDetailView(UserRoleRequiredForModify, DetailView):
                     messages.SUCCESS,
                     texts.MEMBER_WITHDRAW_SUCCESS,
                 )
-            except AlreadyPlayedGamesError:
+            except BusinessError as err:
                 messages.add_message(
                     self.request,
-                    messages.WARNING,
-                    texts.ALREADY_PLAYED_GAMES_ERROR,
+                    messages.ERROR,
+                    err.message,
                 )
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
@@ -480,7 +488,7 @@ class LeagueAdminView(TemplateView, UserRoleRequired):
 
     def post(self, request, *args, **kwargs):
         if "action-update-gor" in request.POST:
-            tasks.update_gor.delay(triggering_user_email=self.request.user.email)
+            tasks.update_gor_task.delay(triggering_user_email=self.request.user.email)
             messages.add_message(
                 request=request,
                 level=messages.SUCCESS,

@@ -265,4 +265,5 @@ LOCALE_PATHS = [
 ]
 
 ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default=False)
+ENABLE_SGF_FETCH = env("ENABLE_SGF_FETCH", as_bool=True, default=False)
 ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)

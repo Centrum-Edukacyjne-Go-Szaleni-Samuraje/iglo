@@ -5,7 +5,7 @@ from django.core import mail
 from django.test import TestCase, override_settings
 
 from league.models import GameAIAnalyseUploadStatus, SeasonState
-from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder
+from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder_task
 from league.tests.factories import GameFactory, SeasonFactory
 from league.utils.aisensei import AISenseiException
 
@@ -51,7 +51,7 @@ class SendDelayedGamesRemindersTask(TestCase):
         season = SeasonFactory(state=SeasonState.IN_PROGRESS)
         game = GameFactory(date=now - datetime.timedelta(days=1), win_type=None, group__season=season)
 
-        send_delayed_games_reminder()
+        send_delayed_games_reminder_task()
 
         game.refresh_from_db()
         self.assertIsNotNone(game.delayed_reminder_sent)

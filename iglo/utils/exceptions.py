@@ -1,2 +1,2 @@
 class BusinessError(Exception):
-    pass
+    message = None

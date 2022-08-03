@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
@@ -13,10 +11,12 @@ class Event(models.Model):
     title = models.CharField(max_length=100)
     type = models.CharField(max_length=10, choices=EventType.choices)
     start_date = models.DateField()
-    start_time = models.TimeField(null=True)
-    end_date = models.DateField(null=True)
-    end_time = models.TimeField(null=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
     language = ArrayField(models.CharField(max_length=2), null=True)
+    link = models.URLField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ["start_date", "start_time"]

@@ -21,9 +21,16 @@
                 <tr>
                     <td class="col-2">{{ event.date }} {% if event.time %} {{ event.time|time }} {% endif %}</td>
                     <td>
-                        {% if event.beginningOrEnding == "beginning" %}{% translate "Rozpoczęcie" %}: {% endif %}
-                        {% if event.beginningOrEnding == "ending" %}{% translate "Zakończenie" %}: {% endif %}
+                        {% if event.beginning_or_ending == "beginning" %}{% translate "Rozpoczęcie" %}: {% endif %}
+                        {% if event.beginning_or_ending == "ending" %}{% translate "Zakończenie" %}: {% endif %}
                         <strong>{{ event.title }}</strong>
+                    </td>
+                    <td class="text-end">
+                        {% if event.link is not None %}
+                            <a href="{{ event.link }}" target="_blank">
+                                <i class="fas fa-link"></i>
+                            </a>
+                        {% endif %}
                     </td>
                     <td class="text-muted">{% for lang in event.language %} {{ lang }}{% endfor %}</td>
                 </tr>

@@ -2,6 +2,7 @@ import datetime as dt
 import enum
 from dataclasses import dataclass
 
+from django.db.models import Q
 from django.views.generic import TemplateView
 
 from timetable.models import Event, EventType
@@ -29,7 +30,7 @@ class EventListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         month_ago = dt.date.today() - dt.timedelta(days=30)
-        events = Event.objects.filter(start_date__gte=month_ago).all()
+        events = Event.objects.filter(Q(start_date__gte=month_ago) | Q(end_date__gte=month_ago)).all()
         events_to_display = []
         for event in events:
             if event.is_expanded:

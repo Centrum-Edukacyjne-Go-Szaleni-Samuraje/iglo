@@ -8,7 +8,7 @@ class EventType(models.TextChoices):
 
 
 class Event(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.TextField()
     type = models.CharField(max_length=10, choices=EventType.choices)
     start_date = models.DateField()
     start_time = models.TimeField(null=True, blank=True)

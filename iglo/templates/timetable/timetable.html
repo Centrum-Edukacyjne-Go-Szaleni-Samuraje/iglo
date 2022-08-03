@@ -19,20 +19,39 @@
             <tbody>
                 {% for event in events %}
                 <tr>
-                    <td class="col-2">{{ event.date }} {% if event.time %} {{ event.time|time }} {% endif %}</td>
+                    <td>{{ event.date }} {% if event.time %} {{ event.time|time }} {% endif %}</td>
                     <td>
                         {% if event.beginning_or_ending == "beginning" %}{% translate "Rozpoczęcie" %}: {% endif %}
                         {% if event.beginning_or_ending == "ending" %}{% translate "Zakończenie" %}: {% endif %}
                         <strong>{{ event.title }}</strong>
                     </td>
-                    <td class="text-end">
-                        {% if event.link is not None %}
+                    <td class="text-end timetable-icons-col">
+                        <button class="btn btn-sm fas fa-chevron-down" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#description-{{ forloop.counter }}" aria-expanded="false"
+                                aria-controls="description-{{ forloop.counter }}" onClick="
+                                this.classList.toggle('fa-chevron-down');
+                                this.classList.toggle('fa-chevron-up');">
+                        </button>
+                        {% if event.link %}
                             <a href="{{ event.link }}" target="_blank">
                                 <i class="fas fa-link"></i>
                             </a>
                         {% endif %}
                     </td>
-                    <td class="text-muted">{% for lang in event.language %} {{ lang }}{% endfor %}</td>
+                    <td class="text-muted timetable-lang-col">{% for lang in event.language %} {{ lang }}{% endfor %}</td>
+                </tr>
+                <tr>
+                    <td colspan="100%">
+                        <div class="collapse" id="description-{{ forloop.counter }}">
+                            <div class="card card-body">
+                                {% if event.description %}
+                                    {{ event.description }}
+                                {% else %}
+                                    {% translate "Brak opisu" %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

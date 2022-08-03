@@ -85,7 +85,8 @@ class Command(BaseCommand):
         )
         event.save()
         event = Event(
-            title="Wykład DDD",
+            title="Bardo poważny i mądry wykładowca: Bardzo mądry wykład na bardzo mądry i skomplikowany temat. "
+                  "I dodam jeszcze kilka literek",
             start_date=datetime.datetime(2022, 9, 21),
             start_time=datetime.time(20, 00),
             type=EventType.LECTURE,

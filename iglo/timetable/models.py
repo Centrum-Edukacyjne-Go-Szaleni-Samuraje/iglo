@@ -14,7 +14,7 @@ class Event(models.Model):
     start_time = models.TimeField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
-    language = ArrayField(models.CharField(max_length=2), null=True)
+    language = ArrayField(models.CharField(max_length=2), default=list, null=True, blank=True)
     link = models.URLField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 

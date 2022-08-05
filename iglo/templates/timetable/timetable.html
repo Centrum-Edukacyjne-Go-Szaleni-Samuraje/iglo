@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block page_title %}{% translate "Kalendarz" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">{% translate "Kalendarz" %}</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-baseline justify-content-between">
+            <h2 class="mb-4">{% translate "Kalendarz" %}</h2>
+        </div>
+        <table class="table table-striped table-borderless table-sm">
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.date }} {% if event.time %} {{ event.time|time }} {% endif %}</td>
+                    <td>
+                        {% if event.beginning_or_ending == "beginning" %}{% translate "Rozpoczęcie" %}: {% endif %}
+                        {% if event.beginning_or_ending == "ending" %}{% translate "Zakończenie" %}: {% endif %}
+                        <strong>{{ event.title }}</strong>
+                        {% if event.description %}
+                            <div class="collapse" id="description-{{ forloop.counter }}" style="padding: 1em">
+                                <small>{{ event.description }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="text-end timetable-icons-col">
+                        {% if event.description %}
+                        <button class="btn btn-sm fas fa-chevron-down" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#description-{{ forloop.counter }}" aria-expanded="false"
+                                aria-controls="description-{{ forloop.counter }}" onClick="
+                                this.classList.toggle('fa-chevron-down');
+                                this.classList.toggle('fa-chevron-up');">
+                        </button>
+                        {% endif %}
+                        {% if event.link %}
+                            <a href="{{ event.link }}" target="_blank">
+                                <i class="fas fa-link"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted timetable-lang-col">{% for lang in event.language %} {{ lang }}{% endfor %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -12,6 +12,7 @@ localized_patterns = i18n_patterns(
     path("", include("misc.urls")),
     path("", include("accounts.urls", namespace="accounts")),
     path("", include("review.urls")),
+    path("", include("timetable.urls")),
     prefix_default_language=False,
 )
 

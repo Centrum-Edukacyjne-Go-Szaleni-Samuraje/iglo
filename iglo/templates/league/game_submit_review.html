@@ -1,0 +1,22 @@
+{% extends "league/game_action_base.html" %}
+
+{% load static crispy_forms_filters i18n %}
+
+{% block page_title %}{% translate "Wprowadzanie Komentarza" %}{% endblock %}
+
+{% block breadcrumb %}
+    {% translate "Wprowadzanie Komentarza" %}
+{% endblock %}
+
+{% block subcontent %}
+    <p class="alert alert-info">
+        {% blocktrans trimmed %}
+        Po wprowadzeniu komentarza obaj gracze zostaną powiadomieni drogą mailową.
+        {% endblocktrans %}
+    </p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">{% translate "Zapisz" %}</button>
+    </form>
+{% endblock %}

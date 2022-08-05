@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-04 16:14+0200\n"
+"POT-Creation-Date: 2022-08-05 13:30+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,15 +115,11 @@ msgstr "Arbiter"
 msgid "Nauczyciel"
 msgstr "Teacher"
 
-#: league/forms.py:84
-msgid "Gra musi zostać rozegrana w trakcie trwania sezonu."
-msgstr "You have to play this game during the season."
-
-#: league/models.py:238
+#: league/models.py:234
 msgid "Każdy z każdym"
 msgstr "Round robin"
 
-#: league/models.py:239
+#: league/models.py:235
 msgid "McMahon"
 msgstr "McMahon"
 
@@ -361,6 +357,39 @@ msgstr "Player has been withdrawn from current season."
 msgid "Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe."
 msgstr "Player has played games in actual season. Withdrawal is not possible."
 
+#: league/texts.py:60
+msgid "Nie można zmienić terminu gry."
+msgstr "You can not reschedule this game."
+
+#: league/texts.py:61
+#, fuzzy
+#| msgid "Ta gra nie została rozegrana w terminie"
+msgid "Gra nie może zostać zaplanowana w podanym terminie."
+msgstr "This game is delayed"
+
+#: league/texts.py:62
+#, fuzzy
+#| msgid "Twoje dane zostały zmienione."
+msgid "Termin gry został zmieniony."
+msgstr "Your profile has been updated."
+
+#: league/texts.py:63
+msgid "Wynik gry został zapisany."
+msgstr "Game result has been submitted."
+
+#: league/texts.py:64
+msgid ""
+"Nie możesz wykonać tej akcji - seazon znajduje się w nieodpowiednim stanie."
+msgstr "You cannot perform this action - the season is in a wrong state."
+
+#: league/texts.py:65
+msgid "Nie można wprowadzić wyniku gry."
+msgstr "You can not submit a result for this game."
+
+#: league/texts.py:66
+msgid "Komentarz do gry został zapisany."
+msgstr "Review has been submitted."
+
 #: templates/404.html:5
 msgid "Brak strony"
 msgstr "Page missing"
@@ -577,14 +606,15 @@ msgstr ""
 #: templates/accounts/registration.html:61
 #: templates/league/includes/result_table_modal.html:57
 #: templates/league/player_detail.html:58
-#: templates/league/player_detail.html:164
+#: templates/league/player_detail.html:175
 msgid "Zamknij"
 msgstr "Close"
 
-#: templates/base.html:47 templates/league/game_detail.html:26
-#: templates/league/game_form.html:19 templates/league/group_detail.html:13
-#: templates/league/season_detail.html:12 templates/league/season_list.html:5
-#: templates/league/season_list.html:12 templates/league/season_list.html:16
+#: templates/base.html:47 templates/league/game_action_base.html:12
+#: templates/league/game_detail.html:26 templates/league/game_form.html:19
+#: templates/league/group_detail.html:13 templates/league/season_detail.html:12
+#: templates/league/season_list.html:5 templates/league/season_list.html:12
+#: templates/league/season_list.html:16
 msgid "Sezony"
 msgstr "Seasons"
 
@@ -606,7 +636,7 @@ msgstr "Teachers"
 msgid "Regulamin"
 msgstr "Rules"
 
-#: templates/base.html:65 templates/league/player_detail.html:136
+#: templates/base.html:65 templates/league/player_detail.html:146
 #: templates/misc/contact.html:5 templates/misc/contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
@@ -627,10 +657,11 @@ msgstr "Change password/email"
 msgid "Wyloguj"
 msgstr "Logout"
 
+#: templates/league/game_action_base.html:15
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:29
 #: templates/league/game_form.html:22 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:17 templates/league/player_detail.html:78
-#: templates/league/player_detail.html:227
+#: templates/league/player_detail.html:229
 #: templates/league/season_detail.html:5 templates/league/season_detail.html:14
 #: templates/league/season_detail.html:20 templates/league/season_list.html:28
 #: templates/misc/home.html:72 templates/review/teacher_detail.html:43
@@ -638,17 +669,19 @@ msgstr "Logout"
 msgid "Sezon"
 msgstr "Season"
 
+#: templates/league/game_action_base.html:20
 #: templates/league/game_detail.html:6 templates/league/game_detail.html:34
 #: templates/league/game_form.html:27 templates/league/group_detail.html:5
 #: templates/league/group_detail.html:21 templates/league/group_detail.html:26
 #: templates/league/player_detail.html:80
-#: templates/league/player_detail.html:228
+#: templates/league/player_detail.html:230
 #: templates/league/season_detail.html:56
 #: templates/review/teacher_detail.html:44
 #: templates/review/teacher_detail.html:55
 msgid "Grupa"
 msgstr "Group"
 
+#: templates/league/game_action_base.html:25
 #: templates/league/game_detail.html:41 templates/league/game_form.html:32
 msgid "Gra"
 msgstr "Game"
@@ -657,10 +690,11 @@ msgstr "Game"
 msgid "Brak przeciwnika w tej rundzie."
 msgstr "No opponent this round."
 
-#: templates/league/game_detail.html:68 templates/league/player_detail.html:67
-#: templates/league/player_detail.html:175
-msgid "Edytuj"
-msgstr "Edit"
+#: templates/league/game_detail.html:68
+#, fuzzy
+#| msgid "Wprowadź nowe hasło"
+msgid "Wprowadź komentarz"
+msgstr "Enter your new password"
 
 #: templates/league/game_detail.html:78 templates/league/group_detail.html:182
 msgid "Gra jeszcze się nie odbyła."
@@ -675,11 +709,46 @@ msgstr "This game is delayed"
 msgid "Edycja"
 msgstr "Edit"
 
-#: templates/league/game_form.html:47 templates/league/player_form.html:16
+#: templates/league/game_form.html:47
+#: templates/league/game_report_result.html:15
+#: templates/league/game_reschedule.html:29
+#: templates/league/game_submit_review.html:20
+#: templates/league/player_form.html:16
 msgid "Zapisz"
 msgstr "Save"
 
-#: templates/league/group_detail.html:43 templates/league/group_detail.html:75
+#: templates/league/game_report_result.html:5
+#: templates/league/game_report_result.html:8
+msgid "Wprowadzanie Wyniku"
+msgstr ""
+
+#: templates/league/game_reschedule.html:12
+#: templates/league/game_reschedule.html:15
+msgid "Zmiana Terminu"
+msgstr ""
+
+#: templates/league/game_reschedule.html:20
+msgid ""
+"<strong>Uwaga!</strong> Wprowadź nowy termin gry, tylko jeżeli wcześniej "
+"ustailłeś jego zmiane z przeciwnikiem. Nowy termin nie może przekraczać daty "
+"końca sezonu. Twój przeciwnik zostanie poinformowany o zmianie drogą mailową."
+msgstr ""
+"<strong>Attention!</strong> Enter a new game date only if you have "
+"previously agreed to change it with your opponent. The new date cannot "
+"exceed the end of the season. Your opponent will be informed about the "
+"change by e-mail."
+
+#: templates/league/game_submit_review.html:5
+#: templates/league/game_submit_review.html:8
+msgid "Wprowadzanie Komentarza"
+msgstr "Submit Review"
+
+#: templates/league/game_submit_review.html:13
+msgid ""
+"Po wprowadzeniu komentarza obaj gracze zostaną powiadomieni drogą mailową."
+msgstr "After submitting a comment, both players will be notified by email."
+
+#: templates/league/group_detail.html:43
 msgid "Miejsce"
 msgstr "Place"
 
@@ -698,6 +767,10 @@ msgstr "SODOS"
 #: templates/league/group_detail.html:49 templates/league/group_detail.html:88
 msgid "Start"
 msgstr "Start"
+
+#: templates/league/group_detail.html:75
+msgid "Pozycja"
+msgstr "Place"
 
 #: templates/league/group_detail.html:81
 msgid "Score"
@@ -856,6 +929,10 @@ msgstr ""
 "Are you sure you want to withdraw the player from the current season? This "
 "operation cannot be undone."
 
+#: templates/league/player_detail.html:67
+msgid "Edytuj"
+msgstr "Edit"
+
 #: templates/league/player_detail.html:74
 msgid "Aktualne rozgrywki"
 msgstr "Current games"
@@ -872,22 +949,32 @@ msgstr "WIN"
 msgid "PRZEGRANA"
 msgstr "LOSS"
 
-#: templates/league/player_detail.html:146
+#: templates/league/player_detail.html:135
+msgid "Zmień termin"
+msgstr "Reschedule"
+
+#: templates/league/player_detail.html:140
+#, fuzzy
+#| msgid "Wprowadź nowe hasło"
+msgid "Wprowadź wynik"
+msgstr "Enter your new password"
+
+#: templates/league/player_detail.html:156
 msgid "Dane kontaktowe"
 msgstr "Contact details"
 
-#: templates/league/player_detail.html:188
+#: templates/league/player_detail.html:190
 msgid ""
 "Sezon nie został jeszcze rozpoczęty. Twoje gry pojawią się tutaj po jego "
 "rozpoczęciu."
 msgstr ""
 "The season has not yet started. Your games will appear here once it starts."
 
-#: templates/league/player_detail.html:194
+#: templates/league/player_detail.html:196
 msgid "Brak nadchodzących gier."
 msgstr "No upcoming games."
 
-#: templates/league/player_detail.html:203
+#: templates/league/player_detail.html:205
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Gdy rozpocznie się nowy "
@@ -899,7 +986,7 @@ msgstr ""
 "starts <strong>you will automatically join</strong>. If you don't want to "
 "participate, <a href=\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:211
+#: templates/league/player_detail.html:213
 #, python-format
 msgid ""
 "Aktualnie nie uczestniczysz w żadnych rozgrywkach. Zgodnie z ustawieniami "
@@ -912,11 +999,11 @@ msgstr ""
 "season</strong>. If you want to participate, <a href="
 "\"%(player_settings_url)s\">change your settings</a>."
 
-#: templates/league/player_detail.html:222
+#: templates/league/player_detail.html:224
 msgid "Poprzednie sezony"
 msgstr "Past seasons"
 
-#: templates/league/player_detail.html:234
+#: templates/league/player_detail.html:236
 msgid "Brak rozegranych sezonów."
 msgstr "No seasons played."
 

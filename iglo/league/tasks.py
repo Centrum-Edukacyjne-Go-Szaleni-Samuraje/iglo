@@ -75,6 +75,9 @@ def game_ai_analyse_upload_task(game_id: int) -> None:
 @shared_task(time_limit=10)
 def game_sgf_fetch_task(game_id: int) -> None:
     logger.info("SGF fetch started for game %d", game_id)
+    if not settings.ENABLE_SGF_FETCH:
+        logger.info("SGF fetch skipped for game %d - this feature is disabled", game_id)
+        return
     game = Game.objects.get(id=game_id)
     if game.external_sgf_link and not game.sgf:
         try:
@@ -88,7 +91,7 @@ def game_sgf_fetch_task(game_id: int) -> None:
 
 
 @shared_task(time_limit=120)
-def update_gor(triggering_user_email: Optional[str] = None):
+def update_gor_task(triggering_user_email: Optional[str] = None):
     logger.info("Updating players ranks")
     players = Player.objects.filter(egd_pin__isnull=False).all()
     logger.info(f"Found {len(players)} players to update")
@@ -109,7 +112,7 @@ def update_gor(triggering_user_email: Optional[str] = None):
 
 
 @shared_task()
-def send_delayed_games_reminder():
+def send_delayed_games_reminder_task():
     if not settings.ENABLE_DELAYED_GAMES_REMINDER:
         logger.info("Send delayed games reminder skipped - this feature is disabled")
         return
@@ -123,5 +126,38 @@ def send_delayed_games_reminder():
             body_template="league/emails/delayed_game_reminder/body.html",
             to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
             context={"game": game},
-            reply_to=[settings.REPLY_TO_EMAIL]
+            reply_to=[settings.REPLY_TO_EMAIL],
         )
+
+
+@shared_task()
+def send_game_rescheduled_notification_task(game_id: int, old_date: datetime.datetime) -> None:
+    game = Game.objects.get(id=game_id)
+    send_email(
+        subject_template="league/emails/game_rescheduled/subject.txt",
+        body_template="league/emails/game_rescheduled/body.html",
+        to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
+        context={"game": game, "old_date": old_date},
+    )
+
+
+@shared_task()
+def send_game_review_submitted_task(game_id: int) -> None:
+    game = Game.objects.get(id=game_id)
+    send_email(
+        subject_template="league/emails/game_review_submitted/subject.txt",
+        body_template="league/emails/game_review_submitted/body.html",
+        to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
+        context={"game": game},
+    )
+
+
+@shared_task()
+def send_game_result_reported_task(game_id: int) -> None:
+    game = Game.objects.get(id=game_id)
+    send_email(
+        subject_template="league/emails/game_result_reported/subject.txt",
+        body_template="league/emails/game_result_reported/body.html",
+        to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
+        context={"game": game},
+    )

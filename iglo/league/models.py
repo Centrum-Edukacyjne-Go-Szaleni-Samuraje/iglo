@@ -8,20 +8,27 @@ from enum import Enum
 from statistics import mean
 from typing import Optional
 
+from django import dispatch
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Sum
 from django.db.models.functions import Round as DjangoRound
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from league import texts
+from league.exceptions import (
+    CanNotRescheduleGameError,
+    WrongRescheduleDateError,
+    WrongSeasonStateError,
+    GamesWithoutResultError,
+    AlreadyPlayedGamesError,
+)
 from league.utils.paring import round_robin, shuffle_colors
 from macmahon import macmahon as mm
 
@@ -31,7 +38,7 @@ NUMBER_OF_BARS = 2
 
 class SeasonState(TextChoices):
     DRAFT = "draft", texts.SEASON_STATE_DRAFT
-    IN_PROGRESS = "in_progress", texts.SEASON_STATE_IN_PROGRES
+    IN_PROGRESS = "in_progress", texts.SEASON_STATE_IN_PROGRESS
     FINISHED = "finished", texts.SEASON_STATE_FINISHED
 
 
@@ -53,14 +60,6 @@ class SeasonManager(models.Manager):
 
     def get_latest(self) -> Optional["Season"]:
         return Season.objects.prefetch_related("groups").latest("number")
-
-
-class WrongSeasonStateError(Exception):
-    pass
-
-
-class GamesWithoutResultError(Exception):
-    pass
 
 
 class Season(models.Model):
@@ -213,12 +212,9 @@ class Season(models.Model):
 
     @cached_property
     def all_games_to_play(self) -> int:
-        return (
-            self.groups.annotate(games_per_round=(Count("members") / 2),).aggregate(
-                games_to_play=Sum("games_per_round")
-            )["games_to_play"]
-            * (self.players_per_group - 1)
-        )
+        return self.groups.annotate(games_per_round=(Count("members") / 2),).aggregate(
+            games_to_play=Sum("games_per_round")
+        )["games_to_play"] * (self.players_per_group - 1)
 
     @cached_property
     def played_games(self) -> int:
@@ -507,10 +503,6 @@ class MemberManager(models.Manager):
             return None
 
 
-class AlreadyPlayedGamesError(Exception):
-    pass
-
-
 class Member(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
@@ -622,6 +614,7 @@ class Round(models.Model):
             return False
         return self.start_date <= datetime.date.today() <= self.end_date
 
+    @property
     def is_closed(self) -> bool:
         if self.group.type != GroupType.MCMAHON:
             return False
@@ -687,6 +680,11 @@ def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
             raise ValidationError(texts.POINTS_DIFFERENCE_NEGATIVE_ERROR)
         if value % 1 != decimal.Decimal("0.5"):
             raise ValidationError(texts.POINTS_DIFFERENCE_HALF_POINT_ERROR)
+
+
+game_rescheduled = dispatch.Signal()
+game_result_reported = dispatch.Signal()
+game_review_submitted = dispatch.Signal()
 
 
 class Game(models.Model):
@@ -823,8 +821,55 @@ class Game(models.Model):
         return not self.win_type and self.date.date() < datetime.date.today()
 
     @property
-    def is_editable_by_player(self):
-        return not self.round.is_closed() and self.group.season.state == SeasonState.IN_PROGRESS
+    def can_report_result(self):
+        return not self.round.is_closed and self.group.season.state == SeasonState.IN_PROGRESS
+
+    def reschedule(self, date: datetime.datetime) -> None:
+        if not self.can_reschedule:
+            raise CanNotRescheduleGameError()
+        if not (self.min_date <= date <= self.max_date):
+            raise WrongRescheduleDateError()
+        old_date = self.date
+        self.date = date
+        self.save()
+        game_rescheduled.send(sender=self.__class__, old_date=old_date, game=self)
+
+    @property
+    def can_reschedule(self) -> bool:
+        return self.win_type is None and self.group.season.state == SeasonState.IN_PROGRESS
+
+    def report_result(
+        self,
+        winner: Optional[Member],
+        win_type: WinType,
+        points_difference: Optional[decimal.Decimal],
+        link: Optional[str],
+        sgf: Optional[File],
+    ) -> None:
+        if not self.can_report_result:
+            raise CanNotRescheduleGameError()
+        self.winner = winner
+        self.win_type = win_type
+        self.points_difference = points_difference
+        self.link = link
+        self.sgf = sgf
+        self.save()
+        game_result_reported.send(sender=self.__class__, game=self)
+
+    @property
+    def min_date(self) -> datetime.datetime:
+        min_date = self.round.start_date if self.group.type == GroupType.MCMAHON else self.group.season.start_date
+        return max(datetime.datetime.now(), datetime.datetime.combine(min_date, datetime.time(0, 0)))
+
+    @property
+    def max_date(self) -> datetime.datetime:
+        max_date = self.round.end_date if self.group.type == GroupType.MCMAHON else self.group.season.end_date
+        return datetime.datetime.combine(max_date, datetime.time(23, 59))
+
+    def submit_review(self, link: str) -> None:
+        self.review_video_link = link
+        self.save()
+        game_review_submitted.send(sender=self.__class__, game=self)
 
 
 class GameAIAnalyseUploadStatus(TextChoices):
@@ -841,13 +886,3 @@ class GameAIAnalyseUpload(models.Model):
     updated = models.DateTimeField(auto_now=True)
     error = models.TextField()
     result = models.URLField(null=True)
-
-
-@receiver(signal=post_save, sender=Game)
-def game_updated(instance, raw, **kwargs):
-    from league.tasks import game_ai_analyse_upload_task, game_sgf_fetch_task
-
-    if instance.sgf and not instance.ai_analyse_link:
-        game_ai_analyse_upload_task.delay(game_id=instance.id)
-    if instance.link and not instance.sgf:
-        game_sgf_fetch_task.delay(game_id=instance.id)

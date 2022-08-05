@@ -11,6 +11,7 @@ from league.models import Member, Player, Group, Season, Game, Round
 class PlayerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Player
+
     user = factory.SubFactory(UserFactory)
     nick = factory.Sequence(lambda n: f"player-{n}")
     rank = 1000
@@ -61,4 +62,4 @@ class GameFactory(factory.django.DjangoModelFactory):
     group = factory.SubFactory(GroupFactory)
     black = factory.SubFactory(MemberFactory)
     white = factory.SubFactory(MemberFactory)
-    sgf = factory.django.FileField(filename='file.sgf')
+    sgf = factory.django.FileField(filename="file.sgf")

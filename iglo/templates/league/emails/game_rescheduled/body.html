@@ -1,0 +1,35 @@
+<p>
+    Termin rozegrania Twojej gry <strong>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</strong> (sezon
+    #{{ game.group.season.number }}, grupa {{ game.group.name }}) została zmieniony.
+</p>
+<p>
+    Poprzedni termin: <s style="color: red">{{ old_date }}</s><br>
+    Nowy termin: <strong style="color: green">{{ game.date }}</strong>
+</p>
+<p>
+    Szczegóły gry znajdziesz pod adresem:
+</p>
+<p>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    Zespół IGLO
+</p>
+<p><b>[ENGLISH]</b><br></p>
+<p>
+    Your game <b>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</b> (season
+    #{{ game.group.season.number }}, group {{ game.group.name }}) has been rescheduled.
+</p>
+<p>
+    Old date: <s style="color: red">{{ old_date }}</s><br>
+    New date: <strong style="color: green">{{ game.date }}</strong>
+</p>
+<p>
+    You can find more details here:
+</p>
+<p>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    The IGLO Team
+</p>

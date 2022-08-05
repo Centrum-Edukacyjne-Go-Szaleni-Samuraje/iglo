@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static crispy_forms_filters i18n %}
+
+{% block page_title %}{{ object.black.player.nick }} vs {{ object.white.player.nick }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "season-detail" object.group.season.number %}">
+                            {% translate "Sezon" %} #{{ object.group.season.number }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "group-detail" season_number=object.group.season.number group_name=object.group.name %}">
+                            {% translate "Grupa" %} {{ object.group.name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ object.get_absolute_url }}">
+                            {% translate "Gra" %} {{ object.black.player.nick }} vs {{ object.white.player.nick }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        {% block breadcrumb %}{% endblock %}
+                    </li>
+                </ol>
+            </nav>
+            <div>
+                <div class="fs-2 mb-3">
+                    {% include "league/includes/game_players.html" with game=object %}
+                </div>
+                {% block subcontent %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,9 +1,11 @@
 import datetime
+from decimal import Decimal
 
 from django.conf import settings
 from django.db.models import Q
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
+from league.exceptions import CanNotRescheduleGameError, WrongRescheduleDateError, GamesWithoutResultError
 from league.models import (
     MemberResult,
     Season,
@@ -12,7 +14,6 @@ from league.models import (
     Round,
     Member,
     GroupType,
-    GamesWithoutResultError,
     WinType,
 )
 from league.tests.factories import (
@@ -554,3 +555,53 @@ class GameTestCase(TestCase):
         self.assertIn(game_1, result)
         self.assertNotIn(game_2, result)
         self.assertNotIn(game_3, result)
+
+    def test_reschedule(self):
+        today = datetime.date.today()
+        season = SeasonFactory(
+            start_date=today,
+            end_date=today + datetime.timedelta(days=7),
+            state=SeasonState.IN_PROGRESS,
+        )
+        game = GameFactory(group__season=season)
+        new_date = datetime.datetime.now() + datetime.timedelta(days=1)
+
+        game.reschedule(date=new_date)
+
+        self.assertEqual(game.date, new_date)
+
+    def test_reschedule_when_can_not_reschedule(self):
+        game = GameFactory(win_type=WinType.NOT_PLAYED)
+
+        with self.assertRaises(CanNotRescheduleGameError):
+            game.reschedule(date=datetime.datetime(2022, 1, 10, 18, 0))
+
+    def test_reschedule_when_date_is_wrong(self):
+        today = datetime.date.today()
+        season = SeasonFactory(
+            start_date=today,
+            end_date=today + datetime.timedelta(days=7),
+            state=SeasonState.IN_PROGRESS,
+        )
+        game = GameFactory(group__season=season)
+
+        with self.assertRaises(WrongRescheduleDateError):
+            game.reschedule(date=datetime.datetime.now() + datetime.timedelta(days=8))
+
+    @override_settings(ENABLE_SGF_FETCH=False)
+    def test_report_result(self):
+        game = GameFactory(group__season__state=SeasonState.IN_PROGRESS)
+
+        game.report_result(
+            winner=game.white,
+            win_type=WinType.POINTS,
+            points_difference=Decimal(0.5),
+            link="https://server.com/game-1",
+            sgf=None,
+        )
+
+        self.assertEqual(game.winner, game.white)
+        self.assertEqual(game.win_type, WinType.POINTS)
+        self.assertEqual(game.points_difference, Decimal(0.5))
+        self.assertEqual(game.link, "https://server.com/game-1")
+        self.assertFalse(game.sgf)

@@ -846,7 +846,7 @@ class Game(models.Model):
         link: Optional[str],
         sgf: Optional[File],
     ) -> None:
-        if self.can_report_result:
+        if not self.can_report_result:
             raise CanNotRescheduleGameError()
         self.winner = winner
         self.win_type = win_type

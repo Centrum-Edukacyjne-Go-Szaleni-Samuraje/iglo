@@ -56,11 +56,11 @@
                        aria-current="page"
                        href="{{ teachers_url }}">{% translate "Nauczyciele" %}</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if calendar_url in request.get_full_path %}active{% endif %}"
-                       aria-current="page"
-                       href="{{ calendar_url }}">{% translate "Kalendarz" %}</a>
-                </li>
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link {% if calendar_url in request.get_full_path %}active{% endif %}"#}
+{#                       aria-current="page"#}
+{#                       href="{{ calendar_url }}">{% translate "Kalendarz" %}</a>#}
+{#                </li>#}
                 <li class="nav-item">
                     <a class="nav-link {% if request.get_full_path == rules_url %}active{% endif %}" aria-current="page"
                        href="{{ rules_url }}">{% translate "Regulamin" %}</a>

@@ -757,20 +757,6 @@ class Game(models.Model):
     def is_bye(self):
         return self.win_type == WinType.BYE
 
-    @property
-    def result(self) -> Optional[str]:
-        if not self.is_played:
-            return None
-        if not self.winner or self.is_bye:
-            return WinType(self.win_type).label
-        winner_color = "B" if self.winner == self.black else "W"
-        if self.win_type:
-            win_type = (
-                self.points_difference or 0.5 if self.win_type == WinType.POINTS else WinType(self.win_type).label
-            )
-            return f"{winner_color}+{win_type}"
-        return winner_color
-
     def get_absolute_url(self):
         if self.is_bye:
             return reverse(

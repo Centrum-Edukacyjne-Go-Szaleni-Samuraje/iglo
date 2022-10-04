@@ -14,7 +14,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Sum
 from django.db.models.functions import Round as DjangoRound
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -680,6 +680,12 @@ class GameManager(models.Manager):
             date__lt=datetime.date.today(),
         )
 
+    def get_latest_finished(self, count: int = 5) -> list["Game"]:
+        return self.filter(sgf_updated__isnull=False).order_by("-sgf_updated")[:count]
+
+    def get_latest_reviews(self, count: int = 5) -> list["Game"]:
+        return self.filter(review_updated__isnull=False).order_by("-review_updated")[:count]
+
 
 def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
     if value is not None:
@@ -732,6 +738,9 @@ class Game(models.Model):
     review_video_link = models.URLField(null=True, blank=True)
     ai_analyse_link = models.URLField(null=True, blank=True)
     delayed_reminder_sent = models.DateTimeField(null=True)
+
+    sgf_updated = models.DateTimeField(null=True)
+    review_updated = models.DateTimeField(null=True)
 
     objects = GameManager()
 
@@ -841,6 +850,19 @@ class GameAIAnalyseUpload(models.Model):
     updated = models.DateTimeField(auto_now=True)
     error = models.TextField()
     result = models.URLField(null=True)
+
+
+@receiver(signal=pre_save, sender=Game)
+def update_game_timestamps(sender, instance: Game, raw, using, update_fields, **kwargs):
+    try:
+        db_game: Game = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        pass
+    else:
+        if db_game.review_updated is None and instance.review_video_link and len(str(instance.review_video_link)) > 0:
+            instance.review_updated = datetime.datetime.now()
+        if db_game.sgf_updated is None and instance.sgf and len(str(instance.sgf)) > 0:
+            instance.sgf_updated = datetime.datetime.now()
 
 
 @receiver(signal=post_save, sender=Game)

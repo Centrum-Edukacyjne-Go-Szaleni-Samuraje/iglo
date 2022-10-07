@@ -434,3 +434,11 @@ class LeagueAdminView(TemplateView, UserRoleRequired):
             )
         context = self.get_context_data()
         return self.render_to_response(context)
+
+
+class GameListView(ListView):
+    model = Game
+    paginate_by = 30
+
+    def get_queryset(self):
+        return Game.objects.get_latest_finished()

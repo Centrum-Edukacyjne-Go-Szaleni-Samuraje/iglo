@@ -103,37 +103,8 @@
             <div class="card h-100">
                 <div class="card-header">{% translate "Najnowsze gry" %}</div>
                 <div class="card-body">
-                    <table class="table table-sm">
-                    {% for game in latest_games %}
-                        <tr style="position: relative;">
-                            <td>
-                                <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
-                                    <i class="fas fa-circle"></i>
-                                    {{ game.black.player.nick }}
-                                </span>
-                            </td>
-                            <td>
-                                <span> - </span>
-                            </td>
-                            <td>
-                                <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
-                                    <i class="far fa-circle"></i>
-                                    {{ game.white.player.nick }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="text-muted small">
-                                    {{ game | result }}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{{ game.get_absolute_url }}" class="stretched-link">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </table>
+                    {% include "includes/results_table.html" with games=latest_games %}
+                    <a href="{% url "games-list" %}">{% translate "więcej..." %}</a>
                 </div>
             </div>
         </div>
@@ -141,39 +112,8 @@
             <div class="card h-100">
                 <div class="card-header">{% translate "Najnowsze komentarze" %}</div>
                 <div class="card-body">
-                    <table class="table table-sm">
-                    {% for game in latest_reviews %}
-                        <tr style="position: relative;">
-                            <td>
-                                <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
-                                    <i class="fas fa-circle"></i>
-                                    {{ game.black.player.nick }}
-                                </span>
-                            </td>
-                            <td>
-                                <span> - </span>
-                            </td>
-                            <td>
-                                <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
-                                    <i class="far fa-circle"></i>
-                                    {{ game.white.player.nick }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="text-muted small">
-                                    {% with teacher=game.group.teacher %}
-                                        {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
-                                    {% endwith %}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{{ game.get_absolute_url }}" class="stretched-link">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </table>
+                    {% include "includes/reviews_table.html" with games=latest_reviews %}
+                    <a href="{% url "reviews-list" %}">{% translate "więcej..." %}</a>
                 </div>
             </div>
         </div>

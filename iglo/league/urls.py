@@ -14,7 +14,7 @@ from league.views import (
     GroupEGDExportView,
     GameDetailRedirectView,
     LeagueAdminView,
-    PlayersListView,
+    PlayersListView, GameListView,
 )
 
 
@@ -59,4 +59,5 @@ urlpatterns = [
     path("players/<slug>", PlayerDetailView.as_view(), name="player-detail"),
     path("players/<slug>/settings", PlayerUpdateView.as_view(), name="player-settings"),
     path("league/admin", LeagueAdminView.as_view(), name="league-admin-view"),
+    path("league/games", GameListView.as_view(), name="games-list")
 ]

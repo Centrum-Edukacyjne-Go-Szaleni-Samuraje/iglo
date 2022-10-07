@@ -680,11 +680,15 @@ class GameManager(models.Manager):
             date__lt=datetime.date.today(),
         )
 
-    def get_latest_finished(self, count: int = 5) -> list["Game"]:
-        return self.filter(sgf_updated__isnull=False).order_by("-sgf_updated")[:count]
+    def get_latest_finished(self) -> QuerySet:
+        return self.prefetch_related("group")\
+            .filter(sgf_updated__isnull=False)\
+            .order_by("-sgf_updated")
 
-    def get_latest_reviews(self, count: int = 5) -> list["Game"]:
-        return self.filter(review_updated__isnull=False).order_by("-review_updated")[:count]
+    def get_latest_reviews(self) -> QuerySet:
+        return self.prefetch_related("group", "group__teacher")\
+            .filter(review_updated__isnull=False)\
+            .order_by("-review_updated")
 
 
 def points_difference_validator(value: Optional[decimal.Decimal]) -> None:

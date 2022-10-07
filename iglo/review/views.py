@@ -1,5 +1,6 @@
 from django.views.generic import DetailView, ListView
 
+from league.models import Game
 from review.models import Teacher
 
 
@@ -12,3 +13,11 @@ class TeacherListView(ListView):
 
 class TeacherDetailView(DetailView):
     model = Teacher
+
+
+class ReviewListView(ListView):
+    model = Game  # todo: split reviews from game?
+    paginate_by = 30
+
+    def get_queryset(self):
+        return Game.objects.get_latest_reviews()

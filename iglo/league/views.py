@@ -442,3 +442,12 @@ class GameListView(ListView):
 
     def get_queryset(self):
         return Game.objects.get_latest_finished()
+
+
+class UpcomingGameListView(ListView):
+    model = Game
+    template_name = "league/upcoming_games_list.html"
+    paginate_by = 30
+
+    def get_queryset(self):
+        return Game.objects.get_upcoming_games()

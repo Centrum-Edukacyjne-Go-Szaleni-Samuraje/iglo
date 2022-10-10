@@ -101,10 +101,23 @@
     <div class="row mb-3">
         <div class="col">
             <div class="card h-100">
+                <div class="card-header">{% translate "Nadchodzące gry" %}</div>
+                <div class="card-body">
+                    {% include "includes/upcoming_games_table.html" with games=upcoming_games %}
+                    <p class="text-end">
+                        <a href="{% url "upcoming-games-list" %}">{% translate "więcej..." %}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
                 <div class="card-header">{% translate "Najnowsze gry" %}</div>
                 <div class="card-body">
                     {% include "includes/results_table.html" with games=latest_games %}
-                    <a href="{% url "games-list" %}">{% translate "więcej..." %}</a>
+                    <p class="text-end">
+                        <a href="{% url "games-list" %}">{% translate "więcej..." %}</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -113,7 +126,9 @@
                 <div class="card-header">{% translate "Najnowsze komentarze" %}</div>
                 <div class="card-body">
                     {% include "includes/reviews_table.html" with games=latest_reviews %}
-                    <a href="{% url "reviews-list" %}">{% translate "więcej..." %}</a>
+                    <p class="text-end">
+                        <a href="{% url "reviews-list" %}">{% translate "więcej..." %}</a>
+                    </p>
                 </div>
             </div>
         </div>

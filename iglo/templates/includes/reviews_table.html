@@ -1,38 +1,39 @@
-<table class="table table-sm">
-{% for game in games %}
-    <tr style="position: relative;">
-        {% if full %}
-        <td class="text-muted">
-            {{ game.group.name }}
-        </td>
-        {% endif %}
-        <td>
-            <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
-                <i class="fas fa-circle"></i>
-                {{ game.black.player.nick }}
-            </span>
-        </td>
-        <td>
-            <span> - </span>
-        </td>
-        <td>
-            <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
-                <i class="far fa-circle"></i>
-                {{ game.white.player.nick }}
-            </span>
-        </td>
-        <td>
-            <span class="text-muted small">
-                {% with teacher=game.group.teacher %}
-                    {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
-                {% endwith %}
-            </span>
-        </td>
-        <td>
-            <a href="{{ game.get_absolute_url }}" class="stretched-link">
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        </td>
-    </tr>
-{% endfor %}
-</table>
+<div class="container">
+    {% for game in games %}
+        <div class="row">
+            {% if full %}
+                <div class="col-1 text-muted">
+                    {{ game.group.name }}
+                </div>
+            {% endif %}
+            <div class="col">
+                <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
+                    <i class="fas fa-circle"></i>
+                    {{ game.black.player.nick }}
+                </span>
+            </div>
+            {% if not full %}
+                <div class="col-1">-</div>
+            {% endif %}
+            <div class="col">
+                <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
+                    <i class="far fa-circle"></i>
+                    {{ game.white.player.nick }}
+                </span>
+            </div>
+            <div class="col {% if not full %} order-md-last {% endif %}">
+                <span class="text-muted small">
+                    {% with teacher=game.group.teacher %}
+                        {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
+                    {% endwith %}
+                </span>
+            </div>
+            <div class="col-1">
+                <a href="{{ game.get_absolute_url }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+            <div class="w-100"></div>
+        </div>
+    {% endfor %}
+</div>

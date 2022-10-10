@@ -17,6 +17,7 @@ class TeacherDetailView(DetailView):
 
 class ReviewListView(ListView):
     model = Game  # todo: split reviews from game?
+    template_name = "review/review_list.html"
     paginate_by = 30
 
     def get_queryset(self):

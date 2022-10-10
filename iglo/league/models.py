@@ -681,14 +681,21 @@ class GameManager(models.Manager):
         )
 
     def get_latest_finished(self) -> QuerySet:
-        return self.prefetch_related("group")\
+        return self.prefetch_related("group", "black__player", "white__player")\
             .filter(sgf_updated__isnull=False)\
             .order_by("-sgf_updated")
 
     def get_latest_reviews(self) -> QuerySet:
-        return self.prefetch_related("group", "group__teacher")\
+        return self.prefetch_related("group", "black__player", "white__player", "group__teacher")\
             .filter(review_updated__isnull=False)\
             .order_by("-review_updated")
+
+    def get_upcoming_games(self) -> QuerySet:
+        now = datetime.datetime.now()
+        one_hour_ago = now - datetime.timedelta(hours=1)
+        return self.prefetch_related("group", "black__player", "white__player")\
+            .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)\
+            .order_by("date")
 
 
 def points_difference_validator(value: Optional[decimal.Decimal]) -> None:

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-10 17:48+0200\n"
+"POT-Creation-Date: 2022-10-10 18:43+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -112,6 +112,7 @@ msgstr "Arbiter"
 
 #: .\accounts\texts.py:28 .\templates\league\group_detail.html:32
 #: .\templates\league\season_detail.html:79
+#: .\templates\review\review_list.html:12
 msgid "Nauczyciel"
 msgstr "Teacher"
 
@@ -583,7 +584,7 @@ msgid "Zamknij"
 msgstr "Close"
 
 #: .\templates\base.html:50 .\templates\league\game_list.html:5
-#: .\templates\league\game_list.html:10
+#: .\templates\league\game_list.html:9
 msgid "Wyniki"
 msgstr "Results"
 
@@ -604,7 +605,7 @@ msgid "Gracze"
 msgstr "Players"
 
 #: .\templates\base.html:63 .\templates\review\review_list.html:5
-#: .\templates\review\review_list.html:10
+#: .\templates\review\review_list.html:9
 #: .\templates\review\teacher_detail.html:49
 msgid "Komentarze"
 msgstr "Reviews"
@@ -705,6 +706,13 @@ msgstr "Edit"
 #: .\templates\league\game_form.html:47 .\templates\league\player_form.html:16
 msgid "Zapisz"
 msgstr "Save"
+
+#: .\templates\league\game_list.html:12
+#: .\templates\league\upcoming_games_list.html:11 .\templates\misc\home.html:61
+#: .\templates\review\review_list.html:13
+#: .\templates\review\teacher_detail.html:38
+msgid "Grupy"
+msgstr "Groups"
 
 #: .\templates\league\group_detail.html:43
 msgid "Miejsce"
@@ -1015,8 +1023,7 @@ msgid "Stwórz"
 msgstr "Create"
 
 #: .\templates\league\upcoming_games_list.html:5
-#: .\templates\league\upcoming_games_list.html:10
-#: .\templates\misc\home.html:104
+#: .\templates\league\upcoming_games_list.html:8 .\templates\misc\home.html:104
 msgid "Nadchodzące gry"
 msgstr "Upcoming games"
 
@@ -1090,10 +1097,6 @@ msgstr "Sign up!"
 #: .\templates\misc\home.html:53
 msgid "Aktualny sezon"
 msgstr "Current season"
-
-#: .\templates\misc\home.html:61 .\templates\review\teacher_detail.html:38
-msgid "Grupy"
-msgstr "Groups"
 
 #: .\templates\misc\home.html:68
 msgid "Rozegranych gier"

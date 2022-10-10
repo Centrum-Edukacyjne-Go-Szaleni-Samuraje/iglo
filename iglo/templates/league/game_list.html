@@ -5,9 +5,17 @@
 {% block page_title %}{% translate "Wyniki" %}{% endblock %}
 
 {% block content %}
+    <div class="d-sm-flex align-items-baseline justify-content-between mb-3">
+        <h2>{% translate "Wyniki" %}</h2>
+        <form class="d-flex" method="get">
+            <div class="input-group">
+                <input type="text" name="groups" class="form-control" placeholder="{% translate "Grupy" %}" value="{{ groups }}">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+            </div>
+        </form>
+    </div>
     <div class="row mb-3">
         <div class="col">
-            <h2 class="mb-4">{% translate "Wyniki" %}</h2>
             {% include "includes/results_table.html" with games=game_list full=True%}
         </div>
     </div>

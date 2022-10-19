@@ -14,7 +14,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Sum
 from django.db.models.functions import Round as DjangoRound
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -680,6 +680,23 @@ class GameManager(models.Manager):
             date__lt=datetime.date.today(),
         )
 
+    def get_latest_finished(self) -> QuerySet:
+        return self.prefetch_related("group", "black__player", "white__player")\
+            .filter(sgf_updated__isnull=False)\
+            .order_by("-sgf_updated")
+
+    def get_latest_reviews(self) -> QuerySet:
+        return self.prefetch_related("group", "black__player", "white__player", "group__teacher")\
+            .filter(review_updated__isnull=False)\
+            .order_by("-review_updated")
+
+    def get_upcoming_games(self) -> QuerySet:
+        now = datetime.datetime.now()
+        one_hour_ago = now - datetime.timedelta(hours=1)
+        return self.prefetch_related("group", "black__player", "white__player")\
+            .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)\
+            .order_by("date")
+
 
 def points_difference_validator(value: Optional[decimal.Decimal]) -> None:
     if value is not None:
@@ -733,6 +750,9 @@ class Game(models.Model):
     ai_analyse_link = models.URLField(null=True, blank=True)
     delayed_reminder_sent = models.DateTimeField(null=True)
 
+    sgf_updated = models.DateTimeField(null=True)
+    review_updated = models.DateTimeField(null=True)
+
     objects = GameManager()
 
     def __str__(self) -> str:
@@ -747,20 +767,6 @@ class Game(models.Model):
     @property
     def is_bye(self):
         return self.win_type == WinType.BYE
-
-    @property
-    def result(self) -> Optional[str]:
-        if not self.is_played:
-            return None
-        if not self.winner or self.is_bye:
-            return WinType(self.win_type).label
-        winner_color = "B" if self.winner == self.black else "W"
-        if self.win_type:
-            win_type = (
-                self.points_difference or 0.5 if self.win_type == WinType.POINTS else WinType(self.win_type).label
-            )
-            return f"{winner_color}+{win_type}"
-        return winner_color
 
     def get_absolute_url(self):
         if self.is_bye:
@@ -841,6 +847,19 @@ class GameAIAnalyseUpload(models.Model):
     updated = models.DateTimeField(auto_now=True)
     error = models.TextField()
     result = models.URLField(null=True)
+
+
+@receiver(signal=pre_save, sender=Game)
+def update_game_timestamps(sender, instance: Game, raw, using, update_fields, **kwargs):
+    try:
+        db_game: Game = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        pass
+    else:
+        if db_game.review_updated is None and instance.review_video_link and len(str(instance.review_video_link)) > 0:
+            instance.review_updated = datetime.datetime.now()
+        if db_game.sgf_updated is None and instance.sgf and len(str(instance.sgf)) > 0:
+            instance.sgf_updated = datetime.datetime.now()
 
 
 @receiver(signal=post_save, sender=Game)

@@ -73,7 +73,7 @@
                 </div>
                 <h5>
                     {% if object.is_played %}
-                        {{ object.result }}
+                        {{ object | result }}
                     {% else %}
                         {% blocktrans %}Gra jeszcze się nie odbyła.{% endblocktrans %}
                     {% endif %}

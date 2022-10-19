@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block page_title %}{% translate "Nadchodzące gry" %}{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-baseline justify-content-between mb-3">
+        <h2>{% translate "Nadchodzące gry" %}</h2>
+        <form class="d-flex" method="get">
+            <div class="input-group">
+                <input type="text" name="groups" class="form-control" placeholder="{% translate "Grupy" %}" value="{{ groups }}">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            {% include "includes/upcoming_games_table.html" with games=game_list full=True%}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="d-flex justify-content-center">
+                {% include "includes/pagination.html" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

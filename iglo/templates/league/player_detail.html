@@ -113,7 +113,7 @@
                                                     {% include "league/includes/game_players.html" with game=game %}
                                                 </div>
                                                 {% if game.is_played %}
-                                                    <h6>{{ game.result }}</h6>
+                                                    <h6>{{ game | result }}</h6>
                                                 {% elif game.date %}
                                                     <div>
                                                         <i class="fas fa-calendar-day"></i> {{ game.date }}

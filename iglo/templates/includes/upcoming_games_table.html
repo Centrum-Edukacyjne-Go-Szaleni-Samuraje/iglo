@@ -1,0 +1,38 @@
+{% load i18n %}
+{% if games %}
+    <div class="container">
+        {% for game in games %}
+            <div class="row">
+                {% if full %}
+                    <div class="col-1 text-muted">
+                        {{ game.group.name }}
+                    </div>
+                {% endif %}
+                <div class="col">
+                    <i class="fas fa-circle"></i>
+                    {{ game.black.player.nick }}
+                </div>
+                {% if not full %}
+                    <div class="col-1">-</div>
+                {% endif %}
+                <div class="col">
+                    <i class="far fa-circle"></i>
+                    {{ game.white.player.nick }}
+                </div>
+                <div class="col {% if not full %} order-md-last {% endif %}">
+                    <span class="text-muted small">
+                        {{ game.date }}
+                    </span>
+                </div>
+                <div class="col-1">
+                    <a href="{{ game.get_absolute_url }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                <div class="w-100"></div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div>{% translate "W najbliższym czasie nie ma zaplanowanych gier" %}</div>
+{% endif %}

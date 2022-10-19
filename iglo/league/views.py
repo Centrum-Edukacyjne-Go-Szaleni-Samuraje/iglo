@@ -434,3 +434,40 @@ class LeagueAdminView(TemplateView, UserRoleRequired):
             )
         context = self.get_context_data()
         return self.render_to_response(context)
+
+
+class GameListView(ListView):
+    model = Game
+    paginate_by = 30
+
+    def get_queryset(self):
+        queryset = Game.objects.get_latest_finished()
+        groups = self.request.GET.get("groups")
+        if groups:
+            groups = list(groups.upper())
+            queryset = queryset.filter(group__name__in=groups)
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return super().get_context_data(object_list=object_list, **kwargs) | {
+            "groups": self.request.GET.get("groups", "")
+        }
+
+
+class UpcomingGameListView(ListView):
+    model = Game
+    template_name = "league/upcoming_games_list.html"
+    paginate_by = 30
+
+    def get_queryset(self):
+        queryset = Game.objects.get_upcoming_games()
+        groups = self.request.GET.get("groups")
+        if groups:
+            groups = list(groups.upper())
+            queryset = queryset.filter(group__name__in=groups)
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return super().get_context_data(object_list=object_list, **kwargs) | {
+            "groups": self.request.GET.get("groups", "")
+        }

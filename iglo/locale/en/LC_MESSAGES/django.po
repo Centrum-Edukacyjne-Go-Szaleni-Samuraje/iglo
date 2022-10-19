@@ -112,6 +112,7 @@ msgstr "Arbiter"
 
 #: .\accounts\texts.py:28 .\templates\league\group_detail.html:32
 #: .\templates\league\season_detail.html:79
+#: .\templates\review\review_list.html:12
 msgid "Nauczyciel"
 msgstr "Teacher"
 
@@ -379,7 +380,7 @@ msgid "Zoastaliśmy o tym poinformowani."
 msgstr "We have been informed about it."
 
 #: .\templates\accounts\login.html:5 .\templates\accounts\login.html:8
-#: .\templates\base.html:118
+#: .\templates\base.html:129
 msgid "Logowanie"
 msgstr "Login"
 
@@ -598,7 +599,13 @@ msgstr "Seasons"
 msgid "Gracze"
 msgstr "Players"
 
-#: .\templates\base.html:57 .\templates\review\teacher_detail.html:13
+#: .\templates\base.html:63 .\templates\review\review_list.html:5
+#: .\templates\review\review_list.html:9
+#: .\templates\review\teacher_detail.html:49
+msgid "Komentarze"
+msgstr "Reviews"
+
+#: .\templates\base.html:68 .\templates\review\teacher_detail.html:13
 #: .\templates\review\teacher_list.html:5
 #: .\templates\review\teacher_list.html:12
 #: .\templates\review\teacher_list.html:15
@@ -630,6 +637,10 @@ msgstr "Change password/email"
 #: .\templates\base.html:109
 msgid "Wyloguj"
 msgstr "Logout"
+
+#: .\templates\includes\upcoming_games_table.html:37
+msgid "W najbliższym czasie nie ma zaplanowanych gier"
+msgstr "No upcoming games yet"
 
 #: .\templates\league\game_detail.html:6 .\templates\league\game_detail.html:29
 #: .\templates\league\game_form.html:22 .\templates\league\group_detail.html:5
@@ -690,6 +701,13 @@ msgstr "Edit"
 #: .\templates\league\game_form.html:47 .\templates\league\player_form.html:16
 msgid "Zapisz"
 msgstr "Save"
+
+#: .\templates\league\game_list.html:12
+#: .\templates\league\upcoming_games_list.html:11 .\templates\misc\home.html:61
+#: .\templates\review\review_list.html:13
+#: .\templates\review\teacher_detail.html:38
+msgid "Grupy"
+msgstr "Groups"
 
 #: .\templates\league\group_detail.html:43
 msgid "Miejsce"
@@ -999,6 +1017,11 @@ msgstr "%(number_of_players)s players in %(groups_count)s groups"
 msgid "Stwórz"
 msgstr "Create"
 
+#: .\templates\league\upcoming_games_list.html:5
+#: .\templates\league\upcoming_games_list.html:8 .\templates\misc\home.html:104
+msgid "Nadchodzące gry"
+msgstr "Upcoming games"
+
 #: .\templates\misc\contact.html:11
 msgid "W sprawach dotyczących IGLO zapraszamy do kontaktu z:"
 msgstr "In matters regarding IGLO please contact:"
@@ -1070,10 +1093,6 @@ msgstr "Sign up!"
 msgid "Aktualny sezon"
 msgstr "Current season"
 
-#: .\templates\misc\home.html:61 .\templates\review\teacher_detail.html:38
-msgid "Grupy"
-msgstr "Groups"
-
 #: .\templates\misc\home.html:68
 msgid "Rozegranych gier"
 msgstr "Finished games"
@@ -1110,7 +1129,20 @@ msgstr ""
 "For more information see the <a href=\"%(rules_url)s\"> terms of service </"
 "a>."
 
-#: .\templates\misc\home.html:106
+#: .\templates\misc\home.html:108 .\templates\misc\home.html:119
+#: .\templates\misc\home.html:130
+msgid "więcej..."
+msgstr "more..."
+
+#: .\templates\misc\home.html:115
+msgid "Najnowsze gry"
+msgstr "Recent games"
+
+#: .\templates\misc\home.html:126
+msgid "Najnowsze komentarze"
+msgstr "Recent reviews"
+
+#: .\templates\misc\home.html:141
 msgid ""
 "<strong>Dołącz do naszego serwera Discord!</strong> Bądź na bieżąco ze "
 "wszystkimi ogłoszeniami organizatorów. Uczestnicz w dyskusjach dotyczących "
@@ -1121,15 +1153,15 @@ msgstr ""
 "organizers announcements. Participate in discussions about the league, games "
 "and teachers comments. We invite you to the <code>#iglo</code> channel."
 
-#: .\templates\misc\home.html:113
+#: .\templates\misc\home.html:148
 msgid "Dołącz"
 msgstr "Join"
 
-#: .\templates\misc\home.html:122
+#: .\templates\misc\home.html:157
 msgid "Wsparcie"
 msgstr "Support"
 
-#: .\templates\misc\home.html:125
+#: .\templates\misc\home.html:160
 msgid ""
 "Udział w IGLO jest całkowicie darmowy! Pamiętaj jednak, że aby opłacić "
 "wykłady i komentarze korzystamy ze wsparcia naszych patronów. Jeśli również "
@@ -1140,11 +1172,11 @@ msgstr ""
 "to pay for lectures and comments. We encourage you to join if you want to "
 "take part in the development of the League and support its further expansion!"
 
-#: .\templates\misc\home.html:132
+#: .\templates\misc\home.html:167
 msgid "Co jesteśmy w stanie zdziałać dzięki Twojemu wsparciu:"
 msgstr "What we are able to do thanks to your support:"
 
-#: .\templates\misc\home.html:139
+#: .\templates\misc\home.html:174
 #, python-format
 msgid ""
 "Podpisujemy umowy z Nauczycielami, dzięki czemu możesz korzystać z "
@@ -1155,7 +1187,7 @@ msgstr ""
 "lectures and commentaries tailored to each group (more in <a href="
 "\"%(teacher_list_url)s\"> Teachers </a>)."
 
-#: .\templates\misc\home.html:146
+#: .\templates\misc\home.html:181
 msgid ""
 "Opłacamy serwer i domenę strony internetowej, dlatego każdy gracz posiada "
 "własne konto, dzięki któremu może w łatwy sposób obsługiwać swoje gry."
@@ -1163,11 +1195,11 @@ msgstr ""
 "We pay for the server and the website domain so each player has their own "
 "account and can easily manage their games."
 
-#: .\templates\misc\home.html:152
+#: .\templates\misc\home.html:187
 msgid "Jesteśmy w stanie zapewnić niezbędną obsługę prawną i księgową."
 msgstr "We are able to provide the necessary legal and accounting services."
 
-#: .\templates\misc\home.html:158
+#: .\templates\misc\home.html:193
 msgid ""
 "Wystarczy naprawdę niewiele, a dzięki temu możemy działać szybciej i "
 "sprawniej."
@@ -1175,7 +1207,7 @@ msgstr ""
 "It takes really little and thanks to this we can act faster and more "
 "efficiently."
 
-#: .\templates\misc\home.html:163
+#: .\templates\misc\home.html:198
 msgid "Wpłat można dokonywać na:"
 msgstr "Payments can be made to:"
 

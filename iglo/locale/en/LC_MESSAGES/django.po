@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-10 18:43+0200\n"
+"POT-Creation-Date: 2022-10-02 11:43+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -507,7 +507,7 @@ msgid "Resetowanie hasła na stronie IGLO"
 msgstr "Resetting password on the IGLO site"
 
 #: .\templates\accounts\registration.html:5
-#: .\templates\accounts\registration.html:8 .\templates\base.html:134
+#: .\templates\accounts\registration.html:8 .\templates\base.html:123
 msgid "Rejestracja"
 msgstr "Register"
 
@@ -583,12 +583,7 @@ msgstr ""
 msgid "Zamknij"
 msgstr "Close"
 
-#: .\templates\base.html:50 .\templates\league\game_list.html:5
-#: .\templates\league\game_list.html:9
-msgid "Wyniki"
-msgstr "Results"
-
-#: .\templates\base.html:54 .\templates\league\game_detail.html:26
+#: .\templates\base.html:48 .\templates\league\game_detail.html:26
 #: .\templates\league\game_form.html:19 .\templates\league\group_detail.html:13
 #: .\templates\league\season_detail.html:12
 #: .\templates\league\season_list.html:5 .\templates\league\season_list.html:12
@@ -596,7 +591,7 @@ msgstr "Results"
 msgid "Sezony"
 msgstr "Seasons"
 
-#: .\templates\base.html:58 .\templates\league\group_detail.html:196
+#: .\templates\base.html:52 .\templates\league\group_detail.html:196
 #: .\templates\league\player_detail.html:13
 #: .\templates\league\player_list.html:5 .\templates\league\player_list.html:12
 #: .\templates\league\player_list.html:16
@@ -617,29 +612,29 @@ msgstr "Reviews"
 msgid "Nauczyciele"
 msgstr "Teachers"
 
-#: .\templates\base.html:77 .\templates\misc\rules.html:5
+#: .\templates\base.html:66 .\templates\misc\rules.html:5
 #: .\templates\misc\rules.html:10
 msgid "Regulamin"
 msgstr "Rules"
 
-#: .\templates\base.html:82 .\templates\league\player_detail.html:136
+#: .\templates\base.html:71 .\templates\league\player_detail.html:136
 #: .\templates\misc\contact.html:5 .\templates\misc\contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
 
-#: .\templates\base.html:91
+#: .\templates\base.html:80
 msgid "Twoje Gry"
 msgstr "Your games"
 
-#: .\templates\base.html:105
+#: .\templates\base.html:94
 msgid "Edytuj profil"
 msgstr "Edit profile"
 
-#: .\templates\base.html:112
+#: .\templates\base.html:101
 msgid "Zmień hasło/email"
 msgstr "Change password/email"
 
-#: .\templates\base.html:120
+#: .\templates\base.html:109
 msgid "Wyloguj"
 msgstr "Logout"
 
@@ -1563,6 +1558,10 @@ msgstr ""
 "By registering on the website, you declare that you have read and accept the "
 "terms of service."
 
+#: .\templates\review\teacher_detail.html:49
+msgid "Komentarze"
+msgstr "Comments"
+
 #: .\templates\review\teacher_list.html:17
 msgid ""
 "Wszystkie archiwalne i bieżące wykłady przeprowadzone przez naszych "
@@ -1616,7 +1615,7 @@ msgstr "Our teachers"
 #: .\templates\timetable\timetable.html:12
 #: .\templates\timetable\timetable.html:16
 msgid "Kalendarz"
-msgstr "Calendar"
+msgstr "Timetable"
 
 #: .\templates\timetable\timetable.html:24
 #, fuzzy

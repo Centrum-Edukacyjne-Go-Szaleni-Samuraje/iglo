@@ -7,13 +7,23 @@
 {% block content %}
     <div class="d-sm-flex align-items-baseline justify-content-between mb-3">
         <h2>{% translate "Wyniki" %}</h2>
-        <form class="d-flex" method="get">
-            <div class="input-group">
+    </div>
+    <form method="get">
+        <div class="row">
+            <div class="col-1">
+                <input type="text" name="seasons" class="form-control" placeholder="{% translate "Sezony" %}" value="{{ seasons }}">
+            </div>
+            <div class="col-1">
                 <input type="text" name="groups" class="form-control" placeholder="{% translate "Grupy" %}" value="{{ groups }}">
+            </div>
+            <div class="col-5">
+                <input type="text" name="player" class="form-control" placeholder="{% translate "Gracz" %}" value="{{ player }}">
+            </div>
+            <div class="col-1">
                 <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
     <div class="row mb-3">
         <div class="col">
             {% include "includes/results_table.html" with games=game_list full=True%}

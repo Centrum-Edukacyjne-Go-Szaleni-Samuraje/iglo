@@ -3,7 +3,7 @@ import datetime
 
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -442,15 +442,27 @@ class GameListView(ListView):
 
     def get_queryset(self):
         queryset = Game.objects.get_latest_finished()
+        seasons = self.request.GET.get("seasons")
+        if seasons:
+            seasons = (int(s) for s in seasons.split() if s.isdigit())
+            queryset = queryset.filter(group__season__number__in=seasons)
         groups = self.request.GET.get("groups")
         if groups:
             groups = list(groups.upper())
             queryset = queryset.filter(group__name__in=groups)
+        player = self.request.GET.get("player")
+        if player:
+            queryset = queryset.filter(
+                Q(black__player__nick__icontains=player) |
+                Q(white__player__nick__icontains=player)
+            )
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         return super().get_context_data(object_list=object_list, **kwargs) | {
-            "groups": self.request.GET.get("groups", "")
+            "seasons": self.request.GET.get("seasons", ""),
+            "groups": self.request.GET.get("groups", ""),
+            "player": self.request.GET.get("player", "")
         }
 
 

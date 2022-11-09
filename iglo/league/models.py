@@ -680,20 +680,26 @@ class GameManager(models.Manager):
             date__lt=datetime.date.today(),
         )
 
-    def get_latest_finished(self) -> QuerySet:
-        return self.prefetch_related("group", "black__player", "white__player")\
-            .filter(sgf_updated__isnull=False)\
-            .order_by("-sgf_updated")
+    def get_latest_finished(self, current_season=False) -> QuerySet:
+        queryset = self.prefetch_related("group", "black__player", "white__player", "group__season")\
+            .order_by("-sgf_updated")\
+            .filter(sgf_updated__isnull=False)
+        if current_season:
+            queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
+        return queryset
 
-    def get_latest_reviews(self) -> QuerySet:
-        return self.prefetch_related("group", "black__player", "white__player", "group__teacher")\
-            .filter(review_updated__isnull=False)\
-            .order_by("-review_updated")
+    def get_latest_reviews(self, current_season=False) -> QuerySet:
+        queryset = self.prefetch_related("group", "black__player", "white__player", "group__teacher", "group__season")\
+            .order_by("-review_updated")\
+            .filter(review_updated__isnull=False)
+        if current_season:
+            queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
+        return queryset
 
     def get_upcoming_games(self) -> QuerySet:
         now = datetime.datetime.now()
         one_hour_ago = now - datetime.timedelta(hours=1)
-        return self.prefetch_related("group", "black__player", "white__player")\
+        return self.prefetch_related("group", "black__player", "white__player", "group__season")\
             .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)\
             .order_by("date")
 

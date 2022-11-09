@@ -59,6 +59,6 @@ urlpatterns = [
     path("players/<slug>", PlayerDetailView.as_view(), name="player-detail"),
     path("players/<slug>/settings", PlayerUpdateView.as_view(), name="player-settings"),
     path("league/admin", LeagueAdminView.as_view(), name="league-admin-view"),
-    path("league/games/finished", GameListView.as_view(), name="games-list"),
-    path("league/games/upcoming", UpcomingGameListView.as_view(), name="upcoming-games-list")
+    path("games/finished", GameListView.as_view(), name="games-list"),
+    path("games/upcoming", UpcomingGameListView.as_view(), name="upcoming-games-list")
 ]

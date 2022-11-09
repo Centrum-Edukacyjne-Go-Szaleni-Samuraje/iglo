@@ -10,8 +10,8 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "latest_season": Season.objects.get_latest(),
-            "latest_reviews": Game.objects.get_latest_reviews()[:self.tables_count],
-            "latest_games": Game.objects.get_latest_finished()[:self.tables_count],
+            "latest_reviews": Game.objects.get_latest_reviews(current_season=True)[:self.tables_count],
+            "latest_games": Game.objects.get_latest_finished(current_season=True)[:self.tables_count],
             "upcoming_games": Game.objects.get_upcoming_games()[:self.tables_count]
         }
 

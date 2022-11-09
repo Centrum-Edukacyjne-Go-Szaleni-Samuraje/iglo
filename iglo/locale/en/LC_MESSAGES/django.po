@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-02 11:43+0200\n"
+"POT-Creation-Date: 2022-11-09 20:26+0100\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -112,7 +112,7 @@ msgstr "Arbiter"
 
 #: .\accounts\texts.py:28 .\templates\league\group_detail.html:32
 #: .\templates\league\season_detail.html:79
-#: .\templates\review\review_list.html:12
+#: .\templates\review\review_list.html:23
 msgid "Nauczyciel"
 msgstr "Teacher"
 
@@ -507,7 +507,7 @@ msgid "Resetowanie hasła na stronie IGLO"
 msgstr "Resetting password on the IGLO site"
 
 #: .\templates\accounts\registration.html:5
-#: .\templates\accounts\registration.html:8 .\templates\base.html:123
+#: .\templates\accounts\registration.html:8 .\templates\base.html:134
 msgid "Rejestracja"
 msgstr "Register"
 
@@ -583,15 +583,22 @@ msgstr ""
 msgid "Zamknij"
 msgstr "Close"
 
-#: .\templates\base.html:48 .\templates\league\game_detail.html:26
-#: .\templates\league\game_form.html:19 .\templates\league\group_detail.html:13
+#: .\templates\base.html:50 .\templates\league\game_list.html:5
+#: .\templates\league\game_list.html:9
+msgid "Wyniki"
+msgstr "Results"
+
+#: .\templates\base.html:54 .\templates\league\game_detail.html:26
+#: .\templates\league\game_form.html:19 .\templates\league\game_list.html:14
+#: .\templates\league\group_detail.html:13
 #: .\templates\league\season_detail.html:12
 #: .\templates\league\season_list.html:5 .\templates\league\season_list.html:12
 #: .\templates\league\season_list.html:16
+#: .\templates\review\review_list.html:14
 msgid "Sezony"
 msgstr "Seasons"
 
-#: .\templates\base.html:52 .\templates\league\group_detail.html:196
+#: .\templates\base.html:58 .\templates\league\group_detail.html:196
 #: .\templates\league\player_detail.html:13
 #: .\templates\league\player_list.html:5 .\templates\league\player_list.html:12
 #: .\templates\league\player_list.html:16
@@ -612,31 +619,39 @@ msgstr "Reviews"
 msgid "Nauczyciele"
 msgstr "Teachers"
 
-#: .\templates\base.html:66 .\templates\misc\rules.html:5
+#: .\templates\base.html:77 .\templates\misc\rules.html:5
 #: .\templates\misc\rules.html:10
 msgid "Regulamin"
 msgstr "Rules"
 
-#: .\templates\base.html:71 .\templates\league\player_detail.html:136
+#: .\templates\base.html:82 .\templates\league\player_detail.html:136
 #: .\templates\misc\contact.html:5 .\templates\misc\contact.html:10
 msgid "Kontakt"
 msgstr "Contact"
 
-#: .\templates\base.html:80
+#: .\templates\base.html:91
 msgid "Twoje Gry"
 msgstr "Your games"
 
-#: .\templates\base.html:94
+#: .\templates\base.html:105
 msgid "Edytuj profil"
 msgstr "Edit profile"
 
-#: .\templates\base.html:101
+#: .\templates\base.html:112
 msgid "Zmień hasło/email"
 msgstr "Change password/email"
 
-#: .\templates\base.html:109
+#: .\templates\base.html:120
 msgid "Wyloguj"
 msgstr "Logout"
+
+#: .\templates\includes\results_table.html:41
+msgid "Żadna gra w tym sezonie nie została jeszcze rozegrana"
+msgstr "No results yet this season"
+
+#: .\templates\includes\reviews_table.html:48
+msgid "Żadna gra w tym sezonie nie została jeszcze skomentowana"
+msgstr "No reviews yet this season"
 
 #: .\templates\includes\upcoming_games_table.html:37
 msgid "W najbliższym czasie nie ma zaplanowanych gier"
@@ -702,21 +717,22 @@ msgstr "Edit"
 msgid "Zapisz"
 msgstr "Save"
 
-#: .\templates\league\game_list.html:12
+#: .\templates\league\game_list.html:17
 #: .\templates\league\upcoming_games_list.html:11 .\templates\misc\home.html:61
-#: .\templates\review\review_list.html:13
+#: .\templates\review\review_list.html:17
 #: .\templates\review\teacher_detail.html:38
 msgid "Grupy"
 msgstr "Groups"
 
+#: .\templates\league\game_list.html:20 .\templates\league\group_detail.html:44
+#: .\templates\league\group_detail.html:76
+#: .\templates\review\review_list.html:20
+msgid "Gracz"
+msgstr "Player"
+
 #: .\templates\league\group_detail.html:43
 msgid "Miejsce"
 msgstr "Place"
-
-#: .\templates\league\group_detail.html:44
-#: .\templates\league\group_detail.html:76
-msgid "Gracz"
-msgstr "Player"
 
 #: .\templates\league\group_detail.html:46
 #: .\templates\league\group_detail.html:78
@@ -1557,10 +1573,6 @@ msgid ""
 msgstr ""
 "By registering on the website, you declare that you have read and accept the "
 "terms of service."
-
-#: .\templates\review\teacher_detail.html:49
-msgid "Komentarze"
-msgstr "Comments"
 
 #: .\templates\review\teacher_list.html:17
 msgid ""

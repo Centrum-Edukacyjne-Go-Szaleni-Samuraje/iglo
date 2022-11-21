@@ -1,39 +1,49 @@
-<div class="container">
-    {% for game in games %}
-        <div class="row">
-            {% if full %}
-                <div class="col-1 text-muted">
-                    {{ game.group.name }}
+{% load i18n %}
+{% if games %}
+    <div class="container">
+        {% for game in games %}
+            <div class="row">
+                {% if full %}
+                    <div class="col-1 text-muted">
+                        {{ game.group.season.number }}
+                    </div>
+                    <div class="col-1 text-muted">
+                        {{ game.group.name }}
+                    </div>
+                {% endif %}
+                <div class="col">
+                    <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
+                        <i class="fas fa-circle"></i>
+                        {{ game.black.player.nick }}
+                    </span>
                 </div>
-            {% endif %}
-            <div class="col">
-                <span class="text-nowrap {% if game.winner == game.black %}fw-bold{% endif %}">
-                    <i class="fas fa-circle"></i>
-                    {{ game.black.player.nick }}
-                </span>
+                <div class="col">
+                    <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
+                        <i class="far fa-circle"></i>
+                        {{ game.white.player.nick }}
+                    </span>
+                </div>
+                <div class="col {% if not full %} order-md-last {% endif %}">
+                    <span class="text-muted small">
+                        {% with teacher=game.group.teacher %}
+                            {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
+                        {% endwith %}
+                    </span>
+                </div>
+                <div class="col-1">
+                    <a href="{{ game.review_video_link }}">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+                <div class="col-1">
+                    <a href="{{ game.get_absolute_url }}" target="_blank">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                <div class="w-100"></div>
             </div>
-            {% if not full %}
-                <div class="col-1">-</div>
-            {% endif %}
-            <div class="col">
-                <span class="text-nowrap {% if game.winner == game.white %}fw-bold{% endif %}">
-                    <i class="far fa-circle"></i>
-                    {{ game.white.player.nick }}
-                </span>
-            </div>
-            <div class="col {% if not full %} order-md-last {% endif %}">
-                <span class="text-muted small">
-                    {% with teacher=game.group.teacher %}
-                        {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
-                    {% endwith %}
-                </span>
-            </div>
-            <div class="col-1">
-                <a href="{{ game.get_absolute_url }}">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </div>
-            <div class="w-100"></div>
-        </div>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div>{% translate "Żadna gra w tym sezonie nie została jeszcze skomentowana" %}</div>
+{% endif %}

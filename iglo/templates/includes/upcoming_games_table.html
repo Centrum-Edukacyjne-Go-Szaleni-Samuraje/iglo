@@ -5,6 +5,9 @@
             <div class="row">
                 {% if full %}
                     <div class="col-1 text-muted">
+                        {{ game.group.season.number }}
+                    </div>
+                    <div class="col-1 text-muted">
                         {{ game.group.name }}
                     </div>
                 {% endif %}
@@ -12,9 +15,6 @@
                     <i class="fas fa-circle"></i>
                     {{ game.black.player.nick }}
                 </div>
-                {% if not full %}
-                    <div class="col-1">-</div>
-                {% endif %}
                 <div class="col">
                     <i class="far fa-circle"></i>
                     {{ game.white.player.nick }}

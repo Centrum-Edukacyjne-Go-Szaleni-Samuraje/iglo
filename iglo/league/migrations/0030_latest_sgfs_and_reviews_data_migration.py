@@ -4,33 +4,33 @@ from datetime import datetime
 from django.apps.registry import Apps
 from django.db import migrations
 
-
 BEFORE_IGLO = datetime(2020, 4, 1)
 
 
 def fill_sgf_updated_and_review_updated_fields(apps: Apps, schema_editor):
-    Game = apps.get_model("league", "Game")
-    for game in Game.objects.all():
-        default_date = game.round.end_date or game.group.season.end_date or BEFORE_IGLO
-        default_datetime = datetime.fromordinal(default_date.toordinal())
-        timestamp = min(default_datetime, datetime.now())
-        if game.sgf and len(str(game.sgf)) > 0:
-            game.sgf_updated = timestamp
-        if game.review_video_link and len(str(game.review_video_link)) > 0:
-            game.review_updated = timestamp
-        game.save()
+    pass
+    # Game = apps.get_model("league", "Game")
+    # for game in Game.objects.all():
+    #     default_date = game.round.end_date or game.group.season.end_date or BEFORE_IGLO
+    #     default_datetime = datetime.fromordinal(default_date.toordinal())
+    #     timestamp = min(default_datetime, datetime.now())
+    #     if game.sgf and len(str(game.sgf)) > 0:
+    #         game.sgf_updated = timestamp
+    #     if game.review_video_link and len(str(game.review_video_link)) > 0:
+    #         game.review_updated = timestamp
+    #     game.save()
 
 
 def clean_sgf_updated_and_review_updated_fields(apps: Apps, schema_editor):
-    Game = apps.get_model("league", "Game")
-    for game in Game.objects.all():
-        game.sgf_updated = None
-        game.review_updated = None
-        game.save()
+    pass
+    # Game = apps.get_model("league", "Game")
+    # for game in Game.objects.all():
+    #     game.sgf_updated = None
+    #     game.review_updated = None
+    #     game.save()
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('league', '0029_latest_sgfs_and_reviews'),
     ]

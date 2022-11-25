@@ -18,9 +18,9 @@ def env(key, as_bool=False, as_list=False, as_int=False, required=True, default=
         if not value:
             raise ValueError()
         elif as_bool:
-            return value.lower() == 'true'
+            return value.lower() == "true"
         elif as_list:
-            return value.split(',')
+            return value.split(",")
         elif as_int:
             return int(value)
         return value
@@ -29,7 +29,7 @@ def env(key, as_bool=False, as_list=False, as_int=False, required=True, default=
             return default
         if not required:
             return None
-        raise ImproperlyConfigured('missing environment variable: {0}'.format(key))
+        raise ImproperlyConfigured("missing environment variable: {0}".format(key))
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     "django_countries",
+    "rest_framework",
     "utils",
 ]
 
@@ -105,7 +106,7 @@ WSGI_APPLICATION = "iglo.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default="postgres://postgres:postgres@localhost:5432/postgres"),
+    "default": dj_database_url.config(default="postgres://postgres:postgres@localhost:5432/postgres"),
 }
 
 # Password validation
@@ -171,14 +172,11 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-LOGIN_URL = '/login'
+LOGIN_URL = "/login"
 
 if "SENTRY_DSN" in os.environ:
     sentry_sdk.init(
-        dsn=env("SENTRY_DSN"),
-        integrations=[DjangoIntegration()],
-        traces_sample_rate=1.0,
-        send_default_pii=True
+        dsn=env("SENTRY_DSN"), integrations=[DjangoIntegration()], traces_sample_rate=1.0, send_default_pii=True
     )
 
 DEFAULT_GAME_TIME = datetime.time(16, 0)
@@ -192,12 +190,12 @@ if "EMAIL_HOST" in os.environ and "EMAIL_HOST_USER" in os.environ and "EMAIL_HOS
     EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 INTERNAL_IPS = [
-    '127.0.0.1',
+    "127.0.0.1",
 ]
 
 EGD_SETTINGS = {
@@ -213,7 +211,7 @@ EGD_SETTINGS = {
         byo_yomi=ByoYomi(
             duration=30,
             periods=3,
-        )
+        ),
     ),
 }
 
@@ -243,16 +241,16 @@ OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 OGS_SGF_LINK_FORMAT = "https://online-go.com/api/v1/games/{id}/sgf"
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
     },
 }
 
@@ -267,3 +265,8 @@ LOCALE_PATHS = [
 
 ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default=False)
 ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
+}

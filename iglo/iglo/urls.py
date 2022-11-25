@@ -5,6 +5,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from league.api import router
+
 admin.site.site_header = "IGLO Administration"
 
 localized_patterns = i18n_patterns(
@@ -13,6 +15,7 @@ localized_patterns = i18n_patterns(
     path("", include("accounts.urls", namespace="accounts")),
     path("", include("review.urls")),
     path("", include("timetable.urls")),
+    path("api/", include(router.urls)),
     prefix_default_language=False,
 )
 

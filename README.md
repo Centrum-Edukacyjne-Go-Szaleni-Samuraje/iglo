@@ -1,6 +1,6 @@
 # IGLO
 
-You need Python 3.9 to run this project. 
+You need Python 3.10 to run this project. 
 
 Local development (inside Python venv):
 

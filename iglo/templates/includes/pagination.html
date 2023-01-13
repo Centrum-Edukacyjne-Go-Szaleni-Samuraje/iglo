@@ -1,27 +1,35 @@
 <nav aria-label="Page Navigation">
-  <ul class="pagination">
-    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-      <a class="page-link"
-         {% if page_obj.has_previous %}
-           href="?{% url_params_copy page=page_obj.previous_page_number %}"
-         {% endif %}
-         aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
-    {% for page_number in page_obj.paginator.page_range %}
-    <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
-      <a class="page-link" href="?{% url_params_copy page=page_number %}">{{ page_number }}</a>
-    </li>
-    {% endfor %}
-    <li class="page-item  {% if not page_obj.has_next %}disabled{% endif %}">
-      <a class="page-link"
-         {% if page_obj.has_next %}
-           href="?{% url_params_copy page=page_obj.next_page_number %}"
-         {% endif %}
-         aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-  </ul>
+    <ul class="pagination">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+            <a class="page-link"
+                    {% if page_obj.has_previous %}
+               href="?{% url_params_copy page=page_obj.previous_page_number %}"
+                    {% endif %}
+               aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% if page_obj.number|add:'-4' > 1 %}
+            <li class="page-item"><a class="page-link" href="?{% url_params_copy page=page_obj.number|add:'-5' %}">&hellip;</a></li>
+        {% endif %}
+        {% for page_number in page_obj.paginator.page_range %}
+            {% if page_number > page_obj.number|add:'-5' and page_number < page_obj.number|add:'5' %}
+                <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+                    <a class="page-link" href="?{% url_params_copy page=page_number %}">{{ page_number }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.paginator.num_pages > page_obj.number|add:'4' %}
+            <li class="page-item"><a class="page-link" href="?{% url_params_copy page=page_obj.number|add:'5' %}">&hellip;</a></li>
+        {% endif %}
+        <li class="page-item  {% if not page_obj.has_next %}disabled{% endif %}">
+            <a class="page-link"
+                    {% if page_obj.has_next %}
+               href="?{% url_params_copy page=page_obj.next_page_number %}"
+                    {% endif %}
+               aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
 </nav>

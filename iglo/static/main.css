@@ -34,6 +34,7 @@
 
 .group-table__cell-name {
     text-align: left;
+    white-space: nowrap;
 }
 
 .group-table__cell-result {

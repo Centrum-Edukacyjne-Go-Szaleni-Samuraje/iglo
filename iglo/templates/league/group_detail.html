@@ -2,7 +2,8 @@
 
 {% load static i18n %}
 
-{% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %} {{ object.name }}{% endblock %}
+{% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %}
+    {{ object.name }}{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -35,83 +36,89 @@
             </div>
             {% if object.season.state != "draft" %}
                 <div class="d-flex justify-content-center">
-                    <div class="d-flex flex-column mb-4">
-                        <table class="group-table">
-                            {% if object.type == "round_robin" %}
-                                <thead>
-                                <tr>
-                                    <th class="group-table__header">{% translate "Miejsce" %}</th>
-                                    <th class="group-table__header">{% translate "Gracz" %}</th>
-                                    <th colspan="{{ object.rounds_number }}"
-                                        class="group-table__header d-none d-lg-table-cell">{% translate "Rundy" %}</th>
-                                    <th class="group-table__header d-none d-lg-table-cell">{% translate "Punkty" %}</th>
-                                    <th class="group-table__header d-none d-lg-table-cell">{% translate "SODOS" %}</th>
-                                    <th class="group-table__header d-none d-lg-table-cell">{% translate "Start" %}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for position, member, results in object.results_table %}
-                                    <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
-                                        data-position="{{ position }}">
-                                        <td>{{ position }}</td>
-                                        <td class="group-table__header group-table__cell-name">
-                                            {% include "league/includes/player_badge.html" with player=member.player member=member %}
-                                        </td>
-                                        {% for result, url in results %}
-                                            <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
-                                                <a class="group-table__result-link" data-result="{{ result }}"
-                                                   href="{{ url }}">{{ result }}</a>
-                                            </td>
-                                        {% endfor %}
-                                        <td class="d-none d-lg-table-cell">{{ member.points }}</td>
-                                        <td class="d-none d-lg-table-cell">{{ member.sodos }}</td>
-                                        <td class="d-none d-lg-table-cell">{{ member.order }}</td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            {% elif object.type == "mcmahon" %}
-                                <thead>
-                                    <tr>
-                                        <th class="group-table__header">{% translate "Pozycja" %}</th>
-                                        <th class="group-table__header">{% translate "Gracz" %}</th>
-                                        {% if object.rounds_number %}
-                                        <th colspan="{{ object.rounds_number }}" class="group-table__header d-none d-lg-table-cell">{% translate "Rundy" %}</th>
-                                        {% endif %}
-                                        <th class="group-table__header d-none d-lg-table-cell">
-                                            {% translate "Score" %}
-                                        </th>
-                                        <th class="group-table__header d-none d-lg-table-cell">
-                                            {% translate "SOS" %}
-                                        </th>
-                                        <th class="group-table__header d-none d-lg-table-cell">
-                                            {% translate "SOSOS" %}</th>
-                                        <th class="group-table__header d-none d-lg-table-cell">{% translate "Start" %}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for position, member, results in object.results_table %}
-                                        <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}" data-position="{{ position }}">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td class="group-table__header group-table__cell-name">
-                                                {% include "league/includes/player_badge.html" with player=member.player member=member %}
-                                            </td>
-                                            {% for result, url in results %}
-                                                <td class="group-table__cell-result d-none d-lg-table-cell{% if "+" in result %} group-table__result--win{% endif %}">
-                                                    <a class="group-table__result-link" data-result="{{ result }}" href="{{ url }}">{{ result }}</a>
-                                                </td>
-                                            {% endfor %}
-                                            <td class="d-none d-lg-table-cell">{{ member.score }}</td>
-                                            <td class="d-none d-lg-table-cell">{{ member.sos }}</td>
-                                            <td class="d-none d-lg-table-cell">{{ member.sosos }}</td>
-                                            <td class="d-none d-lg-table-cell">{{ member.order }}</td>
+                    <div class="d-flex flex-column mb-4 mw-100">
+                        <div class="table-responsive">
+                            <table class="group-table">
+                                {% if object.type == "round_robin" %}
+                                    <thead>
+                                        <tr>
+                                            <th class="group-table__header">{% translate "Miejsce" %}</th>
+                                            <th class="group-table__header">{% translate "Gracz" %}</th>
+                                            <th colspan="{{ object.rounds_number }}"
+                                                class="group-table__header">{% translate "Rundy" %}</th>
+                                            <th class="group-table__header">{% translate "Punkty" %}</th>
+                                            <th class="group-table__header">{% translate "SODOS" %}</th>
+                                            <th class="group-table__header">{% translate "Start" %}</th>
                                         </tr>
-                                    {% endfor %}
-                                </tbody>
-                            {% else %}
-                                {% translate "Nieznany typ grupy" %}
-                            {% endif %}
-                        </table>
-                        <a href="#" class="align-self-end text-decoration-none mt-1" data-bs-toggle="modal" data-bs-target="#result-table-modal">
+                                    </thead>
+                                    <tbody>
+                                        {% for position, member, results in object.results_table %}
+                                            <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
+                                                data-position="{{ position }}">
+                                                <td>{{ position }}</td>
+                                                <td class="group-table__header group-table__cell-name">
+                                                    {% include "league/includes/player_badge.html" with player=member.player member=member %}
+                                                </td>
+                                                {% for result, url in results %}
+                                                    <td class="group-table__cell-result{% if "+" in result %} group-table__result--win{% endif %}">
+                                                        <a class="group-table__result-link" data-result="{{ result }}"
+                                                           href="{{ url }}">{{ result }}</a>
+                                                    </td>
+                                                {% endfor %}
+                                                <td>{{ member.points }}</td>
+                                                <td>{{ member.sodos }}</td>
+                                                <td>{{ member.order }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                {% elif object.type == "mcmahon" %}
+                                    <thead>
+                                        <tr>
+                                            <th class="group-table__header">{% translate "Pozycja" %}</th>
+                                            <th class="group-table__header">{% translate "Gracz" %}</th>
+                                            {% if object.rounds_number %}
+                                                <th colspan="{{ object.rounds_number }}"
+                                                    class="group-table__header">{% translate "Rundy" %}</th>
+                                            {% endif %}
+                                            <th class="group-table__header">
+                                                {% translate "MMS" %}
+                                            </th>
+                                            <th class="group-table__header">
+                                                {% translate "SOS" %}
+                                            </th>
+                                            <th class="group-table__header">
+                                                {% translate "SOSOS" %}</th>
+                                            <th class="group-table__header">{% translate "Start" %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for position, member, results in object.results_table %}
+                                            <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
+                                                data-position="{{ position }}">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="group-table__header group-table__cell-name">
+                                                    {% include "league/includes/player_badge.html" with player=member.player member=member %}
+                                                </td>
+                                                {% for result, url in results %}
+                                                    <td class="group-table__cell-result{% if "+" in result %} group-table__result--win{% endif %}">
+                                                        <a class="group-table__result-link" data-result="{{ result }}"
+                                                           href="{{ url }}">{{ result }}</a>
+                                                    </td>
+                                                {% endfor %}
+                                                <td>{{ member.score }}</td>
+                                                <td>{{ member.sos }}</td>
+                                                <td>{{ member.sosos }}</td>
+                                                <td>{{ member.order }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                {% else %}
+                                    {% translate "Nieznany typ grupy" %}
+                                {% endif %}
+                            </table>
+                        </div>
+                        <a href="#" class="align-self-end text-decoration-none mt-1" data-bs-toggle="modal"
+                           data-bs-target="#result-table-modal">
                             <span class="text-muted small">{% blocktrans %}Jak czytać wyniki?{% endblocktrans %}</span></a>
                     </div>
                 </div>
@@ -137,18 +144,20 @@
                 </div>
                 {% for round in object.rounds.all %}
                     <div class="card mb-3">
-                        <div class="card-header d-flex justify-content-between align-items-center clickable"
+                        <div class="card-header d-flex justify-content-between align-items-center clickable flex-column flex-md-row align-items-stretch align-items-md-baseline"
                              onClick="toggle_collapse(event)" data-target="round-{{ forloop.counter }}">
-                            <strong>{% translate "Runda" %} #{{ round.number }}</strong>
-                            <div>
-                                {% if round.start_date and round.end_date %}{{ round.start_date }} -
-                                    {{ round.end_date }}{% endif %}
-                                <button class="btn" onClick="toggle_collapse(event)"
-                                        data-target="round-{{ forloop.counter }}">
-                                    <i id="collapse-round-{{ forloop.counter }}" style="pointer-events: none;" class="fas
-                                       {% if round.is_current %} fa-chevron-up {% else %} fa-chevron-down {% endif %}"></i>
-                                </button>
+                            <div class="d-flex flex-grow-1">
+                                <strong class="flex-grow-1">{% translate "Runda" %} #{{ round.number }}</strong>
+                                <div>
+                                    {% if round.start_date and round.end_date %}{{ round.start_date }} -
+                                        {{ round.end_date }}{% endif %}
+                                </div>
                             </div>
+                            <button class="btn" onClick="toggle_collapse(event)"
+                                    data-target="round-{{ forloop.counter }}">
+                                <i id="collapse-round-{{ forloop.counter }}" style="pointer-events: none;" class="fas
+                                   {% if round.is_current %} fa-chevron-up {% else %} fa-chevron-down {% endif %}"></i>
+                            </button>
                         </div>
                         <div class="card-body collapse {% if round.is_current %}show{% endif %}"
                              id="round-{{ forloop.counter }}">
@@ -240,31 +249,31 @@
     <script>
         function toggle_collapse(event) {
             event.stopPropagation();
-            element_id = event.target.getAttribute("data-target");
-            document.getElementById(element_id).classList.toggle("show");
-            icon_id = "collapse-" + element_id;
-            document.getElementById(icon_id).classList.toggle("fa-chevron-down");
-            document.getElementById(icon_id).classList.toggle("fa-chevron-up");
+            element_id = event.target.getAttribute('data-target');
+            document.getElementById(element_id).classList.toggle('show');
+            icon_id = 'collapse-' + element_id;
+            document.getElementById(icon_id).classList.toggle('fa-chevron-down');
+            document.getElementById(icon_id).classList.toggle('fa-chevron-up');
         }
 
         function toggleRowHighlight(event, highlight) {
-            const result = event.target.getAttribute("data-result");
+            const result = event.target.getAttribute('data-result');
             if (result) {
                 const position = result.slice(0, -1);
                 const row = document.querySelector(`.group-table__row[data-position="${position}"]`)
                 if (highlight) {
-                    row.classList.add("group-table__row--highlighted");
+                    row.classList.add('group-table__row--highlighted');
                 } else {
-                    row.classList.remove("group-table__row--highlighted");
+                    row.classList.remove('group-table__row--highlighted');
                 }
             }
         }
 
         document.querySelectorAll('.group-table__result-link').forEach(function (item) {
-            item.addEventListener("mouseover", function (event) {
+            item.addEventListener('mouseover', function (event) {
                 toggleRowHighlight(event, true);
             });
-            item.addEventListener("mouseleave", function (event) {
+            item.addEventListener('mouseleave', function (event) {
                 toggleRowHighlight(event, false);
             });
         });

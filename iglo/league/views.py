@@ -28,7 +28,7 @@ from league.models import (
     Member,
     GamesWithoutResultError,
     WinType,
-    AlreadyPlayedGamesError,
+    AlreadyPlayedGamesError, GroupType,
 )
 from league.models import SeasonState
 from league.permissions import (
@@ -155,13 +155,16 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
         self.object = self.get_object()
         if "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
-            self.object.set_initial_score()
+            if self.object.type == GroupType.MCMAHON:
+                self.object.set_initial_score()
         elif "action-up" in request.POST:
             self.object.move_member_up(member_id=int(request.POST["member_id"]))
-            self.object.set_initial_score()
+            if self.object.type == GroupType.MCMAHON:
+                self.object.set_initial_score()
         elif "action-down" in request.POST:
             self.object.move_member_down(member_id=int(request.POST["member_id"]))
-            self.object.set_initial_score()
+            if self.object.type == GroupType.MCMAHON:
+                self.object.set_initial_score()
         elif "action-add" in request.POST:
             try:
                 self.object.add_member(player_nick=request.POST["player_nick"])

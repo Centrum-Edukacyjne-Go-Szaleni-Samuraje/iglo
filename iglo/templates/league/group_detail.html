@@ -218,6 +218,13 @@
                             <small class="text-muted">#{{ member.order }}</small>
                             <strong><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
                             <span class="text-muted">[{{ member.rank }}]</span>
+                            {% if member.membership_history == "NEWBIE" %}
+                            <span class="badge bg-success">NOWY</span>
+                            {% elif member.membership_history == "CONTINUING" %}
+                            <span class="badge bg-info">KONTYNUACJA</span>
+                            {% elif member.membership_history == "RETURNING" %}
+                            <span class="badge bg-primary">POWRÓT</span>
+                            {% endif %}
                             {% if group.type == "mcmahon" %}
                                 <span class="text-muted">
                                     {% translate "Punkty początkowe" %}: {{ member.initial_score }}

@@ -213,12 +213,9 @@ class Season(models.Model):
 
     @cached_property
     def all_games_to_play(self) -> int:
-        return (
-            self.groups.annotate(games_per_round=(Count("members") / 2),).aggregate(
-                games_to_play=Sum("games_per_round")
-            )["games_to_play"]
-            * (self.players_per_group - 1)
-        )
+        return self.groups.annotate(games_per_round=(Count("members") / 2),).aggregate(
+            games_to_play=Sum("games_per_round")
+        )["games_to_play"] * (self.players_per_group - 1)
 
     @cached_property
     def played_games(self) -> int:
@@ -511,6 +508,12 @@ class AlreadyPlayedGamesError(Exception):
     pass
 
 
+class MembershipHistory(str, Enum):
+    NEWBIE = "NEWBIE"
+    CONTINUING = "CONTINUING"
+    RETURNING = "RETURNING"
+
+
 class Member(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="memberships")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
@@ -599,6 +602,18 @@ class Member(models.Model):
         self.group.members.filter(order__gt=self.order).update(order=F("order") - 1)
         self.delete()
 
+    @cached_property
+    def membership_history(self) -> MembershipHistory:
+        previous_season = Season.objects.exclude(
+            id=self.group.season_id
+        ).filter(groups__members__player_id=self.player_id).values("number").first()
+        if not previous_season:
+            return MembershipHistory.NEWBIE
+        if self.group.season.number - previous_season["number"] == 1:
+            return MembershipHistory.CONTINUING
+        else:
+            return MembershipHistory.RETURNING
+
 
 def game_upload_to(instance, filename) -> str:
     return f"games/season-{instance.group.season.number}-group-{instance.group.name}-game-{instance.black.player.nick}-{instance.white.player.nick}.sgf"
@@ -681,17 +696,21 @@ class GameManager(models.Manager):
         )
 
     def get_latest_finished(self, current_season=False) -> QuerySet:
-        queryset = self.prefetch_related("group", "black__player", "white__player", "group__season")\
-            .order_by("-sgf_updated")\
+        queryset = (
+            self.prefetch_related("group", "black__player", "white__player", "group__season")
+            .order_by("-sgf_updated")
             .filter(sgf_updated__isnull=False)
+        )
         if current_season:
             queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
         return queryset
 
     def get_latest_reviews(self, current_season=False) -> QuerySet:
-        queryset = self.prefetch_related("group", "black__player", "white__player", "group__teacher", "group__season")\
-            .order_by("-review_updated")\
+        queryset = (
+            self.prefetch_related("group", "black__player", "white__player", "group__teacher", "group__season")
+            .order_by("-review_updated")
             .filter(review_updated__isnull=False)
+        )
         if current_season:
             queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
         return queryset
@@ -699,9 +718,11 @@ class GameManager(models.Manager):
     def get_upcoming_games(self) -> QuerySet:
         now = datetime.datetime.now()
         one_hour_ago = now - datetime.timedelta(hours=1)
-        return self.prefetch_related("group", "black__player", "white__player", "group__season")\
-            .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)\
+        return (
+            self.prefetch_related("group", "black__player", "white__player", "group__season")
+            .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)
             .order_by("date")
+        )
 
 
 def points_difference_validator(value: Optional[decimal.Decimal]) -> None:

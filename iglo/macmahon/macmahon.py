@@ -1,9 +1,12 @@
 import math
-import random
+
+import numpy as np
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Iterable, Optional, Iterator, Tuple
+from typing import Iterable, Optional, Tuple
+
+from macmahon.optimization import find_maximum_assignment
 
 
 class ResultType(str, Enum):
@@ -50,10 +53,8 @@ class Score:
 
 @dataclass(frozen=True)
 class ColorPreference:
-    can_play_as_black: bool
-    can_play_as_white: bool
-    should_play_as_black: bool
-    should_play_as_white: bool
+    as_black: float
+    as_white: float
 
 
 class BasicInitialOrdering:
@@ -121,84 +122,88 @@ Pairing = Tuple[list[Pair], Optional[Player]]
 
 class MacMahon:
     def __init__(self, sorted_players: list[Player]):
-        self.players = sorted_players[:]
-        self.position = {player.name: pos for pos, player in enumerate(self.players)}
+        self.players: list[Player] = sorted_players[:]
 
     def get_pairing(self) -> Pairing:
-        pairs = []
-        bye = self._get_bye(self.players)
-        while len(self.players):
-            player1 = self._get_first_player()
-            player2 = self._get_second_player(player1)
-            player1_color_preference = self._get_color_preference(player1)
-            player2_color_preference = self._get_color_preference(player2)
-            player1_color, _ = self._determine_colors(player1_color_preference, player2_color_preference)
-            if player1_color == Color.BLACK:
-                pairs.append(Pair(player1, player2))
-            else:
-                pairs.append(Pair(player2, player1))
+        bye = self._get_bye()
+        pairs = self._get_pairs()
         return pairs, bye
 
-    def _get_bye(self, players: list[Player]) -> Optional[Player]:
-        if len(players) % 2 == 0:
+    def _get_pairs(self):
+        mmpm = MacMahonPreferenceMatrix(self.players)
+        names, preference_matrix = mmpm.get_preference_matrix()
+        indices = find_maximum_assignment(preference_matrix)
+        pairs = []
+        for black_player_index, white_player_index in indices:
+            pairs.append(Pair(
+                black=self.players[black_player_index],
+                white=self.players[white_player_index]
+            ))
+        return pairs
+
+    def _get_bye(self) -> Optional[Player]:
+        if len(self.players) % 2 == 0:
             return None
-        for player in players[::-1]:
+        for player in self.players[::-1]:
             can_bye = not any(g.result == ResultType.BYE for g in player.games)
             if can_bye:
-                players.remove(player)
+                self.players.remove(player)
                 return player
 
-    def _get_first_player(self) -> Player:
-        sorted_players = sorted(self.players, key=lambda player: (len(list(self._possible_opponents(player))), self.position[player.name]))
-        first_player = sorted_players[0]
-        self.players.remove(first_player)
-        return first_player
 
-    def _get_second_player(self, player1: Player) -> Player:
-        player1_position = self.position[player1.name]
-        possible_opponents = self._possible_opponents(player1)
-        sorted_opponents = sorted(possible_opponents, key=lambda player: abs(self.position[player.name] - player1_position))
-        second_player = sorted_opponents[0]
-        self.players.remove(second_player)
-        return second_player
+FORBIDDEN_MATCH = 0
 
-    def _possible_opponents(self, player: Player) -> Iterator[Player]:
-        past_opponents = [g.opponent for g in player.games]
+
+class MacMahonPreferenceMatrix:
+    def __init__(self, players: list[Player]):
+        self.players = players
+        self.names: list[str] = None
+        self.position: dict[str, int] = None
+        self.possible_opponents: dict[str, list[str]] = None
+        self.color_preference: dict[str, ColorPreference] = None
+        self.pairs: list[list[Pair]]
+        self.n: int = None
+
+    def get_preference_matrix(self):
+        self.names = [player.name for player in self.players]
+        self.n = len(self.names)
+        self.position = {player.name: pos for pos, player in enumerate(self.players)}
+        self.possible_opponents = {player.name: self._get_possible_opponents(player) for player in self.players}
+        self.color_preference = {player.name: self._get_player_color_preference(player) for player in self.players}
+
+        preferences_matrix = np.full((self.n, self.n), 0)
+        for i in range(self.n):
+            for j in range(self.n):
+                player1, player2 = self.names[i], self.names[j]
+                preferences_matrix[i, j] = self._get_match_preference(player1, player2)
+        return self.names, preferences_matrix
+
+    def _get_possible_opponents(self, player: Player) -> list[str]:
+        past_opponents = [game.opponent for game in player.games]
         excluded_players = past_opponents + [player.name]
-        return (opponent for opponent in self.players if opponent.name not in excluded_players)
+        return [opponent.name for opponent in self.players if opponent.name not in excluded_players]
 
-    def _get_color_preference(self, player: Player) -> ColorPreference:
-        color_history = [g.color for g in player.games if g.color != Color.BYE]
-        if not color_history:
-            return ColorPreference(True, True, True, True)
-        games_as_black = sum(1 for c in color_history if c == Color.BLACK)
-        games_as_white = sum(1 for c in color_history if c == Color.WHITE)
-        can_play_black = games_as_black - games_as_white < 2
-        can_play_white = games_as_white - games_as_black < 2
-        should_play_black = color_history[-1] == Color.WHITE
-        should_play_white = color_history[-1] == Color.BLACK
-        return ColorPreference(can_play_black, can_play_white, should_play_black, should_play_white)
+    def _get_match_preference(self, player1: str, player2: str):
+        if player2 not in self.possible_opponents[player1]:
+            return FORBIDDEN_MATCH
 
-    def _determine_colors(self, p1: ColorPreference, p2: ColorPreference) -> Tuple[Color, Color]:
-        if not p1.can_play_as_black:
-            return Color.WHITE, Color.BLACK
-        if not p1.can_play_as_white:
-            return Color.BLACK, Color.WHITE
-        if not p2.can_play_as_black:
-            return Color.BLACK, Color.WHITE
-        if not p2.can_play_as_white:
-            return Color.WHITE, Color.BLACK
-        if not p1.should_play_as_black:
-            return Color.WHITE, Color.BLACK
-        if not p1.should_play_as_white:
-            return Color.BLACK, Color.WHITE
-        if not p2.should_play_as_black:
-            return Color.BLACK, Color.WHITE
-        if not p2.should_play_as_white:
-            return Color.WHITE, Color.BLACK
-        colors = [Color.WHITE, Color.BLACK]
-        random.shuffle(colors)
-        return tuple(colors)
+        pos1, pos2 = self.position[player1], self.position[player2]
+        distance_preference = (self.n - abs(pos1 - pos2)) / (self.n - 1)
+
+        black, white = self.color_preference[player1].as_black, self.color_preference[player2].as_white
+        color_preference = min(black, white)
+
+        preference = distance_preference * color_preference
+        return preference
+
+    @staticmethod
+    def _get_player_color_preference(player: Player) -> ColorPreference:
+        as_black = len([game for game in player.games if game.color == Color.BLACK])
+        as_white = len([game for game in player.games if game.color == Color.WHITE])
+        return ColorPreference(
+            as_black=1 / (max(as_black - as_white, 0) + 1),
+            as_white=1 / (max(as_white - as_black, 0) + 1)
+        )
 
 
 def prepare_next_round(players: list[Player]) -> Pairing:

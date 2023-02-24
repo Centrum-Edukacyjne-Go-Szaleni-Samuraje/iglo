@@ -123,3 +123,51 @@ def real_live_players_round_3(real_live_players):
 @pytest.fixture
 def real_live_players_round_4(real_live_players):
     return [replace(player, games=player.games[:3]) for player in real_live_players]
+
+
+@pytest.fixture
+def real_live_s19r5():
+    return [
+        Player('Patryk',            395,  0, [
+            GameRecord('ric', Color.WHITE, ResultType.WIN),
+            GameRecord('Arina', Color.BLACK, ResultType.LOSE),
+            GameRecord('MareczKa', Color.BLACK, ResultType.LOSE),
+            GameRecord('', Color.BYE, ResultType.BYE)
+        ]),
+        Player('ric',               499,  0, [
+            GameRecord('Patryk', Color.BLACK, ResultType.LOSE),
+            GameRecord('MareczKa', Color.WHITE, ResultType.LOSE),
+            GameRecord('', Color.BYE, ResultType.BYE),
+            GameRecord('Tomko', Color.BLACK, ResultType.WIN)
+        ]),
+        Player('MareczKa',          100,  0, [
+            GameRecord('Arina', Color.WHITE, ResultType.LOSE),
+            GameRecord('ric', Color.BLACK, ResultType.WIN),
+            GameRecord('Patryk', Color.WHITE, ResultType.WIN),
+            GameRecord('sir_husky_potato', Color.WHITE, ResultType.LOSE)
+        ]),
+        Player('Arina',             100,  0, [
+            GameRecord('MareczKa', Color.BLACK, ResultType.WIN),
+            GameRecord('Patryk', Color.WHITE, ResultType.WIN),
+            GameRecord('sir_husky_potato', Color.BLACK, ResultType.LOSE),
+            GameRecord('Polymorph', Color.WHITE, ResultType.WIN)
+        ]),
+        Player('sir_husky_potato',  400, -1, [
+            GameRecord('Tomko', Color.BLACK, ResultType.WIN),
+            GameRecord('Polymorph', Color.WHITE, ResultType.WIN),
+            GameRecord('Arina', Color.WHITE, ResultType.WIN),
+            GameRecord('MareczKa', Color.BLACK, ResultType.WIN)
+        ]),
+        Player('Tomko',             100, -1, [
+            GameRecord('sir_husky_potato', Color.WHITE, ResultType.LOSE),
+            GameRecord('', Color.BYE, ResultType.BYE),
+            GameRecord('Polymorph', Color.BLACK, ResultType.WIN),
+            GameRecord('ric', Color.WHITE, ResultType.LOSE)
+        ]),
+        Player('Polymorph',          18, -1, [
+            GameRecord('', Color.BYE, ResultType.BYE),
+            GameRecord('sir_husky_potato', Color.BLACK, ResultType.LOSE),
+            GameRecord('Tomko', Color.WHITE, ResultType.LOSE),
+            GameRecord('Arina', Color.BLACK, ResultType.LOSE)
+        ])
+    ]

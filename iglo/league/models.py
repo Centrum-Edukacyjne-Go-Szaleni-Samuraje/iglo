@@ -720,7 +720,7 @@ class GameManager(models.Manager):
         one_hour_ago = now - datetime.timedelta(hours=1)
         return (
             self.prefetch_related("group", "black__player", "white__player", "group__season")
-            .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)
+            .filter(Q(win_type=WinType.NOT_PLAYED) | Q(win_type__isnull=True), date__gt=one_hour_ago)
             .order_by("date")
         )
 

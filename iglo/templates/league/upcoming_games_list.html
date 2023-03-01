@@ -13,11 +13,34 @@
             </div>
         </form>
     </div>
-    <div class="row mb-3">
-        <div class="col">
-            {% include "includes/upcoming_games_table.html" with games=game_list full=True%}
+    {% for game in game_list %}
+        <div class="row mb-3">
+            <div class="col-1 order-3 order-md-first text-muted">
+                {{ game.group.name }}
+            </div>
+            <div class="col text-truncate">
+                <i class="fas fa-circle"></i>
+                {{ game.black.player.nick }}
+            </div>
+            <div class="col text-truncate">
+                <i class="far fa-circle"></i>
+                {{ game.white.player.nick }}
+            </div>
+            <div class="col-1 order-md-last">
+                <a href="{{ game.get_absolute_url }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+            <div class="w-100 d-md-none order-2"></div>
+            <div class="col order-3 order-md-1">
+                <span class="text-muted small">
+                    {{ game.date }}
+                </span>
+            </div>
         </div>
-    </div>
+    {% empty %}
+        <div>{% translate "W najbliższym czasie nie ma zaplanowanych gier" %}</div>
+    {% endfor %}
     <div class="row mb-3">
         <div class="col">
             <div class="d-flex justify-content-center">

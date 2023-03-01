@@ -10,26 +10,68 @@
     </div>
     <form method="get">
         <div class="row">
-            <div class="col-1">
+            <div class="col-1 d-none d-md-block">
                 <input type="text" name="seasons" class="form-control" placeholder="{% translate "Sezony" %}" value="{{ seasons }}">
             </div>
-            <div class="col-1">
+            <div class="col-1 d-none d-md-block">
                 <input type="text" name="groups" class="form-control" placeholder="{% translate "Grupy" %}" value="{{ groups }}">
             </div>
-            <div class="col-5">
+            <div class="col-4 d-none d-md-block">
                 <input type="text" name="player" class="form-control" placeholder="{% translate "Gracz" %}" value="{{ player }}">
             </div>
-            <div class="col-3">
+            <div class="col-4 d-none d-md-block">
                 <input type="text" name="teacher" class="form-control" placeholder="{% translate "Nauczyciel" %}" value="{{ teacher }}">
             </div>
-            <div class="col-1">
+            <div class="col-1 d-none d-md-block">
                 <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
             </div>
         </div>
     </form>
     <div class="row mb-3">
         <div class="col">
-            {% include "includes/reviews_table.html" with games=game_list full=True%}
+            {% for game in game_list %}
+                <div class="row">
+                    <div class="col-1 order-3 order-md-first text-muted">
+                        {{ game.group.season.number }}
+                    </div>
+                    <div class="col-1 order-3 order-md-first text-muted">
+                        {{ game.group.name }}
+                    </div>
+                    <div class="col text-nowrap text-truncate ">
+                        <span class="{% if game.winner == game.black %}fw-bold{% endif %}">
+                            <i class="fas fa-circle"></i>
+                            {{ game.black.player.nick }}
+                        </span>
+                    </div>
+                    <div class="col text-nowrap text-truncate ">
+                        <span class="{% if game.winner == game.white %}fw-bold{% endif %}">
+                            <i class="far fa-circle"></i>
+                            {{ game.white.player.nick }}
+                        </span>
+                    </div>
+                    {% with teacher=game.group.teacher %}
+                        <div class="col order-5 order-md-1 text-nowrap text-muted text-truncate small">
+                            {{ teacher.last_name }} {{ teacher.first_name }}
+                        </div>
+                        <div class="col order-5 order-md-1 text-nowrap text-muted small">
+                            {{ teacher.rank|lower }}
+                        </div>
+                    {% endwith %}
+                    <div class="col-1 order-1 order-md-last">
+                        <a href="{{ game.review_video_link }}" target="_blank">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                    <div class="col-1 order-1 order-md-last">
+                        <a href="{{ game.get_absolute_url }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <div class="w-100 order-2 d-md-none"></div>
+                </div>
+            {% empty %}
+                <div>{% translate "Żadna gra w tym sezonie nie została jeszcze skomentowana" %}</div>
+            {% endfor %}
         </div>
     </div>
     <div class="row mb-3">

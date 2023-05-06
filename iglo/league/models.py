@@ -558,6 +558,10 @@ class Member(models.Model):
         return result
 
     @cached_property
+    def igor(self) -> float:
+        return self.player.ielo_rating
+
+    @cached_property
     def sos(self) -> float:
         result = 0.0
         for game in self.games_as_white.all():

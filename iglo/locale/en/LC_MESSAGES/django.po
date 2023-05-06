@@ -877,7 +877,15 @@ msgstr ""
 "The <b>Start</b> column represents the starting position of a player in the "
 "group."
 
-#: .\templates\league\includes\result_table_modal.html:52
+#: .\templates\league\includes\result_table_modal.html:51
+msgid ""
+"Kolumna <b>IGoR </b> zawiera <a href="https://github.com/lukaszlew/accurating">AccuRating</a>"
+"(rating podobny to EGD GoR) policzony tylko na podstawie wyników gier w IGLO."
+msgstr ""
+"Column <b>IGoR </b> contains <a href="https://github.com/lukaszlew/accurating">AccuRating</a>"
+"(rating similar to EGD GoR) evaluated only using IGLO match results."
+
+#: .\templates\league\includes\result_table_modal.html:58
 msgid "Więcej informacji o tabelach z wynikami"
 msgstr "Learn more about result tables"
 

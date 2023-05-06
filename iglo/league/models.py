@@ -460,6 +460,7 @@ class Player(models.Model):
     last_name = models.CharField(max_length=32)
     user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
+    ielo_rating = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
     auto_join = models.BooleanField(default=True)

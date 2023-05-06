@@ -1,6 +1,6 @@
 # IGLO
 
-You need Python 3.10 to run this project. 
+You need Python 3.10 to run this project.
 
 Local development (inside Python venv):
 
@@ -17,4 +17,10 @@ Docker build & run:
 ```
 $ ./deploy/build.sh
 $ ./deploy/start.sh
+```
+
+Running python with iglo and its libraries:
+
+```
+$ poetry run python3 iglo/manage.py shell
 ```

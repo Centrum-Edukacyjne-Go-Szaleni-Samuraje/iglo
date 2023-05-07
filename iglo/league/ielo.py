@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.renderers import JSONRenderer
 
-from league.models import Game, WinType
+from league.models import Game, WinType, Player
 
 import accurating
 import json
@@ -42,9 +42,7 @@ def register(router):
     router.register("ielo-matches", IeloViewSet, basename="api-ielo-matches")
 
 
-# Run shell (README.md) and then:
-# from league import ielo; from importlib import reload; reload(ielo);ielo.compute_ar_ratings()
-def compute_ar_ratings():
+def recalculate_igor():
     matches_json = JSONRenderer().render(
         IeloMatchSerializer(ielo_matches(), many=True).data)
 
@@ -53,14 +51,18 @@ def compute_ar_ratings():
         smoothing=0.1,
         initial_lr=1.0,
         do_log=True,
+        # max_steps=300,
     )
-    print(ar_config)
-
     matches_dict = json.loads(matches_json)
-    print(matches_dict)
-
     ar_data = accurating.data_from_dicts(matches_dict)
-    print(ar_data)
-
     model = accurating.fit(ar_data, ar_config)
-    print(model)
+
+    ratings = {}
+    for nick, season_ratings in model.rating.items():
+        last_season = max(season_ratings.keys())
+        ratings[nick] = season_ratings[last_season]
+    to_update = Player.objects.filter(nick__in=model.rating.keys())
+    for obj in to_update:
+        if obj.nick in ratings:
+            obj.ielo_rating = ratings[obj.nick]
+    Player.objects.bulk_update(to_update, fields=['ielo_rating'])

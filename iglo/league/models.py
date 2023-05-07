@@ -48,7 +48,7 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season.create_groups()
+        season.create_groups(use_igor=True)
         return season
 
     def get_latest(self) -> Optional["Season"]:
@@ -122,20 +122,23 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self) -> None:
+    def reset_groups(self, use_igor) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
-        self.create_groups()
+        self.create_groups(use_igor)
 
-    def create_groups(self) -> None:
+    def create_groups(self, use_igor) -> None:
         self.validate_state(state=SeasonState.DRAFT)
-        try:
-            previous_season = Season.objects.get(number=self.number - 1)
-            players = previous_season.get_leaderboard()
-            players = [player for player in players if player.auto_join]
-        except Season.DoesNotExist:
-            players = []
-        players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
+        if use_igor:
+            players = Player.objects.filter(auto_join=True).order_by("-igor")
+        else:
+            try:
+                previous_season = Season.objects.get(number=self.number - 1)
+                players = previous_season.get_leaderboard()
+                players = [player for player in players if player.auto_join]
+            except Season.DoesNotExist:
+                players = []
+            players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
         self._assign_players_to_groups(players=players)
 
     def get_leaderboard(self) -> list["Player"]:

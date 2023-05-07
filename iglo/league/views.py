@@ -70,7 +70,9 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
         if "action-start-season" in request.POST:
             self.object.start()
         elif "action-reset-groups" in request.POST:
-            self.object.reset_groups()
+            self.object.reset_groups(use_igor=False)
+        elif "action-reset-groups-igor" in request.POST:
+            self.object.reset_groups(use_igor=True)
         elif "action-finish-season" in request.POST:
             try:
                 self.object.finish()

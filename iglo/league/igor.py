@@ -11,7 +11,7 @@ import accurating
 import json
 
 
-class IeloMatchSerializer(ModelSerializer):
+class IgorMatchSerializer(ModelSerializer):
     p1 = serializers.CharField(source="black.player.nick")
     p2 = serializers.CharField(source="white.player.nick")
     season = serializers.IntegerField(source="group.season.number")
@@ -27,24 +27,24 @@ class IeloMatchSerializer(ModelSerializer):
         ]
 
 
-def ielo_matches():
+def igor_matches():
     return Game.objects.all().filter(
         win_type__in=[WinType.POINTS, WinType.RESIGN, WinType.TIME]).exclude(winner=None)
 
 
-class IeloViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, GenericViewSet):
-    queryset = ielo_matches()
-    serializer_class = IeloMatchSerializer
+class IgorViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, GenericViewSet):
+    queryset = igor_matches()
+    serializer_class = IgorMatchSerializer
     pagination_class = None
 
 
 def register(router):
-    router.register("ielo-matches", IeloViewSet, basename="api-ielo-matches")
+    router.register("igor-matches", IgorViewSet, basename="api-igor-matches")
 
 
 def recalculate_igor():
     matches_json = JSONRenderer().render(
-        IeloMatchSerializer(ielo_matches(), many=True).data)
+        IgorMatchSerializer(igor_matches(), many=True).data)
 
     ar_config = accurating.Config(
         season_rating_stability=0.5,
@@ -64,5 +64,5 @@ def recalculate_igor():
     to_update = Player.objects.filter(nick__in=model.rating.keys())
     for obj in to_update:
         if obj.nick in ratings:
-            obj.ielo_rating = ratings[obj.nick]
-    Player.objects.bulk_update(to_update, fields=['ielo_rating'])
+            obj.igor = ratings[obj.nick]
+    Player.objects.bulk_update(to_update, fields=['igor'])

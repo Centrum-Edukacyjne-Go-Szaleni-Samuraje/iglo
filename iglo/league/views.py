@@ -37,7 +37,7 @@ from league.permissions import (
     UserRoleRequired,
 )
 from league.utils.egd import create_tournament_table, DatesRange, Player as EGDPlayer, Game as EGDGame, gor_to_rank
-from league import ielo
+from league import igor
 
 
 class SeasonsListView(ListView):
@@ -437,7 +437,7 @@ class LeagueAdminView(TemplateView, UserRoleRequired):
                 message=texts.UPDATE_GOR_MESSAGE,
             )
         elif "action-recalculate-igor" in request.POST:
-            ielo.recalculate_igor()
+            igor.recalculate_igor()
         context = self.get_context_data()
         return self.render_to_response(context)
 

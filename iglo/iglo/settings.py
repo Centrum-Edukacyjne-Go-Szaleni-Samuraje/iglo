@@ -220,7 +220,7 @@ COUNTRIES_FIRST = [
 ]
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
-CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool=True)
+CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=False, as_bool=True)
 
 # Periodic task schedules uses the UTC time zone
 CELERY_BEAT_SCHEDULE = {

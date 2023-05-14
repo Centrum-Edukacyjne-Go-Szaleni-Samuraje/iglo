@@ -36,7 +36,7 @@ class SeasonState(TextChoices):
 
 
 class SeasonManager(models.Manager):
-    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int) -> "Season":
+    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int, use_igor: bool=False) -> "Season":
         previous_season = Season.objects.first()
         if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
@@ -48,7 +48,7 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season.create_groups(use_igor=True)
+        season.create_groups(use_igor=use_igor)
         return season
 
     def get_latest(self) -> Optional["Season"]:
@@ -122,12 +122,12 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self, use_igor) -> None:
+    def reset_groups(self, use_igor: bool) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
         self.create_groups(use_igor)
 
-    def create_groups(self, use_igor) -> None:
+    def create_groups(self, use_igor: bool) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         if use_igor:
             players = Player.objects.filter(auto_join=True).order_by("-igor")

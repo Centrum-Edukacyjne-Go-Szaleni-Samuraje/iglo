@@ -4,6 +4,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.renderers import JSONRenderer
+from rest_framework_extensions.routers import ExtendedDefaultRouter
 
 from league.models import Game, WinType, Player
 
@@ -38,7 +39,7 @@ class IgorViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, Generi
     pagination_class = None
 
 
-def register(router):
+def register(router: ExtendedDefaultRouter):
     router.register("igor-matches", IgorViewSet, basename="api-igor-matches")
 
 

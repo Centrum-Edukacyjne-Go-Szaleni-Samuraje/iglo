@@ -105,8 +105,10 @@ WSGI_APPLICATION = "iglo.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+IGLO_DB_PORT = env("IGLO_DB_PORT", default="5432")
+IGLO_DB_URL = f"postgres://postgres:postgres@localhost:{IGLO_DB_PORT}/postgres"
 DATABASES = {
-    "default": dj_database_url.config(default="postgres://postgres:postgres@localhost:15432/postgres"),
+    "default": dj_database_url.config(default=IGLO_DB_URL),
 }
 
 # Password validation

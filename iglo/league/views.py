@@ -406,12 +406,14 @@ class PrepareSeasonView(UserRoleRequired, FormView):
 
     DEFAULT_PROMOTION_COUNT = 2
     DEFAULT_PLAYERS_PER_GROUP = 6
+    DEFAULT_USE_IGOR = True
 
     def form_valid(self, form):
         self.object = Season.objects.prepare_season(
             start_date=form.cleaned_data["start_date"],
             players_per_group=form.cleaned_data["players_per_group"],
             promotion_count=form.cleaned_data["promotion_count"],
+            use_igor=form.cleaned_data["use_igor"],
         )
         return super().form_valid(form)
 
@@ -420,6 +422,7 @@ class PrepareSeasonView(UserRoleRequired, FormView):
             "start_date": datetime.date.today(),
             "promotion_count": self.DEFAULT_PROMOTION_COUNT,
             "players_per_group": self.DEFAULT_PLAYERS_PER_GROUP,
+            "use_igor": self.DEFAULT_USE_IGOR,
         }
 
     def get_success_url(self):

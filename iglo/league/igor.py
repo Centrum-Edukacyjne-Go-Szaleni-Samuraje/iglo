@@ -27,11 +27,13 @@ class IgorMatchSerializer(ModelSerializer):
             "season",
         ]
 
-
 def igor_matches():
-    return Game.objects.all().filter(
-        win_type__in=[WinType.POINTS, WinType.RESIGN, WinType.TIME]).exclude(winner=None)
-
+    return (
+        Game.objects.all()
+        .filter(win_type__in=[WinType.POINTS, WinType.RESIGN, WinType.TIME])
+        .exclude(winner=None)
+        .select_related("black__player", "white__player", "group__season", "winner__player")
+    )
 
 class IgorViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, GenericViewSet):
     queryset = igor_matches()

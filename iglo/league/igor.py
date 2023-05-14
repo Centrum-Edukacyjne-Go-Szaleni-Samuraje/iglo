@@ -46,13 +46,21 @@ def register(router: ExtendedDefaultRouter):
 
 
 def recalculate_igor():
-    matches_json = JSONRenderer().render(
-        IgorMatchSerializer(igor_matches(), many=True).data)
 
     ar_config = accurating.Config(**settings.IGOR_CONFIG)
 
-    matches_dict = json.loads(matches_json)
-    ar_data = accurating.data_from_dicts(matches_dict)
+    matches = [
+        dict(
+            p1=game.black.player.nick,
+            p2=game.white.player.nick,
+            season=game.group.season.number,
+            winner=game.winner.player.nick,
+        ) for game in igor_matches()
+    ]
+    # The above code is equivalent to:
+    # matches_json = JSONRenderer().render(IgorMatchSerializer(igor_matches(), many=True).data)
+    # matches = json.loads(matches_json)
+    ar_data = accurating.data_from_dicts(matches)
     model = accurating.fit(ar_data, ar_config)
 
     ratings = {}

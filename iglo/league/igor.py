@@ -6,11 +6,11 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.renderers import JSONRenderer
 from rest_framework_extensions.routers import ExtendedDefaultRouter
 
+from django.conf import settings
 from league.models import Game, WinType, Player
 
 import accurating
 import json
-
 
 class IgorMatchSerializer(ModelSerializer):
     p1 = serializers.CharField(source="black.player.nick")
@@ -47,13 +47,8 @@ def recalculate_igor():
     matches_json = JSONRenderer().render(
         IgorMatchSerializer(igor_matches(), many=True).data)
 
-    ar_config = accurating.Config(
-        season_rating_stability=0.5,
-        smoothing=0.1,
-        initial_lr=1.0,
-        do_log=True,
-        # max_steps=300,
-    )
+    ar_config = accurating.Config(**settings.IGOR_CONFIG)
+
     matches_dict = json.loads(matches_json)
     ar_data = accurating.data_from_dicts(matches_dict)
     model = accurating.fit(ar_data, ar_config)

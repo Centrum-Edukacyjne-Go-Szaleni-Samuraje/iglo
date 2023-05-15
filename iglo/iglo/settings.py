@@ -274,11 +274,16 @@ REST_FRAMEWORK = {
 }
 
 # Small IGOR_MAX_STEPS is useful when CELERY is eager and we want just some fast iteration for IGoR recalculation.
-IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default="1000000", as_int=True)
+IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000000, as_int=True)
 IGOR_CONFIG = {
     'season_rating_stability': 0.5,
     'smoothing': 0.1,
     'initial_lr': 1.0,
     'do_log': True,
     'max_steps': IGOR_MAX_STEPS,
+    'winner_prior_rating': 2000.0,
+    'loser_prior_rating': 2000.0,
+    'winner_prior_match_count': 0.0,
+    'loser_prior_match_count': 0.0,
+
 }

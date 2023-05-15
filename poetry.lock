@@ -2,19 +2,22 @@
 
 [[package]]
 name = "accurating"
-version = "0.4.8"
+version = "0.5.0"
 description = "AccuRating is a library for accurate player ranking based on match results."
 category = "main"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "accurating-0.4.8-py3-none-any.whl", hash = "sha256:ee32e1398fc410ff5421a3706588662ec581e65a64f2f6c0e047225a59fcbe9a"},
-    {file = "accurating-0.4.8.tar.gz", hash = "sha256:4d952dcb0202893670c787814706d22239a2a20754cb8d8c8fb3b5108fc132b8"},
+    {file = "accurating-0.5.0-py3-none-any.whl", hash = "sha256:2ac77e41395c365760ad8f22f25780558c2186c5cf5c1578b5bbe1c93446f367"},
+    {file = "accurating-0.5.0.tar.gz", hash = "sha256:12ab03f5e5ccebbe5714ce2118b7826bead8ef9618e7acf5e0ffca013e7634dc"},
 ]
 
 [package.dependencies]
 jax = ">=0.4.8,<0.5.0"
 jaxlib = ">=0.4.7,<0.5.0"
+tabulate = ">=0.9.0,<0.10.0"
+types-requests = ">=2.30.0.0,<3.0.0.0"
+types-tabulate = ">=0.9.0.2,<0.10.0.0"
 
 [[package]]
 name = "amqp"
@@ -618,14 +621,14 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "18.6.2"
+version = "18.7.0"
 description = "Faker is a Python package that generates fake data for you."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Faker-18.6.2-py3-none-any.whl", hash = "sha256:6385386ba8d5aa255bec72f5392c2b795fcec8bebf975a9953488948d54bce35"},
-    {file = "Faker-18.6.2.tar.gz", hash = "sha256:ef61bbf266d30819e83bab4a6c74a0f5979ce4d19d4c9305719dd26cb7d8d51c"},
+    {file = "Faker-18.7.0-py3-none-any.whl", hash = "sha256:38dbc3b80e655d7301e190426ab30f04b6b7f6ca4764c5dd02772ffde0fa6dcd"},
+    {file = "Faker-18.7.0.tar.gz", hash = "sha256:f02c6d3fdb5bc781f80b440cf2bdec336ed47ecfb8d620b20c3d4188ed051831"},
 ]
 
 [package.dependencies]
@@ -657,59 +660,59 @@ files = [
 
 [[package]]
 name = "jax"
-version = "0.4.8"
+version = "0.4.10"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jax-0.4.8.tar.gz", hash = "sha256:08116481f7336db16c24812bfb5e6f9786915f4c2f6ff4028331fa69e7535202"},
+    {file = "jax-0.4.10.tar.gz", hash = "sha256:1bf0f2720f778f2937301a16a4d5cd3497f13a4d6c970c24a88918a81816a888"},
 ]
 
 [package.dependencies]
-ml_dtypes = ">=0.0.3"
+ml_dtypes = ">=0.1.0"
 numpy = ">=1.21"
 opt_einsum = "*"
 scipy = ">=1.7"
 
 [package.extras]
 australis = ["protobuf (>=3.13,<4)"]
-ci = ["jaxlib (==0.4.7)"]
-cpu = ["jaxlib (==0.4.7)"]
-cuda = ["jaxlib (==0.4.7+cuda11.cudnn86)"]
-cuda11-cudnn82 = ["jaxlib (==0.4.7+cuda11.cudnn82)"]
-cuda11-cudnn86 = ["jaxlib (==0.4.7+cuda11.cudnn86)"]
-cuda11-local = ["jaxlib (==0.4.7+cuda11.cudnn86)"]
-cuda11-pip = ["jaxlib (==0.4.7+cuda11.cudnn86)", "nvidia-cublas-cu11 (>=11.11)", "nvidia-cuda-nvcc-cu11 (>=11.8)", "nvidia-cuda-runtime-cu11 (>=11.8)", "nvidia-cudnn-cu11 (>=8.6)", "nvidia-cufft-cu11 (>=10.9)", "nvidia-cusolver-cu11 (>=11.4)", "nvidia-cusparse-cu11 (>=11.7)"]
-cuda12-local = ["jaxlib (==0.4.7+cuda12.cudnn88)"]
-cuda12-pip = ["jaxlib (==0.4.7+cuda12.cudnn88)", "nvidia-cublas-cu12", "nvidia-cuda-nvcc-cu12", "nvidia-cuda-runtime-cu12", "nvidia-cudnn-cu12", "nvidia-cufft-cu12", "nvidia-cusolver-cu12", "nvidia-cusparse-cu12"]
+ci = ["jaxlib (==0.4.9)"]
+cpu = ["jaxlib (==0.4.10)"]
+cuda = ["jaxlib (==0.4.10+cuda11.cudnn86)"]
+cuda11-cudnn82 = ["jaxlib (==0.4.10+cuda11.cudnn82)"]
+cuda11-cudnn86 = ["jaxlib (==0.4.10+cuda11.cudnn86)"]
+cuda11-local = ["jaxlib (==0.4.10+cuda11.cudnn86)"]
+cuda11-pip = ["jaxlib (==0.4.10+cuda11.cudnn86)", "nvidia-cublas-cu11 (>=11.11)", "nvidia-cuda-cupti-cu11 (>=11.8)", "nvidia-cuda-nvcc-cu11 (>=11.8)", "nvidia-cuda-runtime-cu11 (>=11.8)", "nvidia-cudnn-cu11 (>=8.6)", "nvidia-cufft-cu11 (>=10.9)", "nvidia-cusolver-cu11 (>=11.4)", "nvidia-cusparse-cu11 (>=11.7)"]
+cuda12-local = ["jaxlib (==0.4.10+cuda12.cudnn88)"]
+cuda12-pip = ["jaxlib (==0.4.10+cuda12.cudnn88)", "nvidia-cublas-cu12", "nvidia-cuda-cupti-cu12", "nvidia-cuda-nvcc-cu12", "nvidia-cuda-runtime-cu12", "nvidia-cudnn-cu12", "nvidia-cufft-cu12", "nvidia-cusolver-cu12", "nvidia-cusparse-cu12"]
 minimum-jaxlib = ["jaxlib (==0.4.7)"]
-tpu = ["jaxlib (==0.4.7)", "libtpu-nightly (==0.1.dev20230327)", "requests"]
+tpu = ["jaxlib (==0.4.10)", "libtpu-nightly (==0.1.dev20230511)", "requests"]
 
 [[package]]
 name = "jaxlib"
-version = "0.4.7"
+version = "0.4.10"
 description = "XLA library for JAX"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jaxlib-0.4.7-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:63c2890978e8646516db3d8a680b43d2bed8b63543a70556391f589a261bd85f"},
-    {file = "jaxlib-0.4.7-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:0c16f922507277d5630e81d9c1a4974366a27aad5230d645d063bc2011564d01"},
-    {file = "jaxlib-0.4.7-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:da88382e6487805974cea6facc61ba92b5828a7a1f2dd80f762c487d873a2b47"},
-    {file = "jaxlib-0.4.7-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:022b216036c009989d4c0683538820c19247215bb99fdd35c7bf32838d596be6"},
-    {file = "jaxlib-0.4.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d0f1d3b6ef6c68013898cca958ab1507d6809b523275037efbdb9aaaaab158ba"},
-    {file = "jaxlib-0.4.7-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:0ae7178c33460822d9d8d03718cba395e02e6bac2402709c35826c94f0c9cc7b"},
-    {file = "jaxlib-0.4.7-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:ea07605e37d2b4e25f3c639e0d22ab4605fbc1a10ea918fd14ce09077bdaffb6"},
-    {file = "jaxlib-0.4.7-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:48b85d3c8923b1619ddf8cbf14c4e4daf6919796d8aa9d006ce2a085e8202930"},
-    {file = "jaxlib-0.4.7-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:a860f2990c97bee5ffcdbb5111751591e5e7a66d5e32b4f6d9e6aa14ac82bf27"},
-    {file = "jaxlib-0.4.7-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:c78dc2b6fa1c92ead137a23d1bd3e10d04c58b268e77eca811502abac05b2b19"},
-    {file = "jaxlib-0.4.7-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:f1f3726e374d0d6fcc14da540b71b758d37356c6726f0f4b48e2f5530a5f8769"},
-    {file = "jaxlib-0.4.7-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:d4629205dbe342153941db5f69c4a1bfe35fd8d2947aebe34f4dff3771d3fff7"},
+    {file = "jaxlib-0.4.10-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:0814c478382e82b0f90aacd820fb898c4a9caa705a1f515c5fd0928198c814f3"},
+    {file = "jaxlib-0.4.10-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:97e7b2b0f32debbb011556cb2dc82cdfb0087b618e302f92319475727408a64e"},
+    {file = "jaxlib-0.4.10-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:f46edb93332285ab6f57b2843869183cbd495b4f35bea0fba25a3766a7429306"},
+    {file = "jaxlib-0.4.10-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:1b705e495149945defe478781865d403bd3994c11e326829aea7aafda0dfa639"},
+    {file = "jaxlib-0.4.10-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:377757745d5e2097fccce71c31292973d544a36329b7ed85bf9c41837e107f74"},
+    {file = "jaxlib-0.4.10-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:a6349c98c3ffd879b390a3532390e8e49f084aa523c1553aa5c21374ca8b4ea9"},
+    {file = "jaxlib-0.4.10-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:7dc9c89b2b07cf8c576d5fca433181f324fed52e51db60873d2b6d3e496588e2"},
+    {file = "jaxlib-0.4.10-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:62f3d2bad0476bb6728d1be813894cf3421a3d31706a0208b1f57eec86d310d5"},
+    {file = "jaxlib-0.4.10-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:6ea7ad6b520732994e25429768d6bd731d55c59c75ef6f9faa2f59e419fb0ada"},
+    {file = "jaxlib-0.4.10-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:749a1135a452db1afb4e5de7770fc5dafebb310c35d9db077ed925fcab028471"},
+    {file = "jaxlib-0.4.10-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:c966b13467c41ff44ba1b3b7cdceb37a76a75f0420f454a8a51543f8bbaabe4a"},
+    {file = "jaxlib-0.4.10-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:07557fcf1e4c7c60bbb48c4f4f426909fcf610a7bfa56cbb139719ba3900722d"},
 ]
 
 [package.dependencies]
-ml-dtypes = ">=0.0.3"
+ml-dtypes = ">=0.1.0"
 numpy = ">=1.21"
 scipy = ">=1.7"
 
@@ -876,18 +879,18 @@ files = [
 
 [[package]]
 name = "platformdirs"
-version = "3.5.0"
+version = "3.5.1"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-3.5.0-py3-none-any.whl", hash = "sha256:47692bc24c1958e8b0f13dd727307cff1db103fca36399f457da8e05f222fdc4"},
-    {file = "platformdirs-3.5.0.tar.gz", hash = "sha256:7954a68d0ba23558d753f73437c55f89027cf8f5108c19844d4b82e5af396335"},
+    {file = "platformdirs-3.5.1-py3-none-any.whl", hash = "sha256:e2378146f1964972c03c085bb5662ae80b2b8c06226c54b2ff4aa9483e8a13a5"},
+    {file = "platformdirs-3.5.1.tar.gz", hash = "sha256:412dae91f52a6f84830f39a8078cecd0e866cb72294a5c66808e74d5e88d251f"},
 ]
 
 [package.extras]
-docs = ["furo (>=2023.3.27)", "proselint (>=0.13)", "sphinx (>=6.1.3)", "sphinx-autodoc-typehints (>=1.23,!=1.23.4)"]
+docs = ["furo (>=2023.3.27)", "proselint (>=0.13)", "sphinx (>=6.2.1)", "sphinx-autodoc-typehints (>=1.23,!=1.23.4)"]
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.3.1)", "pytest-cov (>=4)", "pytest-mock (>=3.10)"]
 
 [[package]]
@@ -1029,18 +1032,18 @@ files = [
 
 [[package]]
 name = "redis"
-version = "4.5.4"
+version = "4.5.5"
 description = "Python client for Redis database and key-value store"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "redis-4.5.4-py3-none-any.whl", hash = "sha256:2c19e6767c474f2e85167909061d525ed65bea9301c0770bb151e041b7ac89a2"},
-    {file = "redis-4.5.4.tar.gz", hash = "sha256:73ec35da4da267d6847e47f68730fdd5f62e2ca69e3ef5885c6a78a9374c3893"},
+    {file = "redis-4.5.5-py3-none-any.whl", hash = "sha256:77929bc7f5dab9adf3acba2d3bb7d7658f1e0c2f1cafe7eb36434e751c471119"},
+    {file = "redis-4.5.5.tar.gz", hash = "sha256:dc87a0bdef6c8bfe1ef1e1c40be7034390c2ae02d92dcd0c7ca1729443899880"},
 ]
 
 [package.dependencies]
-async-timeout = {version = ">=4.0.2", markers = "python_version <= \"3.11.2\""}
+async-timeout = {version = ">=4.0.2", markers = "python_full_version <= \"3.11.2\""}
 
 [package.extras]
 hiredis = ["hiredis (>=1.0.0)"]
@@ -1191,6 +1194,21 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "tabulate"
+version = "0.9.0"
+description = "Pretty-print tabular data"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f"},
+    {file = "tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c"},
+]
+
+[package.extras]
+widechars = ["wcwidth"]
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -1212,6 +1230,45 @@ python-versions = ">=3.7"
 files = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
+name = "types-requests"
+version = "2.30.0.0"
+description = "Typing stubs for requests"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-requests-2.30.0.0.tar.gz", hash = "sha256:dec781054324a70ba64430ae9e62e7e9c8e4618c185a5cb3f87a6738251b5a31"},
+    {file = "types_requests-2.30.0.0-py3-none-any.whl", hash = "sha256:c6cf08e120ca9f0dc4fa4e32c3f953c3fba222bcc1db6b97695bce8da1ba9864"},
+]
+
+[package.dependencies]
+types-urllib3 = "*"
+
+[[package]]
+name = "types-tabulate"
+version = "0.9.0.2"
+description = "Typing stubs for tabulate"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-tabulate-0.9.0.2.tar.gz", hash = "sha256:1dd4322a3a146e9073169c74278b8f14a58eb9905ca9db0d2588df408f27cac9"},
+    {file = "types_tabulate-0.9.0.2-py3-none-any.whl", hash = "sha256:a2e41cc41b6b46bfaec78f8fd8e03058fda7a31af6f203a4b235f5482f571f6f"},
+]
+
+[[package]]
+name = "types-urllib3"
+version = "1.26.25.13"
+description = "Typing stubs for urllib3"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-urllib3-1.26.25.13.tar.gz", hash = "sha256:3300538c9dc11dad32eae4827ac313f5d986b8b21494801f1bf97a1ac6c03ae5"},
+    {file = "types_urllib3-1.26.25.13-py3-none-any.whl", hash = "sha256:5dbd1d2bef14efee43f5318b5d36d805a489f6600252bb53626d4bfafd95e27c"},
 ]
 
 [[package]]
@@ -1294,4 +1351,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "3989d0a6517c6ad7a2fdfce9a5073a636002546f65bf52f55a31f921751b30dd"
+content-hash = "f0f464603b37217da49691c2487089ac9f945e5fa376cb7352f3c11684024f20"

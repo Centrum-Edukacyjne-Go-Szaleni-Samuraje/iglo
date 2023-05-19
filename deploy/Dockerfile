@@ -9,6 +9,7 @@ ADD poetry.lock pyproject.toml /app/
 WORKDIR /app
 
 RUN poetry config virtualenvs.create false
+RUN poetry config installer.parallel false
 
 RUN poetry install
 

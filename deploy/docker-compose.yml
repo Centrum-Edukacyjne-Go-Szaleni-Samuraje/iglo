@@ -8,7 +8,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700M
+          memory: 1000M
         reservations:
           memory: 200M
     expose:

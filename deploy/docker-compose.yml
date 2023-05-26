@@ -7,8 +7,6 @@ services:
     command: /app/deploy/web.sh
     deploy:
       resources:
-        limits:
-          memory: 1300M
         reservations:
           memory: 200M
     expose:
@@ -55,8 +53,6 @@ services:
     command: /app/deploy/worker.sh
     deploy:
       resources:
-        limits:
-          memory: 1300M
         reservations:
           memory: 200M
     environment:
@@ -90,8 +86,6 @@ services:
     command: /app/deploy/scheduler.sh
     deploy:
       resources:
-        limits:
-          memory: 1300M
         reservations:
           memory: 100M
     environment:

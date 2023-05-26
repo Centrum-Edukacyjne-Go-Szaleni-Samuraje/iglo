@@ -8,7 +8,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1000M
+          memory: 1300M
         reservations:
           memory: 200M
     expose:
@@ -56,7 +56,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1000M
+          memory: 1300M
         reservations:
           memory: 200M
     environment:
@@ -91,7 +91,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1000M
+          memory: 1300M
         reservations:
           memory: 100M
     environment:

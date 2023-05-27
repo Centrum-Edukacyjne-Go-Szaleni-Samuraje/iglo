@@ -19,7 +19,7 @@ $ ./deploy/build.sh
 $ ./deploy/start.sh
 ```
 
-Lukasz Lew workflow and useful commands:
+Lukasz Lew's workflow and useful commands:
 
 ```
 # Startup.

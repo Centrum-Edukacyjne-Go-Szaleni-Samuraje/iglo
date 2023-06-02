@@ -36,7 +36,7 @@ class SeasonState(TextChoices):
 
 
 class SeasonManager(models.Manager):
-    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int) -> "Season":
+    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int, use_igor: bool=False) -> "Season":
         previous_season = Season.objects.first()
         if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
@@ -48,7 +48,7 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season.create_groups()
+        season.create_groups(use_igor=use_igor)
         return season
 
     def get_latest(self) -> Optional["Season"]:
@@ -122,20 +122,23 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self) -> None:
+    def reset_groups(self, use_igor: bool) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
-        self.create_groups()
+        self.create_groups(use_igor)
 
-    def create_groups(self) -> None:
+    def create_groups(self, use_igor: bool) -> None:
         self.validate_state(state=SeasonState.DRAFT)
-        try:
-            previous_season = Season.objects.get(number=self.number - 1)
-            players = previous_season.get_leaderboard()
-            players = [player for player in players if player.auto_join]
-        except Season.DoesNotExist:
-            players = []
-        players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
+        if use_igor:
+            players = Player.objects.filter(auto_join=True).order_by("-igor")
+        else:
+            try:
+                previous_season = Season.objects.get(number=self.number - 1)
+                players = previous_season.get_leaderboard()
+                players = [player for player in players if player.auto_join]
+            except Season.DoesNotExist:
+                players = []
+            players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
         self._assign_players_to_groups(players=players)
 
     def get_leaderboard(self) -> list["Player"]:
@@ -460,6 +463,7 @@ class Player(models.Model):
     last_name = models.CharField(max_length=32)
     user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
+    igor = models.IntegerField(null=True, blank=True)
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
     auto_join = models.BooleanField(default=True)
@@ -555,6 +559,10 @@ class Member(models.Model):
             if game.loser:
                 result += game.loser.points
         return result
+
+    @cached_property
+    def igor(self) -> float:
+        return self.player.igor
 
     @cached_property
     def sos(self) -> float:

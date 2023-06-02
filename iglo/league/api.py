@@ -6,6 +6,7 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_extensions.routers import ExtendedDefaultRouter
 
 from league.models import Season, Group, Member, Round, Game
+import league.igor
 
 
 class SeasonSerializer(ModelSerializer):
@@ -124,3 +125,5 @@ group_route.register(
     basename="api-rounds-game",
     parents_query_lookups=["group__season__number", "group__name", "round__number"],
 )
+
+league.igor.register(router)

@@ -1,5 +1,3 @@
-from binhex import REASONABLY_LARGE
-
 from django.contrib import messages
 from django.contrib.auth.views import (
     LoginView as ContribLoginView,

@@ -14,6 +14,7 @@ class PlayerFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     nick = factory.Sequence(lambda n: f"player-{n}")
     rank = 1000
+    igor_history = []
 
 
 class SeasonFactory(factory.django.DjangoModelFactory):

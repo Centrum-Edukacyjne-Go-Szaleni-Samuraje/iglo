@@ -12,6 +12,7 @@ from league.models import Game, WinType, Player
 import accurating
 import json
 
+
 class IgorMatchSerializer(ModelSerializer):
     p1 = serializers.CharField(source="black.player.nick")
     p2 = serializers.CharField(source="white.player.nick")
@@ -27,6 +28,7 @@ class IgorMatchSerializer(ModelSerializer):
             "season",
         ]
 
+
 def igor_matches():
     return (
         Game.objects.all()
@@ -34,6 +36,7 @@ def igor_matches():
         .exclude(winner=None)
         .select_related("black__player", "white__player", "group__season", "winner__player")
     )
+
 
 class IgorViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, GenericViewSet):
     queryset = igor_matches()
@@ -63,12 +66,18 @@ def recalculate_igor():
     ar_data = accurating.data_from_dicts(matches)
     model = accurating.fit(ar_data, ar_config)
 
-    ratings = {}
-    for nick, season_ratings in model.rating.items():
-        last_season = max(season_ratings.keys())
-        ratings[nick] = season_ratings[last_season]
+    ratings = {nick: season_ratings for nick,
+               season_ratings in model.rating.items()}
+
     to_update = Player.objects.filter(nick__in=model.rating.keys())
-    for obj in to_update:
-        if obj.nick in ratings:
-            obj.igor = ratings[obj.nick]
-    Player.objects.bulk_update(to_update, fields=['igor'])
+    for player in to_update:
+        if player.nick in ratings:
+            last_season = max(ratings[player.nick].keys())
+            memberships = player.memberships.select_related("group__season")
+            participated_seasons = {m.group.season.number for m in memberships}
+            igor_history_map = {
+                x + 1: (ratings[player.nick][x] if x + 1 in participated_seasons else None) for x in range(last_season)}
+            player.igor_history = [x[1] for x in sorted(
+                igor_history_map.items(), key=lambda x: int(x[0]))]
+            player.igor = ratings[player.nick][last_season]
+    Player.objects.bulk_update(to_update, fields=['igor', 'igor_history'])

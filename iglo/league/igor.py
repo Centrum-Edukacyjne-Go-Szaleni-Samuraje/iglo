@@ -56,7 +56,7 @@ def recalculate_igor():
         dict(
             p1=game.black.player.nick,
             p2=game.white.player.nick,
-            season=game.group.season.number,
+            season=game.group.season.number - 1,  # For internal datastructure we index seasons from 0
             winner=game.winner.player.nick,
         ) for game in igor_matches()
     ]
@@ -66,18 +66,27 @@ def recalculate_igor():
     ar_data = accurating.data_from_dicts(matches)
     model = accurating.fit(ar_data, ar_config)
 
-    ratings = {nick: season_ratings for nick,
-               season_ratings in model.rating.items()}
-
     to_update = Player.objects.filter(nick__in=model.rating.keys())
     for player in to_update:
-        if player.nick in ratings:
-            last_season = max(ratings[player.nick].keys())
+        if player.nick in model.rating:
             memberships = player.memberships.select_related("group__season")
-            participated_seasons = {m.group.season.number for m in memberships}
-            igor_history_map = {
-                x + 1: (ratings[player.nick][x] if x + 1 in participated_seasons else None) for x in range(last_season)}
-            player.igor_history = [x[1] for x in sorted(
-                igor_history_map.items(), key=lambda x: int(x[0]))]
-            player.igor = ratings[player.nick][last_season]
+            participated_seasons = {m.group.season.number - 1 for m in memberships} # index seasons from 0
+
+            def get_rating(kv):
+                season, rating = kv
+                return rating if season in participated_seasons else None
+
+            pratings = model.rating[player.nick]
+            pratings = sorted(pratings.items())
+            pratings = list(map(get_rating, pratings))
+            player.igor_history = pratings
+            if len(pratings) > 0:
+                player.igor = pratings[-1]
+
+            # Useful when testing from `manage.py shell` (PTAL README.md):
+            # print("player.nick = ", player.nick)
+            # print("participated_seasons = ", participated_seasons)
+            # print("player.igor_history = ", player.igor_history)
+            # print()
+
     Player.objects.bulk_update(to_update, fields=['igor', 'igor_history'])

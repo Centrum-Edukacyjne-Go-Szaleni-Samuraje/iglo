@@ -11,6 +11,7 @@ from typing import Optional
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import F, Q, TextChoices, QuerySet, Avg, Count, Sum
 from django.db.models.functions import Round as DjangoRound
@@ -464,6 +465,9 @@ class Player(models.Model):
     user = models.OneToOneField("accounts.User", null=True, on_delete=models.SET_NULL, blank=True)
     rank = models.IntegerField(null=True, blank=True)
     igor = models.IntegerField(null=True, blank=True)
+    igor_history = ArrayField(
+        models.IntegerField(null=True, blank=True)
+    )
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
     auto_join = models.BooleanField(default=True)

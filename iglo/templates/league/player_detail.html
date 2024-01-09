@@ -4,6 +4,10 @@
 
 {% block page_title %}{{ object.nick }}{% endblock %}
 
+{% block head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col">
@@ -69,6 +73,7 @@
                     {% endif %}
                 </div>
             </div>
+            <canvas id="igor_progress" style="width:100%;max-width:1200px"></canvas>
             {% if current_membership %}
                 <div class="card mb-3">
                     <div class="card-header">{% blocktrans %}Aktualne rozgrywki{% endblocktrans %}</div>
@@ -235,4 +240,36 @@
             {% endif %}
         </div>
     </div>
+    
+    <script>
+        function createGraph() {
+            const x = [];
+            const y = JSON.parse("{{ players_igor }}".replaceAll("None", "null"));
+            for (const i of Array(y.length).keys()) {
+                x.push(i + 1);
+            }
+
+            chart = new Chart("igor_progress", {
+                type: "line",
+                data: {
+                labels: x,
+                datasets: [
+                    {
+                        fill: false,
+                        backgroundColor: "rgba(0,0,255,1.0)",
+                        data: y,
+                    },
+                ],
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                },
+            });
+        }
+        createGraph();
+    </script>
 {% endblock %}

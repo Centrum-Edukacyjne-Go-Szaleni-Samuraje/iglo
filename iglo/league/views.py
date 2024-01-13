@@ -339,6 +339,7 @@ class PlayerDetailView(UserRoleRequiredForModify, DetailView):
 
     def get_context_data(self, **kwargs):
         current_membership = Member.objects.get_current_membership(player=self.object)
+        players_igor = self.object.igor_history
         memberships = self.object.memberships.order_by("-group__season__number").select_related("group__season")
         if current_membership:
             current_games = Game.objects.get_for_member(member=current_membership)
@@ -352,6 +353,7 @@ class PlayerDetailView(UserRoleRequiredForModify, DetailView):
             "memberships": memberships,
             "current_games": current_games,
             "upcoming_game": upcoming_game,
+            "players_igor": players_igor
         }
 
     def post(self, request, *args, **kwargs):

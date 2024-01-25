@@ -466,7 +466,8 @@ class Player(models.Model):
     rank = models.IntegerField(null=True, blank=True)
     igor = models.IntegerField(null=True, blank=True)
     igor_history = ArrayField(
-        models.IntegerField(null=True, blank=True)
+        models.IntegerField(null=True, blank=True),
+        default=list, blank=True, null=True
     )
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)

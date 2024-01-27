@@ -7,6 +7,8 @@ You need Python 3.10 to run this project.
 ```
 # Virtual env
 
+sudo apt install virtualenv
+
 virtualenv /tmp/iglo
 source /tmp/iglo/bin/activate
 pip install poetry
@@ -28,27 +30,29 @@ manage createsuperuser
 # Run server
 
 manage runserver
+```
 
-# update translation file, then one can add translations
+### update translation file, then one can add translations
 
-manage makemessages --all
+`manage makemessages --all`
 
-# update accurating lib version
+### update accurating lib version
 
+```
 poetry cache clear PyPI --all  # sometimes
 poetry add accurating@latest
+```
 
-# Running python with iglo and its libraries
+### Celery dev run.
+Should not be needed because we run iglo with CELERY_TASK_ALWAYS_EAGER=True
 
-# Celery dev run. Should not be needed because we run iglo with CELERY_TASK_ALWAYS_EAGER=True
-
+```
 export IGOR_MAX_STEPS=120
 cd iglo
 celery -A iglo worker -l INFO --concurrency 2 --max-tasks-per-child 50 --max-memory-per-child 200000
-
 ```
 
-## Shell development
+### Shell development
 
 This will run python with iglo:
 `manage shell`
@@ -66,6 +70,14 @@ reload(igor)
 igor.recalculate_igor()
 
 ```
+
+### Postgres access
+
+```
+docker exec -it <container id> bash
+psql -U postgres
+```
+
 
 ## Important links
 

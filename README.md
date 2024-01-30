@@ -72,6 +72,19 @@ igor.recalculate_igor()
 - http://localhost:8000/admin/
 - http://localhost:8000/league/admin
 
+## ssh debugging
+
+`ssh apps@iglo.szalenisamuraje.org`
+
+Global logs:
+`less -R logs.txt`
+
+Iglo dockers on the server:
+`docker ps -a | grep iglo`
+
+Get into dev web docker:
+`docker run iglo-staging_web /bin/bash`
+
 ## Old instructions:
 
 Local development (inside Python venv):

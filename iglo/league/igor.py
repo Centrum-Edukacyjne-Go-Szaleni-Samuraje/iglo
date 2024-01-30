@@ -50,7 +50,9 @@ def register(router: ExtendedDefaultRouter):
 
 def recalculate_igor():
 
-    ar_config = accurating.Config(**settings.IGOR_CONFIG)
+    igor_config = settings.IGOR_CONFIG
+    # igor_config['max_steps'] = 20
+    ar_config = accurating.Config(**igor_config)
 
     matches = [
         dict(
@@ -80,8 +82,9 @@ def recalculate_igor():
             pratings = sorted(pratings.items())
             pratings = list(map(get_rating, pratings))
             player.igor_history = pratings
-            if len(pratings) > 0:
-                player.igor = pratings[-1]
+            non_none_pratings = [r for r in pratings if r is not None]
+            if len(non_none_pratings) > 0:
+                player.igor = non_none_pratings[-1]
 
             # Useful when testing from `manage.py shell` (PTAL README.md):
             # print("player.nick = ", player.nick)

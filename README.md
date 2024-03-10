@@ -95,7 +95,16 @@ Iglo dockers on the server:
 `docker ps -a | grep iglo`
 
 Get into dev web docker:
-`docker run iglo-staging_web /bin/bash`
+`ISW=$(docker ps | grep iglo-production_db_1 | sed 's/ .*//')`
+`docker exec -it ${ISW} bash`
+
+We get: `bash-5.1#`
+`psql -U postgres`
+
+Postgres nice commands:
+`\dt`
+`select * from league_player limit 1;`
+`copy (select nick, rank, igor from league_player) to stdout with csv header;`
 
 ## Old instructions:
 

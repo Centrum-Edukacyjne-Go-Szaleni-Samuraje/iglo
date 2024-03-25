@@ -14,6 +14,7 @@ class PrepareSeasonForm(forms.Form):
     start_date = forms.DateField(label=texts.START_DATE_LABEL)
     players_per_group = forms.IntegerField(label=texts.PLAYERS_PER_GROUP_LABEL)
     promotion_count = forms.IntegerField(label=texts.PROMOTION_COUNT_LABEL)
+    use_igor = forms.BooleanField(label=texts.USE_IGOR_LABEL)
 
 
 def ogs_game_link_validator(value: str) -> None:

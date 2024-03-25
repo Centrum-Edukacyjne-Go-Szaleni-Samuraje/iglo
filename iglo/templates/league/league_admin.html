@@ -16,11 +16,17 @@
                     Zaktualizuj rankingi (GoR) wszystkich graczy, którzy podali swój PIN EGD.
                 {% endblocktrans %}
             </div>
-            <button type="submit" class="btn btn-warning" name="action-update-gor">
-                <span class="d-none d-md-inline">
-                    {% blocktrans %}Zaktualizuj rankingi{% endblocktrans %}
-                </span>
-            </button>
+            <div>
+                <button type="submit" class="btn btn-warning" name="action-update-gor">
+                    <span class="d-none d-md-inline">
+                        {% blocktrans %}Zaktualizuj rankingi{% endblocktrans %}
+                    </span>
+                </button>
+                <button type="submit" class="btn btn-warning" name="action-recalculate-igor">
+                    <i class="fas fa-undo"></i>
+                    <span class="d-none d-md-inline">{% translate "Przelicz IGoR" %}</span>
+                </button>
+            </div>
         </div>
     </div>
 </form>

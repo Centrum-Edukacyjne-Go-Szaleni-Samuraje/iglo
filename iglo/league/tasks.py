@@ -14,6 +14,7 @@ from league.utils.aisensei import upload_sgf, AISenseiConfig, AISenseiException
 from league.utils.egd import get_gor_by_pin, EGDException
 from league.utils.ogs import fetch_sgf, OGSException
 from utils.emails import send_email
+from league import igor
 
 logger = logging.getLogger("league")
 
@@ -106,6 +107,12 @@ def update_gor(triggering_user_email: Optional[str] = None):
             from_email=None,
             recipient_list=[triggering_user_email],
         )
+
+@shared_task(time_limit=600)
+def recalculate_igor():
+    logger.info("Recalculating IGoR")
+    igor.recalculate_igor()
+    logger.info("Recalculating IGoR: success")
 
 
 @shared_task()

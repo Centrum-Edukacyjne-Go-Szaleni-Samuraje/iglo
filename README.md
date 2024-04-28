@@ -102,9 +102,10 @@ We get: `bash-5.1#`
 `psql -U postgres`
 
 Postgres nice commands:
-`\dt`
-`select * from league_player limit 1;`
-`copy (select nick, rank, igor from league_player) to stdout with csv header;`
+
+- `\dt`
+- `select * from league_player limit 1;`
+- `copy (select nick, rank, igor from league_player) to stdout with csv header;`
 
 ## Old instructions:
 

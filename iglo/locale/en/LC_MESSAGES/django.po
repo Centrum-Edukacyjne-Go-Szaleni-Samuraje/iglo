@@ -1236,9 +1236,8 @@ msgstr ""
 
 #: templates/misc/home.html:198
 msgid ""
-"Wpłat można dokonywać jako darowiznę na Centrum Edukacyjne Gry Go \"Szaleni "
-"Samuraje\" (nr rachunku: 79 10902590 0000 0001 4785 4705) oraz na:"
-msgstr ""
+"Wpłat można dokonywać jako darowiznę na konto IGLO (PSG) (nr rachunku: 43 1240 6524 1111 0011 3305 2917) oraz na:"
+msgstr "Contributions can be made as a donation to the IGLO (PSG) account (account number: 43 1240 6524 1111 0011 3305 2917) and to:"
 
 #: templates/misc/rules.html:13
 msgid "Współpraca"

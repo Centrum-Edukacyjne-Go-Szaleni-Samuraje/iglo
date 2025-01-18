@@ -226,6 +226,10 @@ CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=True, as_bool
 
 # Periodic task schedules uses the UTC time zone
 CELERY_BEAT_SCHEDULE = {
+    "send-upcoming-games-reminder": {
+        "task": "league.tasks.send_upcoming_games_reminder",
+        "schedule": crontab(minute=0, hour='*'),
+    },
     "send-delayed-games-reminder": {
         "task": "league.tasks.send_delayed_games_reminder",
         "schedule": crontab(hour="8", minute="0"),
@@ -266,6 +270,7 @@ LOCALE_PATHS = [
 ]
 
 ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default=False)
+ENABLE_UPCOMING_GAMES_REMINDER = env("ENABLE_UPCOMING_GAMES_REMINDER", as_bool=True, default=False)
 ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)
 
 REST_FRAMEWORK = {

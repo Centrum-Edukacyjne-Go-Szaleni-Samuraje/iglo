@@ -1,0 +1,1 @@
+Zbliża się termin Twojej gry {{ game.black.player.nick }} vs. {{ game.white.player.nick }} (sezon #{{ game.group.season.number }}, grupa {{ game.group.name }})

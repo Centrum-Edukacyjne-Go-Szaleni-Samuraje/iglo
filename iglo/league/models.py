@@ -699,6 +699,17 @@ class GameManager(models.Manager):
             win_type=WinType.BYE,
             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
         )
+        
+    def get_immediate_games(self):
+        now = datetime.datetime.now()
+        start = now + datetime.timedelta(hours=2)
+        end = now + datetime.timedelta(days=10)
+        return self.filter(
+            win_type__isnull=True,
+            group__season__state=SeasonState.IN_PROGRESS,
+            upcoming_reminder_sent__isnull=True,
+            date__range=(start, end),
+        )
 
     def get_delayed_games(self):
         return self.filter(
@@ -788,6 +799,7 @@ class Game(models.Model):
 
     review_video_link = models.URLField(null=True, blank=True)
     ai_analyse_link = models.URLField(null=True, blank=True)
+    upcoming_reminder_sent = models.DateTimeField(null=True)
     delayed_reminder_sent = models.DateTimeField(null=True)
 
     sgf_updated = models.DateTimeField(null=True)

@@ -1,0 +1,33 @@
+<p>
+    Zbliża się termin Twojej gry <b>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</b> (sezon
+    #{{ game.group.season.number }}, grupa {{ game.group.name }}).
+    Prosimy o informację jeśli nie możesz wziąć udziału lub chcesz zmienić termin.
+</p>
+<p>
+    Gre możesz edytować pod adresem:<br>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    Jeżeli nie pojawisz się w umówionym terminie, Twój przeciwnik będzie mógł
+    wybrać siebie jako zwycięzce (tzn. walkower).
+</p>
+<p>
+    Zespół IGLO
+</p>
+<p><b>[ENGLISH]</b><br></p>
+<p>
+    Your game is near <b>{{ game.black.player.nick }} vs. {{ game.white.player.nick }}</b> (season
+    #{{ game.group.season.number }}, group {{ game.group.name }}).
+    Please let us know if you are unable to attend or wish to reschedule.
+</p>
+<p>
+    You can edit this game here:<br>
+    <a href="{{ domain }}{{ game.get_absolute_url }}">{{ domain }}{{ game.get_absolute_url }}</a>
+</p>
+<p>
+    If you don't show up on the scheduled date, your opponent will be able to
+    choose him/her as the winner.
+</p>
+<p>
+    The IGLO Team
+</p>

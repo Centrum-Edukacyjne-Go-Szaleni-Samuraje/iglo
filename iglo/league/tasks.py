@@ -114,6 +114,23 @@ def recalculate_igor():
     igor.recalculate_igor()
     logger.info("Recalculating IGoR: success")
 
+@shared_task()
+def send_upcoming_games_reminder():
+    if not settings.ENABLE_UPCOMING_GAMES_REMINDER:
+        logger.info("Send upcoming games reminder skipped - this feature is disabled")
+        return
+    games = Game.objects.get_immediate_games()
+    logger.info("Sending %d upcoming games reminders", games.count())
+    for game in games:
+        game.upcoming_reminder_sent = datetime.datetime.now()
+        game.save()
+        send_email(
+            subject_template="league/emails/upcoming_game_reminder/subject.txt",
+            body_template="league/emails/upcoming_game_reminder/body.html",
+            to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
+            context={"game": game},
+            reply_to=[settings.REPLY_TO_EMAIL]
+        )
 
 @shared_task()
 def send_delayed_games_reminder():

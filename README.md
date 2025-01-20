@@ -5,12 +5,29 @@ You need Python 3.10 to run this project.
 ## Dev workflow and useful commands:
 
 ```
+
+# One time setup/install:
+
+systeminstall() {
+  # sudo apt -y install $@
+  sudo dnf install -y $@
+}
+
+
+systeminstall virtualenv
+systeminstall docker
+# systeminstall gcc-c++ python3-devel gcc-gfortran openblas-devel lapack-devel cmake pkg-config libopenblas-dev
+
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+# needs logout+login
+
+
 # Virtual env
 
-sudo apt install virtualenv
-
-virtualenv /tmp/iglo
-source /tmp/iglo/bin/activate
+# rm -fr ${HOME}/venv/iglo/
+virtualenv ${HOME}/venv/iglo
+source ${HOME}/venv/iglo/bin/activate
 pip install poetry
 poetry install
 
@@ -19,6 +36,7 @@ poetry install
 export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
 export CELERY_TASK_ALWAYS_EAGER=True
 alias manage="poetry run python3 iglo/manage.py"
+
 
 # docker stop iglo-db; docker rm iglo-db
 docker ps -a
@@ -32,12 +50,20 @@ manage createsuperuser
 manage runserver
 ```
 
+Now you can go to `http://127.0.0.1:8000/`
+
 ### update translation file, then one can add translations
 
 `manage makemessages --all`
 
-### update accurating lib version
+### update lib versions
 
+```
+export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
+poetry update --lock
+```
+
+Method for accurating only:
 ```
 poetry cache clear PyPI --all  # sometimes
 poetry add accurating@latest
@@ -124,28 +150,4 @@ Docker build & run:
 ```
 $ ./deploy/build.sh
 $ ./deploy/start.sh
-```
-
-Lukasz Lew's workflow and useful commands:
-
-```
-# Startup.
-$ docker run -e POSTGRES_PASSWORD=postgres --name iglo-db -p 15432:5432 -d postgres
-$ python3 manage.py migrate  # maybe prefix with 'potery run'
-$ python3 manage.py load_seasons ../fixtures/seasons.json
-$ CELERY_TASK_ALWAYS_EAGER=True IGLO_DB_PORT=15432 poetry run python3 manage.py runserver
-$ python3 manage.py createsuperuser
-
-# update translation file, then one can add translations
-$ python3 iglo/manage.py makemessages --all
-
-# update lib version
-$ poetry cache clear PyPI --all  # sometimes
-$ poetry add accurating@latest
-
-# Running python with iglo and its libraries
-$ poetry run python3 manage.py shell
-
-# Celery dev run.
-$ IGOR_MAX_STEPS=120 IGLO_DB_PORT=15432 celery -A iglo worker -l INFO --concurrency 2 --max-tasks-per-child 50 --max-memory-per-child 200000
 ```

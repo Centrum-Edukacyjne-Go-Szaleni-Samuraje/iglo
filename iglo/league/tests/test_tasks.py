@@ -56,3 +56,17 @@ class SendDelayedGamesRemindersTask(TestCase):
         game.refresh_from_db()
         self.assertIsNotNone(game.delayed_reminder_sent)
         self.assertEqual(len(mail.outbox), 1)
+        
+@override_settings(ENABLE_UPCOMING_GAMES_REMINDER=True)
+class SendUpcomingGamesRemindersTask(TestCase):
+
+    def test_task(self):
+        now = datetime.datetime.now()
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+        game = GameFactory(date=now + datetime.timedelta(days=1), win_type=None, group__season=season)
+
+        send_upcoming_games_reminder()
+
+        game.refresh_from_db()
+        self.assertIsNotNone(game.upcoming_reminder_sent)
+        self.assertEqual(len(mail.outbox), 1)

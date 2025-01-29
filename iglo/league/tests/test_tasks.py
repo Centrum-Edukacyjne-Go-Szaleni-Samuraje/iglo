@@ -5,7 +5,7 @@ from django.core import mail
 from django.test import TestCase, override_settings
 
 from league.models import GameAIAnalyseUploadStatus, SeasonState
-from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder
+from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder, send_upcoming_games_reminder
 from league.tests.factories import GameFactory, SeasonFactory
 from league.utils.aisensei import AISenseiException
 

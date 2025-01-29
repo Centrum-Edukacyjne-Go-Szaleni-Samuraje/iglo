@@ -114,6 +114,29 @@ def recalculate_igor():
     igor.recalculate_igor()
     logger.info("Recalculating IGoR: success")
 
+def emails(game):
+    return [player.user.email for player in [game.white.player, game.black.player] if player.user]
+
+def send_game_email(path, to, game):
+    send_email(
+        subject_template=path+"/subject.txt",
+        body_template=path+"/body.html",
+        to=to,
+        context={"game": game},
+        reply_to=[settings.REPLY_TO_EMAIL]
+    )
+
+@shared_task()
+def send_upcoming_games_reminder():
+    if not settings.ENABLE_UPCOMING_GAMES_REMINDER:
+        logger.info("Send upcoming games reminder skipped - this feature is disabled")
+        return
+    games = Game.objects.get_immediate_games()
+    logger.info("Sending %d upcoming games reminders", games.count())
+    for game in games:
+        game.upcoming_reminder_sent = datetime.datetime.now()
+        game.save()
+        send_game_email("league/emails/upcoming_game_reminder", emails(game), game)
 
 @shared_task()
 def send_delayed_games_reminder():
@@ -125,10 +148,4 @@ def send_delayed_games_reminder():
     for game in games:
         game.delayed_reminder_sent = datetime.datetime.now()
         game.save()
-        send_email(
-            subject_template="league/emails/delayed_game_reminder/subject.txt",
-            body_template="league/emails/delayed_game_reminder/body.html",
-            to=[player.user.email for player in [game.white.player, game.black.player] if player.user],
-            context={"game": game},
-            reply_to=[settings.REPLY_TO_EMAIL]
-        )
+        send_game_email("league/emails/delayed_game_reminder", emails(game), game)

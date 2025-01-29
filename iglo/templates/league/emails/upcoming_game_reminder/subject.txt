@@ -1,1 +1,0 @@
-Nadchodzi Wasza gra w IGLO! {{ game.black.player.nick }} vs. {{ game.white.player.nick }} - Wybierzmy termin.

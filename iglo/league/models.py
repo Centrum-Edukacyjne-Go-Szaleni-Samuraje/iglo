@@ -111,7 +111,7 @@ class Season(models.Model):
     def finish(self) -> None:
         self.validate_state(state=SeasonState.IN_PROGRESS)
         if Game.objects.filter(group__season=self, win_type__isnull=True).exists():
-            raise GamesWithoutResultError()
+            Game.objects.filter(group__season=self, win_type__isnull=True).update(win_type=WinType.NOT_PLAYED)
         for group in self.groups.all():
             for position, member in enumerate(group.members_qualification, start=1):
                 member.final_order = position

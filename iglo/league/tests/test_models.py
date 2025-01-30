@@ -348,14 +348,6 @@ class SeasonTestCase(TestCase):
         season.refresh_from_db()
         self.assertEqual(season.state, SeasonState.FINISHED)
 
-    def test_finish_when_games_without_result(self):
-        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
-        group = GroupFactory(season=season)
-        GameFactory(group=group)
-
-        with self.assertRaises(GamesWithoutResultError):
-            season.finish()
-
     def test_start_with_mcmahon_group(self):
         season = SeasonFactory(state=SeasonState.DRAFT, start_date=datetime.date(2021, 1, 1))
         group = GroupFactory(season=season, type=GroupType.MCMAHON)

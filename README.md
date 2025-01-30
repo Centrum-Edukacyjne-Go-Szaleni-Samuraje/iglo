@@ -118,10 +118,12 @@ Global logs:
 `less -R logs.txt`
 
 Iglo dockers on the server:
-`docker ps -a | grep iglo`
+`docker ps -a | grep iglo` 
+(staging = devel)
 
 Get into dev web docker:
 `docker exec -it iglo-staging_web_1 bash`
+
 
 We get: `bash-5.1#`
 `psql -U postgres`

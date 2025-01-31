@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from league import texts
-from league.utils.paring import round_robin, shuffle_colors
+from league.utils.paring import round_robin, shuffle_colors, banded_round_robin
 from macmahon import macmahon as mm
 
 DAYS_PER_GAME = 7
@@ -90,7 +90,9 @@ class Season(models.Model):
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             current_date = self.start_date
-            for round_number, round_pairs in enumerate(shuffle_colors(paring=round_robin(n=len(members))), start=1):
+            # pairing = round_robin(n=len(members))
+            pairing = banded_round_robin(player_count=len(members), band_size=2)
+            for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
                     number=round_number,
                     group=group,
@@ -141,6 +143,7 @@ class Season(models.Model):
                 players = []
             players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
         self._assign_players_to_groups(players=players)
+
 
     def get_leaderboard(self) -> list["Player"]:
         players = []
@@ -249,6 +252,9 @@ class ResultSymbol(str, Enum):
     lose = "-"
     not_played = "?"
     no_result = "X"
+
+    def __str__(self):
+        return str(self.value)
 
 
 class Group(models.Model):
@@ -699,7 +705,7 @@ class GameManager(models.Manager):
             win_type=WinType.BYE,
             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
         )
-        
+
     def get_immediate_games(self):
         now = datetime.datetime.now()
         start = now + datetime.timedelta(hours=2)

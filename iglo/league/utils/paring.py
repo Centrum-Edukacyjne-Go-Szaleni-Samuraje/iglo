@@ -26,6 +26,22 @@ def round_robin(n: int) -> Pairing:
         return list(_round_robin_odd(d, n))
 
 
+def banded_round_robin(player_count: int, band_size: int) -> Pairing:
+  by_round = []
+  for player_distance in range(band_size, 0, -1):
+    round_2pd_0 = set() # round 2*player_distance
+    round_2pd_1 = set() # round 2*player_distance + 1
+    for player in range(player_count):
+      opponent = player + player_distance
+      if opponent < player_count:
+        m = round_2pd_1 if (player // player_distance) % 2 == 0 else round_2pd_0
+        m.add((player, opponent))
+    by_round.append(round_2pd_0)
+    by_round.append(round_2pd_1)
+  by_round = list(map(list, by_round))
+  return by_round
+
+
 def shuffle_colors(paring: Pairing, randomize: bool = True) -> Pairing:
     colors_count = defaultdict(lambda: defaultdict(int))
     result = []

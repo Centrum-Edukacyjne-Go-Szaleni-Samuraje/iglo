@@ -703,7 +703,7 @@ class GameManager(models.Manager):
     def get_immediate_games(self):
         now = datetime.datetime.now()
         start = now + datetime.timedelta(hours=2)
-        end = now + datetime.timedelta(days=8)
+        end = now + datetime.timedelta(days=6, hours=23)
         return self.filter(
             win_type__isnull=True,
             group__season__state=SeasonState.IN_PROGRESS,

@@ -44,6 +44,7 @@ docker run -e POSTGRES_PASSWORD=postgres --name iglo-db -p ${IGLO_DB_PORT}:5432 
 manage migrate
 manage load_seasons fixtures/seasons.json
 manage createsuperuser
+# echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
 
 # Run server
 
@@ -118,7 +119,7 @@ Global logs:
 `less -R logs.txt`
 
 Iglo dockers on the server:
-`docker ps -a | grep iglo` 
+`docker ps -a | grep iglo`
 (staging = devel)
 
 Get into dev web docker:

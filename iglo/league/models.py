@@ -88,13 +88,13 @@ class Season(models.Model):
         self.validate_state(state=SeasonState.DRAFT)
         self.state = SeasonState.IN_PROGRESS
         self.save()
-        
+
         # Process ROUND_ROBIN groups with standard pairing
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             current_date = self.start_date
             pairing = round_robin(n=len(members))
-            
+
             for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
                     number=round_number,
@@ -112,7 +112,7 @@ class Season(models.Model):
                         white=game_members[1],
                         date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
                     )
-            
+
         # Process BANDED groups with banded pairing
         for group in self.groups.filter(type=GroupType.BANDED):
             members = list(group.members.all())
@@ -128,18 +128,18 @@ class Season(models.Model):
                     end_date=current_date + datetime.timedelta(days=DAYS_PER_GAME - 1),
                 )
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
-                
+
                 for pair in round_pairs:
                     # Check if this is a special BYE game
                     if isinstance(pair[1], bool):
                         # This is a player-with-result pair (player, is_win)
                         player = members[pair[0]]
                         is_win = pair[1]  # True is win, False is loss
-                        
+
                         # Create a BYE game with consistent format (player always as black)
                         # Set winner based on is_win
                         winner = player if is_win else None
-                        
+
                         Game.objects.create(
                             group=group,
                             round=round,
@@ -213,11 +213,11 @@ class Season(models.Model):
             # Add all players to the single group with their initial points
             total_players = len(players)
             members_to_create = []
-            
+
             for player_order, player in enumerate(players, start=1):
                 # Base points: N for first player (player_order=1), 0 for last player
                 base_points = total_players - player_order
-                
+
                 # Note: We'll use BYE games later instead of explicit band_bonus
                 members_to_create.append(
                     Member(
@@ -228,7 +228,7 @@ class Season(models.Model):
                         initial_score=base_points
                     )
                 )
-            
+
             # Bulk create all members at once
             members = Member.objects.bulk_create(members_to_create)
         else:
@@ -420,32 +420,32 @@ class Group(models.Model):
         members = list(self.members.select_related("player")
                        .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
                        .all())
-        
+
         # Different sorting based on group type
         if self.type == GroupType.ROUND_ROBIN:
             # ROUND_ROBIN: Sort by final_order, points, sodos, start position
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
-                -member.points, 
-                -member.sodos, 
+                -member.points,
+                -member.sodos,
                 member.order
             ))
         elif self.type == GroupType.BANDED:
             # BANDED: Simple sort by final_order, score, and order (skip sos/sosos calculation)
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
-                -member.score, 
+                -member.score,
                 member.order
             ))
         else:
             # MCMAHON: Full sort with sos and sosos
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
-                -member.score, 
-                -member.sos, 
+                -member.score,
+                -member.sos,
                 -member.sosos
             ))
-            
+
         return members
 
     def delete_member(self, member_id: int) -> None:

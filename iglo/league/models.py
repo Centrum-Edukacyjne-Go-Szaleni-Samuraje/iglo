@@ -88,17 +88,36 @@ class Season(models.Model):
         self.validate_state(state=SeasonState.DRAFT)
         self.state = SeasonState.IN_PROGRESS
         self.save()
+        
+        # Process ROUND_ROBIN groups with standard pairing
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             current_date = self.start_date
-
-            # Check if this group should use banded pairing
-            if group.band_size:
-                # Use banded round robin for this group
-                pairing = banded_round_robin(player_count=len(members), band_size=group.band_size)
-            else:
-                # Use regular round robin
-                pairing = round_robin(n=len(members))
+            pairing = round_robin(n=len(members))
+            
+            for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
+                round = Round.objects.create(
+                    number=round_number,
+                    group=group,
+                    start_date=current_date,
+                    end_date=current_date + datetime.timedelta(days=DAYS_PER_GAME - 1),
+                )
+                current_date += datetime.timedelta(days=DAYS_PER_GAME)
+                for pair in round_pairs:
+                    game_members = [members[pair[0]], members[pair[1]]]
+                    Game.objects.create(
+                        group=group,
+                        round=round,
+                        black=game_members[0],
+                        white=game_members[1],
+                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
+                    )
+            
+        # Process BANDED groups with banded pairing
+        for group in self.groups.filter(type=GroupType.BANDED):
+            members = list(group.members.all())
+            current_date = self.start_date
+            pairing = banded_round_robin(player_count=len(members), band_size=group.band_size)
 
             for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
@@ -160,7 +179,7 @@ class Season(models.Model):
             group = Group.objects.create(
                 name='A',
                 season=self,
-                type=GroupType.ROUND_ROBIN,
+                type=GroupType.BANDED,  # Using our new BANDED type
                 is_egd=is_egd,
             )
 
@@ -168,14 +187,36 @@ class Season(models.Model):
             group.band_size = band_size
             group.save()
 
-            # Add all players to the single group
+            # Add all players to the single group with initial points
+            total_players = len(players)
+            members_to_create = []
+            
             for player_order, player in enumerate(players, start=1):
-                Member.objects.create(
-                    group=group,
-                    order=player_order,
-                    player=player,
-                    rank=player.rank,
+                # Base points: N for first player (player_order=1), 0 for last player
+                base_points = total_players - player_order
+                
+                # Additional points based on band_size for LAST players
+                # (total_players - player_order) gives position from the end: 0 for last, 1 for second-to-last, etc.
+                position_from_end = total_players - player_order
+                
+                # Band bonus for the last band_size players: last gets band_size points, second-to-last gets band_size-1, etc.
+                band_bonus = band_size - position_from_end if position_from_end < band_size else 0
+                
+                # Total initial score
+                initial_score = base_points + band_bonus
+                
+                members_to_create.append(
+                    Member(
+                        group=group,
+                        order=player_order,
+                        player=player,
+                        rank=player.rank,
+                        initial_score=initial_score
+                    )
                 )
+            
+            # Bulk create all members at once
+            Member.objects.bulk_create(members_to_create)
         else:
             # Default behavior - create multiple groups
             self._assign_players_to_groups(players=players)
@@ -277,6 +318,7 @@ class GameResult(Enum):
 class GroupType(models.TextChoices):
     ROUND_ROBIN = "round_robin", _("Każdy z każdym")
     MCMAHON = "mcmahon", _("McMahon")
+    BANDED = "banded", _("Banded Round Robin")
 
 
 class NotMcmahonGroupError(Exception):

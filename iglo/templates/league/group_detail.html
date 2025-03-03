@@ -73,6 +73,40 @@
                                             </tr>
                                         {% endfor %}
                                     </tbody>
+                                {% elif object.type == "banded" %}
+                                    <thead>
+                                        <tr>
+                                            <th class="group-table__header">{% translate "Pozycja" %}</th>
+                                            <th class="group-table__header">{% translate "Gracz" %}</th>
+                                            {% if object.rounds_number %}
+                                                <th colspan="{{ object.rounds_number }}"
+                                                    class="group-table__header">{% translate "Rundy" %}</th>
+                                            {% endif %}
+                                            <th class="group-table__header">
+                                                {% translate "Punkty" %}
+                                            </th>
+                                            <th class="group-table__header">{% translate "IGoR" %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for position, member, results in object.results_table %}
+                                            <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
+                                                data-position="{{ position }}">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="group-table__header group-table__cell-name">
+                                                    {% include "league/includes/player_badge.html" with player=member.player member=member %}
+                                                </td>
+                                                {% for result, url in results %}
+                                                    <td class="group-table__cell-result{% if "+" in result %} group-table__result--win{% endif %}">
+                                                        <a class="group-table__result-link" data-result="{{ result }}"
+                                                           href="{{ url }}">{{ result }}</a>
+                                                    </td>
+                                                {% endfor %}
+                                                <td>{{ member.score }}</td>
+                                                <td>{{ member.igor }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
                                 {% elif object.type == "mcmahon" %}
                                     <thead>
                                         <tr>

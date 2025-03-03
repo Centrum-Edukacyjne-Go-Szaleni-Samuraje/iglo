@@ -417,17 +417,36 @@ class Group(models.Model):
 
     @cached_property
     def members_qualification(self) -> list["Member"]:
-        return sorted(
-            [
-                member
-                for member in self.members.select_related("player")
-                .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
-                .all()
-            ],
-            key=lambda member: (member.final_order, -member.points, -member.sodos, member.order)
-            if self.type == GroupType.ROUND_ROBIN
-            else (member.final_order, -member.score, -member.sos, -member.sosos),
-        )
+        members = list(self.members.select_related("player")
+                       .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
+                       .all())
+        
+        # Different sorting based on group type
+        if self.type == GroupType.ROUND_ROBIN:
+            # ROUND_ROBIN: Sort by final_order, points, sodos, start position
+            members.sort(key=lambda member: (
+                member.final_order if member.final_order is not None else float('inf'),
+                -member.points, 
+                -member.sodos, 
+                member.order
+            ))
+        elif self.type == GroupType.BANDED:
+            # BANDED: Simple sort by final_order, score, and order (skip sos/sosos calculation)
+            members.sort(key=lambda member: (
+                member.final_order if member.final_order is not None else float('inf'),
+                -member.score, 
+                member.order
+            ))
+        else:
+            # MCMAHON: Full sort with sos and sosos
+            members.sort(key=lambda member: (
+                member.final_order if member.final_order is not None else float('inf'),
+                -member.score, 
+                -member.sos, 
+                -member.sosos
+            ))
+            
+        return members
 
     def delete_member(self, member_id: int) -> None:
         self.season.validate_state(state=SeasonState.DRAFT)

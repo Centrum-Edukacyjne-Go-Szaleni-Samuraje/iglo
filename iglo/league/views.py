@@ -411,11 +411,16 @@ class PrepareSeasonView(UserRoleRequired, FormView):
     DEFAULT_USE_IGOR = True
 
     def form_valid(self, form):
+        pairing_type = form.cleaned_data["pairing_type"]
+        band_size = form.cleaned_data.get("band_size", 2)
+
         self.object = Season.objects.prepare_season(
             start_date=form.cleaned_data["start_date"],
             players_per_group=form.cleaned_data["players_per_group"],
             promotion_count=form.cleaned_data["promotion_count"],
             use_igor=form.cleaned_data["use_igor"],
+            pairing_type=pairing_type,
+            band_size=band_size
         )
         return super().form_valid(form)
 

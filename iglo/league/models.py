@@ -37,7 +37,8 @@ class SeasonState(TextChoices):
 
 
 class SeasonManager(models.Manager):
-    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int, use_igor: bool=False) -> "Season":
+    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int,
+                       use_igor: bool=False, pairing_type: str='default', band_size: int=2) -> "Season":
         previous_season = Season.objects.first()
         if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
@@ -49,7 +50,7 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season.create_groups(use_igor=use_igor)
+        season.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size)
         return season
 
     def get_latest(self) -> Optional["Season"]:
@@ -90,8 +91,15 @@ class Season(models.Model):
         for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
             members = list(group.members.all())
             current_date = self.start_date
-            # pairing = round_robin(n=len(members))
-            pairing = banded_round_robin(player_count=len(members), band_size=2)
+
+            # Check if this group should use banded pairing
+            if group.band_size:
+                # Use banded round robin for this group
+                pairing = banded_round_robin(player_count=len(members), band_size=group.band_size)
+            else:
+                # Use regular round robin
+                pairing = round_robin(n=len(members))
+
             for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
                     number=round_number,
@@ -125,13 +133,15 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self, use_igor: bool) -> None:
+    def reset_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
-        self.create_groups(use_igor)
+        self.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size)
 
-    def create_groups(self, use_igor: bool) -> None:
+    def create_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2) -> None:
         self.validate_state(state=SeasonState.DRAFT)
+
+        # Get the players
         if use_igor:
             players = Player.objects.filter(auto_join=True).order_by("-igor")
         else:
@@ -142,7 +152,33 @@ class Season(models.Model):
             except Season.DoesNotExist:
                 players = []
             players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
-        self._assign_players_to_groups(players=players)
+
+        # Handle banded pairing type
+        if pairing_type == 'banded':
+            # Create a single group with all players
+            is_egd = all(p.egd_approval for p in players)
+            group = Group.objects.create(
+                name='A',
+                season=self,
+                type=GroupType.ROUND_ROBIN,
+                is_egd=is_egd,
+            )
+
+            # Store the band_size for later use in the start method
+            group.band_size = band_size
+            group.save()
+
+            # Add all players to the single group
+            for player_order, player in enumerate(players, start=1):
+                Member.objects.create(
+                    group=group,
+                    order=player_order,
+                    player=player,
+                    rank=player.rank,
+                )
+        else:
+            # Default behavior - create multiple groups
+            self._assign_players_to_groups(players=players)
 
 
     def get_leaderboard(self) -> list["Player"]:
@@ -262,6 +298,7 @@ class Group(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
     type = models.CharField(choices=GroupType.choices, max_length=16)
     is_egd = models.BooleanField(default=False)
+    band_size = models.IntegerField(null=True, blank=True, help_text="Band size for banded round robin pairing")
     teacher = models.ForeignKey(
         "review.Teacher", null=True, on_delete=models.SET_NULL, related_name="groups", blank=True
     )

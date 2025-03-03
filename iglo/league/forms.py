@@ -11,10 +11,28 @@ from league.models import Game, Member, Player, WinType
 
 
 class PrepareSeasonForm(forms.Form):
+    PAIRING_CHOICES = [
+        ('default', 'Create multiple groups with standard pairing'),
+        ('banded', 'Create single group with banded round robin pairing')
+    ]
+
     start_date = forms.DateField(label=texts.START_DATE_LABEL)
     players_per_group = forms.IntegerField(label=texts.PLAYERS_PER_GROUP_LABEL)
     promotion_count = forms.IntegerField(label=texts.PROMOTION_COUNT_LABEL)
     use_igor = forms.BooleanField(label=texts.USE_IGOR_LABEL)
+    pairing_type = forms.ChoiceField(
+        label="Pairing Type",
+        choices=PAIRING_CHOICES,
+        initial='default',
+        widget=forms.RadioSelect,
+        help_text="Choose 'banded' to create a single group with players paired using the banded round robin algorithm. This will not create McMahon groups."
+    )
+    band_size = forms.IntegerField(
+        label="Band Size",
+        initial=2,
+        help_text="Number of players above and below to play with (so half the number of games, only applicable when banded pairing is selected)",
+        required=True,
+    )
 
 
 def ogs_game_link_validator(value: str) -> None:

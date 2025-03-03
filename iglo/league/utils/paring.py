@@ -26,7 +26,7 @@ def round_robin(n: int) -> Pairing:
         return list(_round_robin_odd(d, n))
 
 
-def banded_round_robin(player_count: int, band_size: int) -> Pairing:
+def banded_round_robin(player_count: int, band_size: int, add_byes: bool = True) -> Pairing:
   by_round = []
   for player_distance in range(band_size, 0, -1):
     round_2pd_0 = set() # round 2*player_distance
@@ -38,6 +38,31 @@ def banded_round_robin(player_count: int, band_size: int) -> Pairing:
         m.add((player, opponent))
     by_round.append(round_2pd_0)
     by_round.append(round_2pd_1)
+  
+  # Add BYE games for players without matches in certain rounds
+  if add_byes:
+    all_players = set(range(player_count))
+    
+    # Post-process each round to add BYE games
+    for round_idx, round_set in enumerate(by_round):
+      # Find players in this round
+      players_in_round = set()
+      for p1, p2 in round_set:
+        players_in_round.add(p1)
+        players_in_round.add(p2)
+      
+      # Find missing players
+      missing_players = all_players - players_in_round
+      
+      # Add appropriate BYE games
+      for player in missing_players:
+        if player < band_size:
+          # Top players get BYE losses: (player, False)
+          by_round[round_idx].add((player, False))
+        elif player >= player_count - band_size:
+          # Bottom players get BYE wins: (player, True)
+          by_round[round_idx].add((player, True))
+  
   by_round = list(map(list, by_round))
   return by_round
 
@@ -48,12 +73,18 @@ def shuffle_colors(paring: Pairing, randomize: bool = True) -> Pairing:
     for not_shuffled_round in paring:
         shuffled_round = []
         for pair in not_shuffled_round:
-            if randomize and random.randint(0, 1):
-                pair = (pair[1], pair[0])
-            if colors_count[pair[0]]["B"] > colors_count[pair[0]]["W"]:
-                pair = (pair[1], pair[0])
-            colors_count[pair[0]]["B"] += 1
-            colors_count[pair[1]]["W"] += 1
-            shuffled_round.append(pair)
+            # Check if this is a special BYE pair with boolean at index 1
+            if isinstance(pair[1], bool):
+                # This is a BYE game, don't shuffle
+                shuffled_round.append(pair)
+            else:
+                # Regular game between two players
+                if randomize and random.randint(0, 1):
+                    pair = (pair[1], pair[0])
+                if colors_count[pair[0]]["B"] > colors_count[pair[0]]["W"]:
+                    pair = (pair[1], pair[0])
+                colors_count[pair[0]]["B"] += 1
+                colors_count[pair[1]]["W"] += 1
+                shuffled_round.append(pair)
         result.append(shuffled_round)
     return result

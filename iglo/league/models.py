@@ -117,7 +117,8 @@ class Season(models.Model):
         for group in self.groups.filter(type=GroupType.BANDED):
             members = list(group.members.all())
             current_date = self.start_date
-            pairing = banded_round_robin(player_count=len(members), band_size=group.band_size)
+            # Use banded_round_robin with BYE games
+            pairing = banded_round_robin(player_count=len(members), band_size=group.band_size, add_byes=True)
 
             for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
@@ -127,15 +128,37 @@ class Season(models.Model):
                     end_date=current_date + datetime.timedelta(days=DAYS_PER_GAME - 1),
                 )
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
+                
                 for pair in round_pairs:
-                    game_members = [members[pair[0]], members[pair[1]]]
-                    Game.objects.create(
-                        group=group,
-                        round=round,
-                        black=game_members[0],
-                        white=game_members[1],
-                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
-                    )
+                    # Check if this is a special BYE game
+                    if isinstance(pair[1], bool):
+                        # This is a player-with-result pair (player, is_win)
+                        player = members[pair[0]]
+                        is_win = pair[1]  # True is win, False is loss
+                        
+                        # Create a BYE game with consistent format (player always as black)
+                        # Set winner based on is_win
+                        winner = player if is_win else None
+                        
+                        Game.objects.create(
+                            group=group,
+                            round=round,
+                            black=player,     # Always set player as black for consistency
+                            white=None,       # No opponent (BYE)
+                            winner=winner,    # Set winner based on is_win
+                            win_type=WinType.BYE,
+                            date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
+                        )
+                    else:
+                        # Regular game between two players
+                        game_members = [members[pair[0]], members[pair[1]]]
+                        Game.objects.create(
+                            group=group,
+                            round=round,
+                            black=game_members[0],
+                            white=game_members[1],
+                            date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
+                        )
 
     def finish(self) -> None:
         self.validate_state(state=SeasonState.IN_PROGRESS)
@@ -187,7 +210,7 @@ class Season(models.Model):
             group.band_size = band_size
             group.save()
 
-            # Add all players to the single group with initial points
+            # Add all players to the single group with their initial points
             total_players = len(players)
             members_to_create = []
             
@@ -195,28 +218,19 @@ class Season(models.Model):
                 # Base points: N for first player (player_order=1), 0 for last player
                 base_points = total_players - player_order
                 
-                # Additional points based on band_size for LAST players
-                # (total_players - player_order) gives position from the end: 0 for last, 1 for second-to-last, etc.
-                position_from_end = total_players - player_order
-                
-                # Band bonus for the last band_size players: last gets band_size points, second-to-last gets band_size-1, etc.
-                band_bonus = band_size - position_from_end if position_from_end < band_size else 0
-                
-                # Total initial score
-                initial_score = base_points + band_bonus
-                
+                # Note: We'll use BYE games later instead of explicit band_bonus
                 members_to_create.append(
                     Member(
                         group=group,
                         order=player_order,
                         player=player,
                         rank=player.rank,
-                        initial_score=initial_score
+                        initial_score=base_points
                     )
                 )
             
             # Bulk create all members at once
-            Member.objects.bulk_create(members_to_create)
+            members = Member.objects.bulk_create(members_to_create)
         else:
             # Default behavior - create multiple groups
             self._assign_players_to_groups(players=players)
@@ -658,18 +672,26 @@ class Member(models.Model):
     def sos(self) -> float:
         result = 0.0
         for game in self.games_as_white.all():
-            result += game.get_opponent(self).score
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.score
         for game in self.games_as_black.all():
-            result += game.get_opponent(self).score
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.score
         return result
 
     @cached_property
     def sosos(self) -> float:
         result = 0.0
         for game in self.games_as_white.all():
-            result += game.get_opponent(self).sos
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.sos
         for game in self.games_as_black.all():
-            result += game.get_opponent(self).sos
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.sos
         return result
 
     @cached_property

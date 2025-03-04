@@ -102,7 +102,7 @@
                                                            href="{{ url }}">{{ result }}</a>
                                                     </td>
                                                 {% endfor %}
-                                                <td>{{ member.score }}</td>
+                                                <td>{{ member.score|floatformat:2 }}</td>
                                                 <td>{{ member.igor }}</td>
                                             </tr>
                                         {% endfor %}

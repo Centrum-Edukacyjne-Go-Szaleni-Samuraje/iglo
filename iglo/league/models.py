@@ -38,7 +38,8 @@ class SeasonState(TextChoices):
 
 class SeasonManager(models.Manager):
     def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int,
-                       use_igor: bool=False, pairing_type: str='default', band_size: int=2) -> "Season":
+                       use_igor: bool=False, pairing_type: str='default', band_size: int=2,
+                       point_difference: float=1.0) -> "Season":
         previous_season = Season.objects.first()
         if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
@@ -50,7 +51,8 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size)
+        season.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size,
+                            point_difference=point_difference)
         return season
 
     def get_latest(self) -> Optional["Season"]:
@@ -175,12 +177,15 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2) -> None:
+    def reset_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2,
+                   point_difference: float=1.0) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
-        self.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size)
+        self.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size,
+                         point_difference=point_difference)
 
-    def create_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2) -> None:
+    def create_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2,
+                      point_difference: float=1.0) -> None:
         self.validate_state(state=SeasonState.DRAFT)
 
         # Get the players
@@ -206,8 +211,9 @@ class Season(models.Model):
                 is_egd=is_egd,
             )
 
-            # Store the band_size for later use in the start method
+            # Store the band_size and point_difference for later use
             group.band_size = band_size
+            group.point_difference = point_difference  # Store the point difference setting
             group.save()
 
             # Add all players to the single group with their initial points
@@ -215,8 +221,11 @@ class Season(models.Model):
             members_to_create = []
 
             for player_order, player in enumerate(players, start=1):
-                # Base points: N for first player (player_order=1), 0 for last player
-                base_points = total_players - player_order
+                # Calculate points using the provided point difference
+                # First player (position 1) gets (total_players-1) * point_difference points
+                # Last player gets 0 points
+                # This creates a linear progression with the specified step size
+                base_points = (total_players - player_order) * point_difference
 
                 # Note: We'll use BYE games later instead of explicit band_bonus
                 members_to_create.append(
@@ -355,6 +364,7 @@ class Group(models.Model):
     type = models.CharField(choices=GroupType.choices, max_length=16)
     is_egd = models.BooleanField(default=False)
     band_size = models.IntegerField(null=True, blank=True, help_text="Band size for banded round robin pairing")
+    point_difference = models.FloatField(null=True, blank=True, help_text="Points difference between consecutive players in ranking", default=1.0)
     teacher = models.ForeignKey(
         "review.Teacher", null=True, on_delete=models.SET_NULL, related_name="groups", blank=True
     )
@@ -647,7 +657,7 @@ class Member(models.Model):
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
     final_order = models.SmallIntegerField(null=True)
-    initial_score = models.SmallIntegerField(default=0)
+    initial_score = models.FloatField(default=0.0)
 
     objects = MemberManager()
 

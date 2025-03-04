@@ -413,6 +413,7 @@ class PrepareSeasonView(UserRoleRequired, FormView):
     def form_valid(self, form):
         pairing_type = form.cleaned_data["pairing_type"]
         band_size = form.cleaned_data.get("band_size", 2)
+        point_difference = form.cleaned_data.get("point_difference", 1.0)
 
         self.object = Season.objects.prepare_season(
             start_date=form.cleaned_data["start_date"],
@@ -420,7 +421,8 @@ class PrepareSeasonView(UserRoleRequired, FormView):
             promotion_count=form.cleaned_data["promotion_count"],
             use_igor=form.cleaned_data["use_igor"],
             pairing_type=pairing_type,
-            band_size=band_size
+            band_size=band_size,
+            point_difference=point_difference
         )
         return super().form_valid(form)
 
@@ -430,6 +432,7 @@ class PrepareSeasonView(UserRoleRequired, FormView):
             "promotion_count": self.DEFAULT_PROMOTION_COUNT,
             "players_per_group": self.DEFAULT_PLAYERS_PER_GROUP,
             "use_igor": self.DEFAULT_USE_IGOR,
+            "point_difference": 1.0,
         }
 
     def get_success_url(self):

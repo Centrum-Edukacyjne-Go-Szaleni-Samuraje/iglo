@@ -33,6 +33,14 @@ class PrepareSeasonForm(forms.Form):
         help_text="Number of players above and below to play with (so half the number of games, only applicable when banded pairing is selected)",
         required=True,
     )
+    point_difference = forms.FloatField(
+        label="Point Difference",
+        initial=1.0,
+        help_text="Points difference between consecutive players in banded groups (e.g., 1.0 means each player starts with 1 point less than the player above)",
+        required=True,
+        min_value=0.0,
+        max_value=10.0,
+    )
 
 
 def ogs_game_link_validator(value: str) -> None:

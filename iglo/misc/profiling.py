@@ -6,6 +6,9 @@ This module adds profiling to key methods that might be performance bottlenecks.
 import logging
 from functools import wraps
 import time
+import io
+import cProfile
+import pstats
 from django.utils.functional import cached_property
 
 from misc.middleware import add_profiling, profile_func, time_func
@@ -96,35 +99,20 @@ def apply_profiling():
         from league.models import Group, Member, Game
         from league.models import GameManager
         
-        # Get detailed profiling on the two key methods causing the bottleneck
-        # Map original methods to their replacements with detailed profiling
-        detailed_methods = {
-            # results_table method takes 81.8% of page load time
-            'results_table': Group.results_table.__wrapped__,
-            # Causes most of the queries
-            'get_for_member': GameManager.get_for_member,
-        }
-        
-        # Replace with detailed profiling
-        for method_name, original_method in detailed_methods.items():
-            if method_name == 'results_table':
-                setattr(Group, method_name, cached_property(detailed_profiling_decorator(original_method)))
-            elif method_name == 'get_for_member':
-                setattr(GameManager, method_name, detailed_profiling_decorator(original_method))
+        # Get detailed profiling on the key methods causing the bottleneck
+        # Causes most of the queries
+        setattr(GameManager, 'get_for_member', detailed_profiling_decorator(GameManager.get_for_member))
+            
+        # Skip profiling results_table since it's a cached_property without __wrapped__ attribute
+        # This avoids the error: 'cached_property' object has no attribute '__wrapped__'
                 
         # Profile get_absolute_url which is called for every game
         if hasattr(Game, 'get_absolute_url'):
             original_method = Game.get_absolute_url
             setattr(Game, 'get_absolute_url', detailed_profiling_decorator(original_method))
                 
-        # Also profile members_qualification
-        for method_name in ['members_qualification']:
-            if hasattr(Group, method_name):
-                original_method = getattr(Group, method_name)
-                if isinstance(original_method, cached_property):
-                    # Handle cached_property
-                    profiled = profile_cached_property(original_method.__wrapped__)
-                    setattr(Group, method_name, profiled)
+        # Skip profiling members_qualification as it's also a cached_property
+        # This would cause the same error: 'cached_property' object has no attribute '__wrapped__'
         
         # Add timing profiling to various methods
         methods_to_time = [
@@ -150,8 +138,8 @@ def apply_profiling():
                         setattr(cls, method_name, property(timed_property))
                     
                     elif isinstance(original_method, cached_property):
-                        # Handle cached_property
-                        setattr(cls, method_name, profile_cached_property(original_method.__wrapped__))
+                        # Skip profiling cached_property to avoid 'cached_property' object has no attribute '__wrapped__' error
+                        pass
                     
                     elif callable(original_method):
                         # Handle regular methods

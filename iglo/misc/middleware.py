@@ -31,26 +31,49 @@ def profile_func(func=None, name=None):
         
         # Profile CPU usage
         profiler = cProfile.Profile()
-        profiler.enable()
-        result = func(*args, **kwargs)
-        profiler.disable()
+        profiling_enabled = False
         
-        # Calculate elapsed time
-        elapsed = time.time() - start_time
-        
-        # Get detailed stats
-        s = io.StringIO()
-        sortby = 'cumulative'
-        ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
-        ps.print_stats(30)  # Print top 30 functions
-        
-        # Get function name info
-        func_name = name or f"{func.__module__}.{func.__qualname__}"
-        
-        # Log stats with detailed header
-        logger.warning(f"=== PROFILE of {func_name} ===")
-        logger.warning(f"Total execution time: {elapsed:.4f}s")
-        logger.warning(f"Top functions by cumulative time:\n{s.getvalue()}")
+        try:
+            try:
+                profiler.enable()
+                profiling_enabled = True
+            except ValueError as e:
+                # Another profiling tool is already active
+                func_name = name or f"{func.__module__}.{func.__qualname__}"
+                logger.warning(f"Skipping profiling for {func_name}: {str(e)}")
+            
+            result = func(*args, **kwargs)
+            
+            # Calculate elapsed time
+            elapsed = time.time() - start_time
+            
+            # Get function name info
+            func_name = name or f"{func.__module__}.{func.__qualname__}"
+            
+            # Log elapsed time for all functions
+            logger.warning(f"=== TIMING of {func_name} ===")
+            logger.warning(f"Total execution time: {elapsed:.4f}s")
+            
+            # Get detailed stats only if profiling was enabled
+            if profiling_enabled:
+                try:
+                    profiler.disable()
+                    
+                    # Get detailed stats
+                    s = io.StringIO()
+                    sortby = 'cumulative'
+                    ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
+                    ps.print_stats(30)  # Print top 30 functions
+                    
+                    # Log stats with detailed header
+                    logger.warning(f"Top functions by cumulative time:\n{s.getvalue()}")
+                except Exception as e:
+                    logger.warning(f"Error in profiling stats for {func_name}: {str(e)}")
+        except Exception as e:
+            # Still log the error but allow the function to execute
+            func_name = name or f"{func.__module__}.{func.__qualname__}"
+            logger.exception(f"Error during profiled function {func_name}: {str(e)}")
+            raise
         
         return result
     return wrapper
@@ -122,18 +145,37 @@ class ProfilingMiddleware:
         # Process the request with optional CPU profiling
         if should_profile_cpu and duration_above_threshold(request):
             profiler = cProfile.Profile()
-            profiler.enable()
-            response = self.get_response(request)
-            profiler.disable()
+            profiling_enabled = False
             
-            # Get stats
-            s = io.StringIO()
-            sortby = 'cumulative'
-            ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
-            ps.print_stats(30)  # Print top 30 functions
-            
-            # Log CPU profiling stats for slow requests
-            logger.warning(f"CPU Profile for {request.path}:\n{s.getvalue()}")
+            try:
+                try:
+                    profiler.enable()
+                    profiling_enabled = True
+                except ValueError as e:
+                    # Another profiling tool is already active
+                    logger.warning(f"Skipping profiling for {request.path}: {str(e)}")
+                
+                response = self.get_response(request)
+                
+                if profiling_enabled:
+                    try:
+                        profiler.disable()
+                        
+                        # Get stats
+                        s = io.StringIO()
+                        sortby = 'cumulative'
+                        ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
+                        ps.print_stats(30)  # Print top 30 functions
+                        
+                        # Log CPU profiling stats for slow requests
+                        logger.warning(f"CPU Profile for {request.path}:\n{s.getvalue()}")
+                    except Exception as e:
+                        logger.warning(f"Error in profiling stats for {request.path}: {str(e)}")
+            except Exception as e:
+                logger.exception(f"Error during profiled request handling: {str(e)}")
+                # Ensure we still handle the request even if profiling fails
+                profiling_enabled = False
+                response = self.get_response(request)
         else:
             response = self.get_response(request)
         

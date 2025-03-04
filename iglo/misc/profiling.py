@@ -53,9 +53,16 @@ def detailed_profiling_decorator(func):
         
         # Profile the function execution
         profiler = cProfile.Profile()
-        profiler.enable()
+        profiling_enabled = False
         
         try:
+            try:
+                profiler.enable()
+                profiling_enabled = True
+            except ValueError as e:
+                # Another profiling tool is already active, skip profiling
+                logger.warning(f"Skipping profiling for {func_name}: {str(e)}")
+            
             result = func(*args, **kwargs)
             
             # Get the size of the result (approximation)
@@ -73,18 +80,26 @@ def detailed_profiling_decorator(func):
             status = f"ERROR: {type(e).__name__}: {str(e)}"
             raise
         finally:
-            profiler.disable()
             elapsed = time.time() - start
             
-            # Get profiling stats
-            s = io.StringIO()
-            sortby = 'cumulative'
-            ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
-            ps.print_stats(30)
+            # Only disable profiling if it was successfully enabled
+            if profiling_enabled:
+                try:
+                    profiler.disable()
+                    
+                    # Get profiling stats
+                    s = io.StringIO()
+                    sortby = 'cumulative'
+                    ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
+                    ps.print_stats(30)
+                    
+                    # Log profile data
+                    logger.warning(f"PROFILE: {func_name}:\n{s.getvalue()}")
+                except Exception as e:
+                    logger.warning(f"Error in profiling for {func_name}: {str(e)}")
             
-            # Log exit with timing and status
+            # Always log exit with timing and status
             logger.warning(f"EXIT: {func_name} - {status} - elapsed: {elapsed:.4f}s")
-            logger.warning(f"PROFILE: {func_name}:\n{s.getvalue()}")
         
         return result
     return wrapper

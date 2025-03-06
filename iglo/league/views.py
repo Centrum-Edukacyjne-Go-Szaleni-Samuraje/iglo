@@ -190,11 +190,12 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
         if not group.all_games_finished:
             raise Http404()
         
-        # Get all EGD-eligible games
+        # Get all EGD-eligible games that have been played
         egd_eligible_games = []
         for round in group.rounds.all():
             for game in round.games.all():
-                if game.is_egd_eligible:
+                # For export, we need both EGD eligibility AND the game must be played
+                if game.is_egd_eligible and game.is_played and game.win_type != WinType.NOT_PLAYED:
                     egd_eligible_games.append(game)
         
         # If no games are eligible, create an informational response

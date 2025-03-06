@@ -1027,14 +1027,13 @@ class Game(models.Model):
     @property
     def is_egd_eligible(self) -> bool:
         """
-        Determine if a game is eligible for EGD/EGF submission.
-        Both players must exist (not BYE games), have egd_approval, and the game must be played.
+        Determine if a game is eligible for EGD/EGF submission based on player approvals.
+        Both players must exist (not BYE games) and have egd_approval.
+        The game doesn't need to be played yet to be marked as eligible in the UI.
         """
         return (self.black and self.white and 
                 self.black.player.egd_approval and 
-                self.white.player.egd_approval and
-                self.is_played and
-                self.win_type != WinType.BYE)
+                self.white.player.egd_approval)
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

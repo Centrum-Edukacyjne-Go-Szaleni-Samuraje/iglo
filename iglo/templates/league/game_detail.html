@@ -105,6 +105,12 @@
                             <p>
                                 {% if object.is_egd_eligible %}
                                     <span class="badge bg-success">{% translate "This game is eligible for EGD export" %}</span>
+                                    
+                                    {% if not object.is_played %}
+                                        <div class="mt-2 text-muted">
+                                            <small><i class="fas fa-info-circle"></i> {% translate "The game will be exported to EGD once it has been played and a result is recorded." %}</small>
+                                        </div>
+                                    {% endif %}
                                 {% else %}
                                     <span class="badge bg-secondary">{% translate "This game is not eligible for EGD export" %}</span>
                                 {% endif %}

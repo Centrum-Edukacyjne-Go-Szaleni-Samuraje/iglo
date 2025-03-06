@@ -59,6 +59,9 @@
                 <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
                     <div class="fs-2 mb-2">
                         {% include "league/includes/game_players.html" with game=object %}
+                        {% if object.is_egd_eligible %}
+                            <span class="badge bg-info" title="{% translate 'This game is eligible for EGD export' %}">EGD</span>
+                        {% endif %}
                     </div>
                     <div>
                         {% if user|has_role:'referee' or user|has_role:'teacher' %}
@@ -90,6 +93,48 @@
                     <div class="sgf-container">
                         <div data-wgo="{{ object.sgf_link }}"
                              data-wgo-enablewheel="false" data-wgo-move="1000"></div>
+                    </div>
+                {% endif %}
+                
+                {% if not object.is_bye %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <strong>{% translate "EGD Status" %}</strong>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                {% if object.is_egd_eligible %}
+                                    <span class="badge bg-success">{% translate "This game is eligible for EGD export" %}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{% translate "This game is not eligible for EGD export" %}</span>
+                                {% endif %}
+                            </p>
+                            
+                            <p>{% translate "For a game to be eligible for EGD export, both players must have agreed to EGD reporting:" %}</p>
+                            
+                            <ul>
+                                <li>
+                                    {{ object.black.player.nick }}: 
+                                    {% if object.black.player.egd_approval %}
+                                        <i class="fas fa-check text-success"></i> {% translate "Has approved EGD reporting" %}
+                                    {% else %}
+                                        <i class="fas fa-times text-danger"></i> {% translate "Has not approved EGD reporting" %}
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {{ object.white.player.nick }}: 
+                                    {% if object.white.player.egd_approval %}
+                                        <i class="fas fa-check text-success"></i> {% translate "Has approved EGD reporting" %}
+                                    {% else %}
+                                        <i class="fas fa-times text-danger"></i> {% translate "Has not approved EGD reporting" %}
+                                    {% endif %}
+                                </li>
+                            </ul>
+                            
+                            <p>
+                                {% translate "Players can update their EGD reporting preferences in their account settings." %}
+                            </p>
+                        </div>
                     </div>
                 {% endif %}
             </div>

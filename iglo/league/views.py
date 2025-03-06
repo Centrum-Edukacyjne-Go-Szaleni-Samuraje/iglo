@@ -225,6 +225,43 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
         
         # Create EGD player data only for players with eligible games
         members = Member.objects.filter(id__in=member_ids).select_related('player')
+        
+        # Check for players with missing rank or EGD PIN
+        players_without_rank = []
+        players_without_pin = []
+        
+        for member in members:
+            if member.rank is None:
+                players_without_rank.append(f"{member.player.first_name} {member.player.last_name}")
+            if not member.player.egd_pin:
+                players_without_pin.append(f"{member.player.first_name} {member.player.last_name}")
+        
+        # Prepare error information if needed
+        has_errors = bool(players_without_rank or players_without_pin)
+        if has_errors:
+            filename = f"iglo_season_{group.season.number}_group_{group.name}_egd_error.txt"
+            response = HttpResponse(
+                content_type="text/plain",
+                headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+            )
+            response.write("Cannot generate EGD export: Missing required player information.\n\n")
+            
+            if players_without_rank:
+                response.write("The following players need ranks assigned:\n")
+                for player in players_without_rank:
+                    response.write(f"- {player}\n")
+                response.write("\n")
+            
+            if players_without_pin:
+                response.write("The following players need EGD PINs assigned:\n")
+                for player in players_without_pin:
+                    response.write(f"- {player}\n")
+                response.write("\n")
+            
+            response.write("Please update this information in the admin panel or fetch data from the EGD website.")
+            response.write("\nPlayers can find their EGD PINs at: https://www.europeangodatabase.eu/EGD/")
+            return response
+        
         member_id_to_egd_player = {
             member.id: EGDPlayer(
                 first_name=member.player.first_name,

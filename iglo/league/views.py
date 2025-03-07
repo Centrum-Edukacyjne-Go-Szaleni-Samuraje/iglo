@@ -155,7 +155,26 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if "action-delete" in request.POST:
+        if "action-move-to-position" in request.POST:
+            try:
+                member_id = int(request.POST["member_id"])
+                target_position = int(request.POST["target_position"])
+                
+                member = self.object.members.get(id=member_id)
+                current_position = member.order
+                
+                # Calculate the position delta
+                position_delta = target_position - current_position
+                
+                # Only apply if there's an actual change
+                if position_delta != 0:
+                    self.object.move_member(member_id=member_id, positions=position_delta)
+                    if self.object.type == GroupType.MCMAHON:
+                        self.object.set_initial_score()
+            except (ValueError, KeyError, Member.DoesNotExist):
+                # Handle potential errors gracefully
+                pass
+        elif "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
             if self.object.type == GroupType.MCMAHON:
                 self.object.set_initial_score()

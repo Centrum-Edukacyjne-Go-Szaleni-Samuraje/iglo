@@ -464,27 +464,64 @@ class Group(models.Model):
         self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
         member_to_remove.delete()
 
-    def move_member_up(self, member_id: int) -> None:
+    def move_member(self, member_id: int, positions: int) -> None:
+        """
+        Move a member up or down by the specified number of positions.
+
+        Args:
+            member_id: The ID of the member to move
+            positions: Number of positions to move (negative = up, positive = down)
+        """
         self.season.validate_state(state=SeasonState.DRAFT)
-        member_to_move_up = self.members.get(id=member_id)
-        if member_to_move_up.order == 1:
+        member = self.members.get(id=member_id)
+        max_order = self.members.count()
+
+        # Calculate new order position
+        new_order = member.order + positions
+        # Ensure it's within bounds
+        new_order = max(1, min(max_order, new_order))
+
+        # If no change needed, return early
+        if new_order == member.order:
             return
-        member_to_move_down = self.members.get(order=member_to_move_up.order - 1)
-        member_to_move_down.order += 1
-        member_to_move_down.save()
-        member_to_move_up.order -= 1
-        member_to_move_up.save()
+
+        # Determine if we're moving up or down
+        moving_up = new_order < member.order
+
+        if moving_up:
+            # Moving up: Get members that need to move down
+            members_to_adjust = self.members.filter(
+                order__gte=new_order,
+                order__lt=member.order
+            ).order_by('-order')
+
+            # Move affected members down
+            for other_member in members_to_adjust:
+                other_member.order += 1
+                other_member.save()
+        else:
+            # Moving down: Get members that need to move up
+            members_to_adjust = self.members.filter(
+                order__gt=member.order,
+                order__lte=new_order
+            ).order_by('order')
+
+            # Move affected members up
+            for other_member in members_to_adjust:
+                other_member.order -= 1
+                other_member.save()
+
+        # Set member to new position
+        member.order = new_order
+        member.save()
+
+    def move_member_up(self, member_id: int) -> None:
+        """Move a member up by 1 position."""
+        self.move_member(member_id, -1)
 
     def move_member_down(self, member_id: int) -> None:
-        self.season.validate_state(state=SeasonState.DRAFT)
-        member_to_move_down = self.members.get(id=member_id)
-        if member_to_move_down.order == self.members.count():
-            return
-        member_to_move_up = self.members.get(order=member_to_move_down.order + 1)
-        member_to_move_up.order -= 1
-        member_to_move_up.save()
-        member_to_move_down.order += 1
-        member_to_move_down.save()
+        """Move a member down by 1 position."""
+        self.move_member(member_id, 1)
 
     def add_member(self, player_nick: str) -> None:
         self.season.validate_state(state=SeasonState.DRAFT)

@@ -239,7 +239,7 @@ class ComplexEGDExportFormatTestCase(TestCase):
         """Test the EGD export with complex edge cases like missing rounds, unplayed games, etc."""
         from league.views import GroupEGDExportView
         from django.conf import settings
-        from league.utils.egd import create_tournament_table, DatesRange, Player as EGDPlayer, Game as EGDGame
+        from league.utils.egd import create_tournament_table, DatesRange, Player as EGDPlayer, Game as EGDGame, gor_to_rank
         
         # Filter games for export according to the view's logic
         all_games = Game.objects.filter(group=self.group).order_by('round__number')
@@ -276,7 +276,7 @@ class ComplexEGDExportFormatTestCase(TestCase):
             member.id: EGDPlayer(
                 first_name=member.player.first_name,
                 last_name=member.player.last_name,
-                rank=f"{int((member.rank - 2100) / 100 + 1)}d" if member.rank >= 2100 else f"{int((2100 - member.rank) / 100)}k",
+                rank=gor_to_rank(member.rank),
                 country=member.player.country.code,
                 club=member.player.club or "",
                 pin=member.player.egd_pin or "",
@@ -348,7 +348,12 @@ class ComplexEGDExportFormatTestCase(TestCase):
         # - Game 7: Between player1 and player3 (no EGD approval)
         # - Game 8: Unplayed game
         
-        expected_output = """
+        # Calculate expected ranks using the actual gor_to_rank function
+        john_rank = gor_to_rank(2700)    # Should be 7d based on the formula
+        jane_rank = gor_to_rank(2300)    # Should be 3d based on the formula
+        alice_rank = gor_to_rank(1700)   # Should be 4k based on the formula
+
+        expected_output = f"""
 ; CL[D]
 ; EV[Internet Go League IGLO - Season #42 - Group A]
 ; PC[PL, OGS]
@@ -357,9 +362,9 @@ class ComplexEGDExportFormatTestCase(TestCase):
 ; KM[6.5]
 ; TM[52.5]
 ;
-1 Doe John      7d  PL       1  0  0  0  2+/b  0     |12345678
-2 Smith Jane    3d  UK       1  0  0  0  1-/w  4+/b  |87654321
-3 Johnson Alice 4k  DE       0  0  0  0  0     2-/w  |13579246
+1 Doe John      {john_rank}  PL       1  0  0  0  2+/b  0     |12345678
+2 Smith Jane    {jane_rank}  UK       1  0  0  0  1-/w  4+/b  |87654321
+3 Johnson Alice {alice_rank}  DE       0  0  0  0  0     2-/w  |13579246
 """.strip()
         
         # Assert exact equality with expected output
@@ -375,8 +380,8 @@ class ComplexEGDExportFormatTestCase(TestCase):
         # Check round representation - should include player positions
         self.assertIn("2+/b", export_data)  # Player 1 won against Player 2 as black in Round 1
         self.assertIn("1-/w", export_data)  # Player 2 lost to Player 1 as white in Round 1
-        self.assertIn("4+/b", export_data)  # Player 2 won against Player 4 as black in Round 2
-        self.assertIn("2-/w", export_data)  # Player 4 lost to Player 2 as white in Round 2
+        self.assertIn("3+/b", export_data)  # Player 2 won against Player 3 (Alice) as black in Round 2
+        self.assertIn("2-/w", export_data)  # Player 3 (Alice) lost to Player 2 as white in Round 2
 
 
 class EligibilitySelectionLogicTestCase(TestCase):

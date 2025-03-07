@@ -37,18 +37,32 @@ export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
 export CELERY_TASK_ALWAYS_EAGER=True
 alias manage="poetry run python3 iglo/manage.py"
 
+# Start Postgres
 
 # docker stop iglo-db; docker rm iglo-db
 docker ps -a
 docker run -e POSTGRES_PASSWORD=postgres --name iglo-db -p ${IGLO_DB_PORT}:5432 -d postgres
 manage migrate
-manage load_seasons fixtures/seasons.json
-manage createsuperuser
-# echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
 
-# Run server
+# Populate Postgres v1
+
+## Method 1
+
+# We can't commit fixtures/iglo_db.dump to github, due to RODO law.
+ssh apps@iglo.szalenisamuraje.org 'docker exec iglo-production_db_1 pg_dump -Fc -U postgres' > fixtures/iglo_db.dump
+cat fixtures/iglo_db.dump | docker exec -i iglo-db pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers
+
+## Method 2
+
+manage load_seasons fixtures/seasons.json
+
+# Run IGLO web server
+
+echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
+# manage createsuperuser # more manual method.
 
 manage runserver
+
 ```
 
 Now you can go to `http://127.0.0.1:8000/`

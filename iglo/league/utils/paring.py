@@ -1,8 +1,13 @@
 import random
 from collections import deque, defaultdict
-from typing import Generator, Deque
+from enum import Enum
+from typing import Generator, Deque, Union, Tuple
 
-Pairing = list[list[tuple[int, int]]]
+class Bye(Enum):
+    ByeWin = True
+    ByeLoss = False
+
+Pairing = list[list[Union[tuple[int, int], tuple[int, Bye]]]]
 
 
 def _round_robin_even(d: Deque, n: int) -> Generator[list[tuple[int, int]], None, None]:
@@ -57,11 +62,11 @@ def banded_round_robin(player_count: int, band_size: int, add_byes: bool) -> Pai
       # Add appropriate BYE games
       for player in missing_players:
         if player < band_size:
-          # Top players get BYE losses: (player, False)
-          by_round[round_idx].add((player, False))
+          # Top players get BYE losses
+          by_round[round_idx].add((player, Bye.ByeLoss))
         elif player >= player_count - band_size:
-          # Bottom players get BYE wins: (player, True)
-          by_round[round_idx].add((player, True))
+          # Bottom players get BYE wins
+          by_round[round_idx].add((player, Bye.ByeWin))
 
   by_round = list(map(list, by_round))
   return by_round
@@ -73,8 +78,8 @@ def shuffle_colors(paring: Pairing, randomize: bool = True) -> Pairing:
     for not_shuffled_round in paring:
         shuffled_round = []
         for pair in not_shuffled_round:
-            # Check if this is a special BYE pair with boolean at index 1
-            if isinstance(pair[1], bool):
+            # Check if this is a special BYE pair
+            if isinstance(pair[1], Bye):
                 # This is a BYE game, don't shuffle
                 shuffled_round.append(pair)
             else:

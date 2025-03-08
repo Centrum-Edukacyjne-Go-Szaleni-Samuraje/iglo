@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from league import texts
-from league.utils.paring import round_robin, shuffle_colors, banded_round_robin
+from league.utils.paring import round_robin, shuffle_colors, banded_round_robin, Bye
 from macmahon import macmahon as mm
 
 DAYS_PER_GAME = 7
@@ -128,18 +128,18 @@ class Season(models.Model):
                 
                 for pair in round_pairs:
                     # Handle special BYE games for banded pairings
-                    if group.type == GroupType.BANDED and isinstance(pair[1], bool):
-                        # This is a player-with-result pair (player, is_win)
+                    if group.type == GroupType.BANDED and isinstance(pair[1], Bye):
+                        # This is a player-with-result pair (player, bye_result)
                         player = members[pair[0]]
-                        is_win = pair[1]  # True is win, False is loss
+                        bye_result = pair[1]
                         
-                        # Create a BYE game with player as black and winner based on is_win
+                        # Create a BYE game with player as black and winner based on bye result
                         Game.objects.create(
                             group=group,
                             round=round,
                             black=player,     # Always set player as black for consistency
                             white=None,       # No opponent (BYE)
-                            winner=player if is_win else None,
+                            winner=player if bye_result == Bye.ByeWin else None,
                             win_type=WinType.BYE,
                             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
                         )

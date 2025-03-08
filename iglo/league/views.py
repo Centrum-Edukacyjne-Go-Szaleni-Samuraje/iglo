@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Exists, OuterRef, Q
 from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView, RedirectView, TemplateView
@@ -82,6 +82,32 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
                     message=texts.GAMES_WITHOUT_RESULT_ERROR,
                 )
         return self.render_to_response(context)
+
+
+class SeasonDeleteView(UserRoleRequired, TemplateView):
+    template_name = "league/season_delete_confirm.html"
+    required_roles = [UserRole.REFEREE]
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["season"] = get_object_or_404(Season, number=self.kwargs["number"])
+        if context["season"].state != SeasonState.DRAFT:
+            raise Http404("Only draft seasons can be deleted")
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        season = get_object_or_404(Season, number=self.kwargs["number"])
+        if season.state != SeasonState.DRAFT:
+            raise Http404("Only draft seasons can be deleted")
+        
+        # Store the number for the success message
+        season_number = season.number
+        
+        # Delete the season
+        season.delete()
+        
+        messages.success(request, texts.SEASON_DELETE_SUCCESS.format(season_number))
+        return redirect("seasons-list")
 
 
 class SeasonExportCSVView(UserRoleRequired, View):

@@ -13,6 +13,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
 from league import texts, tasks
+from league.models import PairingType
 from league.forms import (
     GameResultUpdateForm,
     PlayerUpdateForm,

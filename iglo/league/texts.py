@@ -59,3 +59,8 @@ UPDATE_GOR_MAIL_CONTENT = _("Aktualizacja rankingów graczy została zakończona
 MEMBER_WITHDRAW_SUCCESS = _("Gracz został wycofany z aktualnego sezonu.")
 ALREADY_PLAYED_GAMES_ERROR = _("Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe.")
 SEASON_DELETE_SUCCESS = _("Sezon {} został usunięty.")
+
+PAIRING_TYPE_DEFAULT = _("Standardowy")
+PAIRING_TYPE_BANDED = _("Banded Round Robin")
+PAIRING_TYPE_LABEL = _("Typ parowania")
+PAIRING_TYPE_HELP_TEXT = _("Wybierz 'Banded Round Robin' aby utworzyć jedną grupę z parami tworzonymi algorytmem banded round robin. To nie utworzy grup McMahon.")

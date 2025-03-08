@@ -36,9 +36,14 @@ class SeasonState(TextChoices):
     FINISHED = "finished", texts.SEASON_STATE_FINISHED
 
 
+class PairingType(TextChoices):
+    DEFAULT = "default", texts.PAIRING_TYPE_DEFAULT
+    BANDED = "banded", texts.PAIRING_TYPE_BANDED
+
+
 class SeasonManager(models.Manager):
     def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int,
-                       use_igor: bool=False, pairing_type: str='default', band_size: int=2,
+                       use_igor: bool=False, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
                        point_difference: float=1.0) -> "Season":
         previous_season = Season.objects.first()
         if previous_season and previous_season.state != SeasonState.FINISHED:
@@ -177,14 +182,14 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2,
+    def reset_groups(self, use_igor: bool, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
                    point_difference: float=1.0) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
         self.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size,
                          point_difference=point_difference)
 
-    def create_groups(self, use_igor: bool, pairing_type: str='default', band_size: int=2,
+    def create_groups(self, use_igor: bool, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
                       point_difference: float=1.0) -> None:
         self.validate_state(state=SeasonState.DRAFT)
 
@@ -201,7 +206,7 @@ class Season(models.Model):
             players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
 
         # Handle banded pairing type
-        if pairing_type == 'banded':
+        if pairing_type == PairingType.BANDED:
             # Create a single group with all players
             is_egd = all(p.egd_approval for p in players)
             group = Group.objects.create(

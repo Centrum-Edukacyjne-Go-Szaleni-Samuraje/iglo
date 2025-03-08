@@ -7,25 +7,20 @@ from django.db.models import BLANK_CHOICE_DASH
 from django.utils.translation import gettext_lazy as _
 
 from league import texts
-from league.models import Game, Member, Player, WinType
+from league.models import Game, Member, PairingType, Player, WinType
 
 
 class PrepareSeasonForm(forms.Form):
-    PAIRING_CHOICES = [
-        ('default', 'Create multiple groups with standard pairing'),
-        ('banded', 'Create single group with banded round robin pairing')
-    ]
-
     start_date = forms.DateField(label=texts.START_DATE_LABEL)
     players_per_group = forms.IntegerField(label=texts.PLAYERS_PER_GROUP_LABEL)
     promotion_count = forms.IntegerField(label=texts.PROMOTION_COUNT_LABEL)
     use_igor = forms.BooleanField(label=texts.USE_IGOR_LABEL)
     pairing_type = forms.ChoiceField(
-        label="Pairing Type",
-        choices=PAIRING_CHOICES,
-        initial='default',
+        label=texts.PAIRING_TYPE_LABEL,
+        choices=PairingType.choices,
+        initial=PairingType.DEFAULT,
         widget=forms.RadioSelect,
-        help_text="Choose 'banded' to create a single group with players paired using the banded round robin algorithm. This will not create McMahon groups."
+        help_text=texts.PAIRING_TYPE_HELP_TEXT
     )
     band_size = forms.IntegerField(
         label="Band Size",

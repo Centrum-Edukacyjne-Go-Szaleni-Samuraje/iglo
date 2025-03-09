@@ -5,3 +5,4 @@ db.sqlite3
 \.pytest_cache
 *.mo
 .DS_Store
+CLAUDE.md

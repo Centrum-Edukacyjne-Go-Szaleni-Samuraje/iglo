@@ -80,6 +80,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    "misc.middleware.ProfilingMiddleware",
 ]
 
 ROOT_URLCONF = "iglo.urls"
@@ -249,14 +250,28 @@ OGS_SGF_LINK_FORMAT = "https://online-go.com/api/v1/games/{id}/sgf"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
     },
     "root": {
         "handlers": ["console"],
         "level": "INFO",
+    },
+    "loggers": {
+        "misc.middleware": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
     },
 }
 
@@ -279,7 +294,11 @@ REST_FRAMEWORK = {
 }
 
 # Small IGOR_MAX_STEPS is useful when CELERY is eager and we want just some fast iteration for IGoR recalculation.
-IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000000, as_int=True)
+# In debug mode, limit to 30 iterations for faster results during development
+if DEBUG:
+    IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=30, as_int=True)
+else:
+    IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000000, as_int=True)
 IGOR_CONFIG = {
     'season_rating_stability': 0.25,
     'smoothing': 0.05,

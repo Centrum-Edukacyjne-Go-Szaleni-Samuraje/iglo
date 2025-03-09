@@ -96,27 +96,19 @@ class Season(models.Model):
         self.state = SeasonState.IN_PROGRESS
         self.save()
 
-        # Process all groups with a unified approach
         for group in self.groups.all():
             members = list(group.members.all())
             current_date = self.start_date
-            
-            # Determine pairing algorithm based on group type
+
             if group.type == GroupType.BANDED:
-                # Use banded_round_robin with BYE games for BANDED groups
                 pairing = banded_round_robin(player_count=len(members), band_size=group.band_size, add_byes=True)
             elif group.type == GroupType.MCMAHON:
-                # McMahon groups are handled separately by their own specialized methods
-                # Skip creating rounds and games here as they will be created on demand
                 continue
             elif group.type == GroupType.ROUND_ROBIN:
-                # Use standard round_robin for ROUND_ROBIN groups
                 pairing = round_robin(n=len(members))
             else:
-                # This should never happen - all group types should be handled explicitly
                 raise ValueError(f"Unhandled group type: {group.type} - this should not happen")
 
-            # Create rounds and games
             for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
                     number=round_number,
@@ -125,26 +117,25 @@ class Season(models.Model):
                     end_date=current_date + datetime.timedelta(days=DAYS_PER_GAME - 1),
                 )
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
-                
+
                 for pair in round_pairs:
-                    # Handle special BYE games for banded pairings
                     if group.type == GroupType.BANDED and isinstance(pair[1], Bye):
-                        # This is a player-with-result pair (player, bye_result)
+                        # Special player-with-result pair (player, bye_result) typically for the top and bottom players.
                         player = members[pair[0]]
                         bye_result = pair[1]
-                        
-                        # Create a BYE game with player as black and winner based on bye result
+
+                        # Design choice: Create a BYE game with player as black and winner based on bye result.
+                        # Note that this game will typically  provide a point depending whether ByeWin/ByeLoss.
                         Game.objects.create(
                             group=group,
                             round=round,
-                            black=player,     # Always set player as black for consistency
-                            white=None,       # No opponent (BYE)
+                            black=player,
+                            white=None,
                             winner=player if bye_result == Bye.ByeWin else None,
                             win_type=WinType.BYE,
                             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
                         )
                     else:
-                        # Regular game between two players
                         game_members = [members[pair[0]], members[pair[1]]]
                         Game.objects.create(
                             group=group,

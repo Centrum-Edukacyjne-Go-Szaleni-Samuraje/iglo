@@ -35,7 +35,7 @@ poetry install
 
 export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
 export CELERY_TASK_ALWAYS_EAGER=True
-# export ENABLE_PROFILING=True  # Uncomment to enable performance profiling
+export ENABLE_PROFILING=False  # Uncomment to enable performance profiling
 alias manage="poetry run python3 iglo/manage.py"
 
 # Start Postgres

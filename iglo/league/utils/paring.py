@@ -34,15 +34,14 @@ def round_robin(n: int) -> Pairing:
 def banded_round_robin(player_count: int, band_size: int, add_byes: bool) -> Pairing:
   by_round = []
   for player_distance in range(band_size, 0, -1):
-    round_2pd_0 = set() # round 2*player_distance
-    round_2pd_1 = set() # round 2*player_distance + 1
+    even_round = set() # round nr 2*player_distance
+    odd_round = set() # round nr 2*player_distance + 1
     for player in range(player_count):
       opponent = player + player_distance
       if opponent < player_count:
-        m = round_2pd_1 if (player // player_distance) % 2 == 0 else round_2pd_0
+        m = odd_round if (player // player_distance) % 2 == 0 else even_round
         m.add((player, opponent))
-    by_round.append(round_2pd_0)
-    by_round.append(round_2pd_1)
+    by_round.extend([even_round, odd_round])
 
   # Add BYE games for players without matches in certain rounds
   if add_byes:
@@ -79,8 +78,8 @@ def shuffle_colors(paring: Pairing, randomize: bool = True) -> Pairing:
         shuffled_round = []
         for pair in not_shuffled_round:
             # Check if this is a special BYE pair
-            if isinstance(pair[1], Bye):
-                # This is a BYE game, don't shuffle
+            if isinstance(pair[0], Bye) or isinstance(pair[1], Bye):
+                # This is a BYE game, we could shuffle, but for simplicity we don't.
                 shuffled_round.append(pair)
             else:
                 # Regular game between two players

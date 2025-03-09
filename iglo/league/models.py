@@ -119,6 +119,9 @@ class Season(models.Model):
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
 
                 for pair in round_pairs:
+                    if isinstance(pair[0], Bye):
+                        # We could implement it but it is not needed in Banded, because it always assigns player as black and shuffle skips byes.
+                        raise ValueError("not implemented, should not happen.")
                     if group.type == GroupType.BANDED and isinstance(pair[1], Bye):
                         # Special player-with-result pair (player, bye_result) typically for the top and bottom players.
                         player = members[pair[0]]
@@ -414,9 +417,8 @@ class Group(models.Model):
                        .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
                        .all())
 
-        # Different sorting based on group type
+        # Note different sorting based on group type.
         if self.type == GroupType.ROUND_ROBIN:
-            # ROUND_ROBIN: Sort by final_order, points, sodos, start position
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
                 -member.points,
@@ -424,14 +426,12 @@ class Group(models.Model):
                 member.order
             ))
         elif self.type == GroupType.BANDED:
-            # BANDED: Simple sort by final_order, score, and order (skip sos/sosos calculation)
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
                 -member.score,
                 member.order
             ))
         else:
-            # MCMAHON: Full sort with sos and sosos
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
                 -member.score,

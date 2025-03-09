@@ -48,7 +48,7 @@ manage migrate
 
 ## Method 1
 
-# We can't commit fixtures/iglo_db.dump to github, due to RODO law.
+# We can't commit fixtures/iglo_db.dump to github, due to GPDR law.
 ssh apps@iglo.szalenisamuraje.org 'docker exec iglo-production_db_1 pg_dump -Fc -U postgres' > fixtures/iglo_db.dump
 cat fixtures/iglo_db.dump | docker exec -i iglo-db pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers
 

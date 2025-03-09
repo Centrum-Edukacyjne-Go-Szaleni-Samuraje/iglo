@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block page_title %}{% translate "Potwierdź usunięcie sezonu" %} #{{ season.number }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url "season-detail" number=season.number %}">{% translate "Sezon" %} #{{ season.number }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% translate "Usuń sezon" %}
+                    </li>
+                </ol>
+            </nav>
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">{% translate "Potwierdź usunięcie sezonu" %}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{% translate "Czy na pewno chcesz usunąć sezon" %} #{{ season.number }}?</p>
+                    <p>{% translate "Ta operacja jest nieodwracalna. Wszystkie grupy i dane związane z tym sezonem zostaną usunięte." %}</p>
+                    
+                    <div class="alert alert-info">
+                        <p class="mb-0"><strong>{% translate "Uwaga" %}:</strong> {% translate "Można usuwać tylko sezony w stanie roboczym (draft), które nie zostały jeszcze rozpoczęte." %}</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex mt-4">
+                            <a href="{% url "season-detail" number=season.number %}" class="btn btn-secondary me-2">
+                                {% translate "Anuluj" %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> {% translate "Usuń sezon" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

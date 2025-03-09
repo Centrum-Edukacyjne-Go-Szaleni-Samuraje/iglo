@@ -4,6 +4,7 @@ from django.views.generic import RedirectView
 from league.views import (
     SeasonsListView,
     SeasonDetailView,
+    SeasonDeleteView,
     GroupDetailView,
     GameDetailView,
     PlayerDetailView,
@@ -22,6 +23,7 @@ urlpatterns = [
     path("seasons", SeasonsListView.as_view(), name="seasons-list"),
     path("seasons/prepare", PrepareSeasonView.as_view(), name="seasons-prepare"),
     path("seasons/<int:number>", SeasonDetailView.as_view(), name="season-detail"),
+    path("seasons/<int:number>/delete", SeasonDeleteView.as_view(), name="season-delete"),
     path("seasons/<int:number>/export", SeasonExportCSVView.as_view(), name="season-export"),
     path("seasons/<int:season_number>/groups/<group_name>", GroupDetailView.as_view(), name="group-detail"),
     path(

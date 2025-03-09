@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Exists, OuterRef, Q
 from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, UpdateView, RedirectView, TemplateView
@@ -13,6 +13,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from accounts.models import UserRole
 from league import texts, tasks
+from league.models import PairingType
 from league.forms import (
     GameResultUpdateForm,
     PlayerUpdateForm,
@@ -82,6 +83,32 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
                     message=texts.GAMES_WITHOUT_RESULT_ERROR,
                 )
         return self.render_to_response(context)
+
+
+class SeasonDeleteView(UserRoleRequired, TemplateView):
+    template_name = "league/season_delete_confirm.html"
+    required_roles = [UserRole.REFEREE]
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["season"] = get_object_or_404(Season, number=self.kwargs["number"])
+        if context["season"].state != SeasonState.DRAFT:
+            raise Http404("Only draft seasons can be deleted")
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        season = get_object_or_404(Season, number=self.kwargs["number"])
+        if season.state != SeasonState.DRAFT:
+            raise Http404("Only draft seasons can be deleted")
+        
+        # Store the number for the success message
+        season_number = season.number
+        
+        # Delete the season
+        season.delete()
+        
+        messages.success(request, texts.SEASON_DELETE_SUCCESS.format(season_number))
+        return redirect("seasons-list")
 
 
 class SeasonExportCSVView(UserRoleRequired, View):
@@ -155,7 +182,26 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if "action-delete" in request.POST:
+        if "action-move-to-position" in request.POST:
+            try:
+                member_id = int(request.POST["member_id"])
+                target_position = int(request.POST["target_position"])
+                
+                member = self.object.members.get(id=member_id)
+                current_position = member.order
+                
+                # Calculate the position delta
+                position_delta = target_position - current_position
+                
+                # Only apply if there's an actual change
+                if position_delta != 0:
+                    self.object.move_member(member_id=member_id, positions=position_delta)
+                    if self.object.type == GroupType.MCMAHON:
+                        self.object.set_initial_score()
+            except (ValueError, KeyError, Member.DoesNotExist):
+                # Handle potential errors gracefully
+                pass
+        elif "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
             if self.object.type == GroupType.MCMAHON:
                 self.object.set_initial_score()

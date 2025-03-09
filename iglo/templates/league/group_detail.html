@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static i18n %}
+{% load static i18n range_tags %}
 
 {% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %}
     {{ object.name }}{% endblock %}
@@ -280,15 +280,31 @@
                             <div class="card-body">
                                 <form method="post">{% csrf_token %}
                                     <input type="hidden" value="{{ member.id }}" name="member_id">
-                                    <button type="submit" class="btn btn-primary" name="action-up"
-                                            {% if forloop.first %}disabled{% endif %}>▲
-                                    </button>
-                                    <button type="submit" class="btn btn-primary" name="action-down"
-                                            {% if forloop.last %}disabled{% endif %}>▼
-                                    </button>
-                                    <button type="submit" class="btn btn-danger" name="action-delete">
-                                        {% translate "Usuń" %}
-                                    </button>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <button type="submit" class="btn btn-sm btn-primary me-1" name="action-up"
+                                                    {% if forloop.first %}disabled{% endif %} title="{% translate 'Move up 1 position' %}">▲
+                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-primary me-1" name="action-down"
+                                                    {% if forloop.last %}disabled{% endif %} title="{% translate 'Move down 1 position' %}">▼
+                                            </button>
+                                            <select class="form-select form-select-sm me-1" name="target_position" aria-label="{% translate 'Move to position' %}" style="width: auto;">
+                                                {% for i in group.members.count|get_range %}
+                                                    {% with position=i|add:1 %}
+                                                    <option value="{{ position }}" {% if position == member.order %}selected{% endif %}>
+                                                        {{ position }}
+                                                    </option>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-info me-1" name="action-move-to-position" title="{% translate 'Move to position' %}">
+                                                {% translate 'Move' %}
+                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-danger" name="action-delete">
+                                                {% translate "Usuń" %}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         {% endif %}

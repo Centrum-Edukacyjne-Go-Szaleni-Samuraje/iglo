@@ -43,6 +43,7 @@ class MemberFactory(factory.django.DjangoModelFactory):
     player = factory.SubFactory(PlayerFactory)
     order = factory.Sequence(lambda n: n)
     group = factory.SubFactory(GroupFactory)
+    egd_approval = factory.LazyAttribute(lambda o: o.player.egd_approval)
 
 
 class RoundFactory(factory.django.DjangoModelFactory):

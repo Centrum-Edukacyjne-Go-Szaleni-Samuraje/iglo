@@ -120,7 +120,10 @@ def _strip_local_chars(text: str) -> str:
     return unicodedata.normalize("NFKD", text.replace("Ł", "L").replace("ł", "l")).encode("ASCII", "ignore").decode()
 
 
-def gor_to_rank(gor: int) -> str:
+def gor_to_rank(gor: Optional[int]) -> str:
+    if gor is None:
+        raise ValueError("Cannot convert None to rank. Player is missing rank information.")
+        
     if gor <= 2050:
         result = -((gor - 50) // 100) + 20
         return f"{result}k"

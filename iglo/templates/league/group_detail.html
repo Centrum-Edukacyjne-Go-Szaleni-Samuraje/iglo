@@ -25,7 +25,6 @@
             </nav>
             <div class="d-flex align-items-center mb-3 flex-wrap">
                 <h2>{% translate "Grupa" %} {{ object.name }}</h2>
-                {% if group.is_egd %}<span class="badge bg-info ms-2">EGD</span>{% endif %}
                 <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>
 
                 {% if group.teacher %}
@@ -33,6 +32,13 @@
                         {% translate "Nauczyciel" %}: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
                     </div>
                 {% endif %}
+            </div>
+            
+            <div class="d-flex mb-2 small text-muted align-items-center">
+                <i class="fas fa-info-circle me-1"></i>
+                <span>{% translate "Gry oznaczone" %} <span class="badge bg-info">EGD</span> {% translate "są raportowane do European Go Database." %}</span>
+                <i class="fas fa-globe-europe text-info ms-2 me-1"></i>
+                <span>{% translate "Ikona wskazuje graczy, którzy zgadzają się na raportowanie do EGD." %}</span>
             </div>
             {% if object.season.state != "draft" %}
                 <div class="d-flex justify-content-center">
@@ -169,7 +175,7 @@
                                     </button>
                                 </form>
                             {% endif %}
-                            {% if group.all_games_finished and group.is_egd %}
+                            {% if group.all_games_finished %}
                                 <a href="{% url "group-egd-export" season_number=group.season.number group_name=group.name %}"
                                    class="btn btn-primary">
                                     <i class="fa fa-file-export"></i> {% blocktrans %}Eksport EGD{% endblocktrans %}
@@ -198,14 +204,17 @@
                         <div class="card-body collapse {% if round.is_current %}show{% endif %}"
                              id="round-{{ forloop.counter }}">
                             {% for game in round.games.all %}
-                                <div class="card mb-3">
-                                    <div class="card-header d-flex justify-content-between">
+                                <div class="card mb-3 {% if not game.is_bye and game.is_egd_eligible %}border-info{% endif %}">
+                                    <div class="card-header d-flex justify-content-between {% if not game.is_bye and game.is_egd_eligible %}bg-light{% endif %}">
                                     <span>
                                         {% if game.is_bye %}
                                             {% translate "Bye" %}:
                                             {% include "league/includes/player_badge.html" with player=game.winner.player member=game.winner %}
                                         {% else %}
                                             {% include "league/includes/game_players.html" with game=game %}
+                                            {% if game.is_egd_eligible %}
+                                                <span class="badge bg-info ms-2" title="{% translate 'This game is eligible for EGD export' %}">EGD</span>
+                                            {% endif %}
                                         {% endif %}
                                     </span>
                                         {% if game.date and not game.is_bye %}

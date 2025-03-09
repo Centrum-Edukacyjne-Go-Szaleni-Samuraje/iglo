@@ -149,6 +149,21 @@ Postgres nice commands:
 - `select * from league_player limit 1;`
 - `copy (select nick, rank, igor from league_player) to stdout with csv header;`
 
+### Postgres dumps and restores
+
+Dumps:
+```
+apps@iglo:~$ docker exec iglo-staging_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-staging_db_1.$(date +%Y%m%d).pg_dump
+apps@iglo:~$ docker exec iglo-production_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump
+```
+
+Copy prod to dev:
+```
+apps@iglo:~$ cat iglo_dumps/iglo-production_db_1.(date +%Y%m%d).pg_dump | docker exec -i iglo-staging_db_1 pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers--no-acl
+```
+NOTE: Double check that `docker exec -i iglo-staging_db_1 ...`, don't run on prod db!
+
+
 ## Old instructions:
 
 Local development (inside Python venv):

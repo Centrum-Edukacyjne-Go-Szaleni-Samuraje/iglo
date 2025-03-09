@@ -1,3 +1,4 @@
 {% load i18n %}
 <a href="{{ player.get_absolute_url }}">{{ player.nick }}</a>{% if player.is_supporter %}
-    <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}"></i>{% endif %}&nbsp;{% if player.rank %}<span class="text-muted">[{% if member %}{{ member.rank }}{% else %}{{ player.rank }}{% endif %}]</span>{% endif %}
+    <i class="fas fa-award player--supporter" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}"></i>{% endif %}{% if player.egd_approval %}
+    <i class="fas fa-globe-europe text-info" style="font-size: 0.8em;" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz zgadza się na raportowanie do EGD" %}"></i>{% endif %}&nbsp;{% if player.rank %}<span class="text-muted">[{% if member %}{{ member.rank }}{% else %}{{ player.rank }}{% endif %}]</span>{% endif %}

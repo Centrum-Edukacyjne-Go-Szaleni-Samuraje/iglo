@@ -188,18 +188,14 @@ class Season(models.Model):
 
         # Handle banded pairing type
         if pairing_type == PairingType.BANDED:
-            # Create a single group with all players
-            is_egd = all(p.egd_approval for p in players)
             group = Group.objects.create(
                 name='A',
                 season=self,
-                type=GroupType.BANDED,  # Using our new BANDED type
-                is_egd=is_egd,
+                type=GroupType.BANDED,
+                is_egd=False,
+                band_size=band_size,
+                point_difference=point_difference,
             )
-
-            # Store the band_size and point_difference for later use
-            group.band_size = band_size
-            group.point_difference = point_difference  # Store the point difference setting
             group.save()
 
             # Add all players to the single group with their initial points
@@ -220,7 +216,8 @@ class Season(models.Model):
                         order=player_order,
                         player=player,
                         rank=player.rank,
-                        initial_score=base_points
+                        initial_score=base_points,
+                        egd_approval=player.egd_approval  # Copy EGD approval from player
                     )
                 )
 
@@ -268,18 +265,20 @@ class Season(models.Model):
         last_group = None
         for group_order in range(math.ceil(len(players) / self.players_per_group)):
             group_players = players[group_order * self.players_per_group : (group_order + 1) * self.players_per_group]
+            # Note: is_egd is deprecated, we now check per-game eligibility
+            # but we keep this for backward compatibility
             is_egd = all(p.egd_approval for p in group_players)
             if len(group_players) < max((self.players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
-                group.is_egd = group.is_egd and is_egd
+                group.is_egd = group.is_egd and is_egd  # Deprecated - games are now eligible based on individual player approvals
                 group.save()
             else:
                 group = Group.objects.create(
                     name=string.ascii_uppercase[group_order],
                     season=self,
                     type=GroupType.ROUND_ROBIN,
-                    is_egd=is_egd,
+                    is_egd=is_egd,  # Deprecated - games are now eligible based on individual player approvals
                 )
                 last_group = group
             for player_order, player in enumerate(group_players, start=group.members.count() + 1):
@@ -288,6 +287,7 @@ class Season(models.Model):
                     order=player_order,
                     player=player,
                     rank=player.rank,
+                    egd_approval=player.egd_approval,  # Copy EGD approval from player
                 )
             if group.type == GroupType.MCMAHON:
                 group.set_initial_score()
@@ -348,7 +348,7 @@ class Group(models.Model):
     name = models.CharField(max_length=1)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
     type = models.CharField(choices=GroupType.choices, max_length=16)
-    is_egd = models.BooleanField(default=False)
+    is_egd = models.BooleanField(default=False, help_text="Deprecated. Games are now eligible for EGD export based on individual player approvals.")
     band_size = models.IntegerField(null=True, blank=True, help_text="Band size for banded round robin pairing")
     point_difference = models.FloatField(null=True, blank=True, help_text="Points difference between consecutive players in ranking", default=1.0)
     teacher = models.ForeignKey(
@@ -522,6 +522,7 @@ class Group(models.Model):
             player=player,
             rank=player.rank,
             order=self.members.count() + 1,
+            egd_approval=player.egd_approval,
         )
 
     def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
@@ -533,6 +534,7 @@ class Group(models.Model):
             player=player_to_add,
             rank=player_to_add.rank,
             order=self.members.count(),
+            egd_approval=player_to_add.egd_approval,
         )
         member_to_remove.games_as_white.update(white=new_member)
         member_to_remove.games_as_black.update(black=new_member)
@@ -678,6 +680,7 @@ class Member(models.Model):
     order = models.SmallIntegerField()
     final_order = models.SmallIntegerField(null=True)
     initial_score = models.FloatField(default=0.0)
+    egd_approval = models.BooleanField(default=False)  # Store EGD approval status for this season
 
     objects = MemberManager()
 
@@ -1039,6 +1042,17 @@ class Game(models.Model):
     @property
     def is_editable_by_player(self):
         return not self.round.is_closed() and self.group.season.state == SeasonState.IN_PROGRESS
+
+    @property
+    def is_egd_eligible(self) -> bool:
+        """
+        Determine if a game is eligible for EGD/EGF submission based on member approvals.
+        Both players must exist (not BYE games) and have egd_approval set for this season.
+        The game doesn't need to be played yet to be marked as eligible in the UI.
+        """
+        return (self.black and self.white and
+                self.black.egd_approval and
+                self.white.egd_approval)
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

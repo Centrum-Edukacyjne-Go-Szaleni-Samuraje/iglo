@@ -93,7 +93,6 @@ class Season(models.Model):
 
     def start(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
-        
         # First, calculate initial scores for each group based on its type
         for group in self.groups.all():
             if group.type == GroupType.MCMAHON:
@@ -118,7 +117,7 @@ class Season(models.Model):
                     member.initial_score = base_points
                 Member.objects.bulk_update(members, ["initial_score"])
             # Round Robin groups have default initial_score = 0, no need to set it
-        
+
         # Now update the state and generate the pairings
         self.state = SeasonState.IN_PROGRESS
         self.save()
@@ -561,18 +560,6 @@ class Group(models.Model):
     def validate_type(self, group_type: GroupType):
         if self.type != group_type:
             raise NotMcmahonGroupError()
-
-    def set_initial_score(self):
-        self.season.validate_state(SeasonState.DRAFT)
-        self.validate_type(GroupType.MCMAHON)
-        members = self.members.all()
-        registered_players = [(member.player.nick, member.rank) for member in members]
-        initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
-        initial_ordering = {p.name: p for p in initial_ordering}
-        for member in members:
-            ordered_player = initial_ordering[member.player.nick]
-            member.initial_score = ordered_player.initial_score
-        Member.objects.bulk_update(members, ["initial_score"])
 
     def start_macmahon_round(self):
         self.validate_type(GroupType.MCMAHON)

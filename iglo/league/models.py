@@ -188,20 +188,19 @@ class Season(models.Model):
 
         # Handle banded pairing type
         if pairing_type == PairingType.BANDED:
-            # Create a single group with all players
             # Note: is_egd is deprecated, we now check per-game eligibility
             # but we keep this for backward compatibility
             is_egd = all(p.egd_approval for p in players)
             group = Group.objects.create(
                 name='A',
                 season=self,
-                type=GroupType.BANDED,  # Using our new BANDED type
-                is_egd=is_egd,  # Deprecated - games are now eligible based on individual player approvals
+                type=GroupType.BANDED,
+                is_egd=is_egd,
             )
 
             # Store the band_size and point_difference for later use
             group.band_size = band_size
-            group.point_difference = point_difference  # Store the point difference setting
+            group.point_difference = point_difference
             group.save()
 
             # Add all players to the single group with their initial points
@@ -1043,7 +1042,7 @@ class Game(models.Model):
     @property
     def is_editable_by_player(self):
         return not self.round.is_closed() and self.group.season.state == SeasonState.IN_PROGRESS
-        
+
     @property
     def is_egd_eligible(self) -> bool:
         """
@@ -1051,8 +1050,8 @@ class Game(models.Model):
         Both players must exist (not BYE games) and have egd_approval.
         The game doesn't need to be played yet to be marked as eligible in the UI.
         """
-        return (self.black and self.white and 
-                self.black.player.egd_approval and 
+        return (self.black and self.white and
+                self.black.player.egd_approval and
                 self.white.player.egd_approval)
 
 

@@ -287,6 +287,7 @@ LOCALE_PATHS = [
 ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default=False)
 ENABLE_UPCOMING_GAMES_REMINDER = env("ENABLE_UPCOMING_GAMES_REMINDER", as_bool=True, default=True)
 ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)
+ENABLE_PROFILING = env("ENABLE_PROFILING", as_bool=True, default=False)
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

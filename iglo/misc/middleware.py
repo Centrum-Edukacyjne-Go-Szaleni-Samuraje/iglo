@@ -126,7 +126,8 @@ class ProfilingMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if not settings.DEBUG:
+        # Only run profiling if explicitly enabled via environment variable
+        if not getattr(settings, 'ENABLE_PROFILING', False):
             return self.get_response(request)
             
         # Reset queries to ensure we only capture this request

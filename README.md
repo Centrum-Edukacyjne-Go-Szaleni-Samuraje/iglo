@@ -35,6 +35,7 @@ poetry install
 
 export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
 export CELERY_TASK_ALWAYS_EAGER=True
+# export ENABLE_PROFILING=True  # Uncomment to enable performance profiling
 alias manage="poetry run python3 iglo/manage.py"
 
 # Start Postgres
@@ -83,6 +84,29 @@ Method for accurating only:
 poetry cache clear PyPI --all  # sometimes
 poetry add accurating@latest
 ```
+
+### Performance Profiling
+
+IGLO includes a performance profiling system that helps identify and fix bottlenecks like N+1 query issues.
+To enable the profiling system:
+
+```bash
+export ENABLE_PROFILING=True
+```
+
+After enabling profiling and running some pages, you can view a performance summary in the Django shell:
+
+```bash
+manage shell
+```
+
+```python
+from logging import getLogger
+logger = getLogger('misc.middleware')
+print(logger.dump_profile_stats())  # Shows performance stats summary
+```
+
+**Note**: Only enable profiling during development as it adds overhead to request processing.
 
 ### Celery dev run.
 Should not be needed because we run iglo with CELERY_TASK_ALWAYS_EAGER=True

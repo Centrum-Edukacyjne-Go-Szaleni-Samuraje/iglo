@@ -93,6 +93,32 @@ class Season(models.Model):
 
     def start(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
+        # First, calculate initial scores for each group based on its type
+        for group in self.groups.all():
+            if group.type == GroupType.MCMAHON:
+                # McMahon groups - Use the MacMahon algorithm
+                members = group.members.all()
+                registered_players = [(member.player.nick, member.rank) for member in members]
+                initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
+                initial_ordering = {p.name: p for p in initial_ordering}
+                for member in members:
+                    ordered_player = initial_ordering[member.player.nick]
+                    member.initial_score = ordered_player.initial_score
+                Member.objects.bulk_update(members, ["initial_score"])
+            elif group.type == GroupType.BANDED:
+                # Banded group - Set scores based on position and point difference
+                members = list(group.members.all())
+                total_players = len(members)
+                for member in members:
+                    # Calculate points using the provided point difference
+                    # First player (position 1) gets (total_players-1) * point_difference points
+                    # Last player gets 0 points
+                    base_points = (total_players - member.order) * group.point_difference
+                    member.initial_score = base_points
+                Member.objects.bulk_update(members, ["initial_score"])
+            # Round Robin groups have default initial_score = 0, no need to set it
+
+        # Now update the state and generate the pairings
         self.state = SeasonState.IN_PROGRESS
         self.save()
 
@@ -198,25 +224,17 @@ class Season(models.Model):
             )
             group.save()
 
-            # Add all players to the single group with their initial points
-            total_players = len(players)
+            # Add all players to the single group without setting initial scores
+            # Initial scores will be calculated in the start() method
             members_to_create = []
 
             for player_order, player in enumerate(players, start=1):
-                # Calculate points using the provided point difference
-                # First player (position 1) gets (total_players-1) * point_difference points
-                # Last player gets 0 points
-                # This creates a linear progression with the specified step size
-                base_points = (total_players - player_order) * point_difference
-
-                # Note: We'll use BYE games later instead of explicit band_bonus
                 members_to_create.append(
                     Member(
                         group=group,
                         order=player_order,
                         player=player,
                         rank=player.rank,
-                        initial_score=base_points,
                         egd_approval=player.egd_approval  # Copy EGD approval from player
                     )
                 )
@@ -289,8 +307,7 @@ class Season(models.Model):
                     rank=player.rank,
                     egd_approval=player.egd_approval,  # Copy EGD approval from player
                 )
-            if group.type == GroupType.MCMAHON:
-                group.set_initial_score()
+            # Initial scores will be calculated during season start
 
     def get_groups(self):
         return (
@@ -543,18 +560,6 @@ class Group(models.Model):
     def validate_type(self, group_type: GroupType):
         if self.type != group_type:
             raise NotMcmahonGroupError()
-
-    def set_initial_score(self):
-        self.season.validate_state(SeasonState.DRAFT)
-        self.validate_type(GroupType.MCMAHON)
-        members = self.members.all()
-        registered_players = [(member.player.nick, member.rank) for member in members]
-        initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
-        initial_ordering = {p.name: p for p in initial_ordering}
-        for member in members:
-            ordered_player = initial_ordering[member.player.nick]
-            member.initial_score = ordered_player.initial_score
-        Member.objects.bulk_update(members, ["initial_score"])
 
     def start_macmahon_round(self):
         self.validate_type(GroupType.MCMAHON)

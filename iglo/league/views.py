@@ -88,25 +88,25 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
 class SeasonDeleteView(UserRoleRequired, TemplateView):
     template_name = "league/season_delete_confirm.html"
     required_roles = [UserRole.REFEREE]
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["season"] = get_object_or_404(Season, number=self.kwargs["number"])
         if context["season"].state != SeasonState.DRAFT:
             raise Http404("Only draft seasons can be deleted")
         return context
-    
+
     def post(self, request, *args, **kwargs):
         season = get_object_or_404(Season, number=self.kwargs["number"])
         if season.state != SeasonState.DRAFT:
             raise Http404("Only draft seasons can be deleted")
-        
+
         # Store the number for the success message
         season_number = season.number
-        
+
         # Delete the season
         season.delete()
-        
+
         messages.success(request, texts.SEASON_DELETE_SUCCESS.format(season_number))
         return redirect("seasons-list")
 
@@ -182,37 +182,30 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        # No need to recalculate scores here - it will be done when season starts
         if "action-move-to-position" in request.POST:
             try:
                 member_id = int(request.POST["member_id"])
                 target_position = int(request.POST["target_position"])
-                
+
                 member = self.object.members.get(id=member_id)
                 current_position = member.order
-                
+
                 # Calculate the position delta
                 position_delta = target_position - current_position
-                
+
                 # Only apply if there's an actual change
                 if position_delta != 0:
                     self.object.move_member(member_id=member_id, positions=position_delta)
-                    if self.object.type == GroupType.MCMAHON:
-                        self.object.set_initial_score()
             except (ValueError, KeyError, Member.DoesNotExist):
                 # Handle potential errors gracefully
                 pass
         elif "action-delete" in request.POST:
             self.object.delete_member(member_id=int(request.POST["member_id"]))
-            if self.object.type == GroupType.MCMAHON:
-                self.object.set_initial_score()
         elif "action-up" in request.POST:
             self.object.move_member_up(member_id=int(request.POST["member_id"]))
-            if self.object.type == GroupType.MCMAHON:
-                self.object.set_initial_score()
         elif "action-down" in request.POST:
             self.object.move_member_down(member_id=int(request.POST["member_id"]))
-            if self.object.type == GroupType.MCMAHON:
-                self.object.set_initial_score()
         elif "action-add" in request.POST:
             try:
                 self.object.add_member(player_nick=request.POST["player_nick"])
@@ -235,7 +228,7 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
         group = self.get_object()
         if not group.all_games_finished:
             raise Http404()
-        
+
         # Get all EGD-eligible games that have been played
         egd_eligible_games = []
         for round in group.rounds.all():
@@ -243,7 +236,7 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
                 # For export, we need both EGD eligibility AND the game must be played
                 if game.is_egd_eligible and game.is_played and game.win_type != WinType.NOT_PLAYED:
                     egd_eligible_games.append(game)
-        
+
         # If no games are eligible, create an informational response
         if not egd_eligible_games:
             filename = f"iglo_season_{group.season.number}_group_{group.name}_egd_info.txt"
@@ -254,7 +247,7 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
             response.write("No EGD eligible games found in this group.\n\n")
             response.write("For a game to be eligible for EGD export, both players must have enabled EGD reporting in their settings.\n")
             return response
-            
+
         # Get all unique players from eligible games
         member_ids = set()
         for game in egd_eligible_games:
@@ -262,26 +255,26 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
                 member_ids.add(game.black.id)
             if game.white:
                 member_ids.add(game.white.id)
-        
+
         filename = f"iglo_season_{group.season.number}_group_{group.name}_egd.txt"
         response = HttpResponse(
             content_type="text/plain",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )
-        
+
         # Create EGD player data only for players with eligible games
         members = Member.objects.filter(id__in=member_ids).select_related('player')
-        
+
         # Check for players with missing rank or EGD PIN
         players_without_rank = []
         players_without_pin = []
-        
+
         for member in members:
             if member.rank is None:
                 players_without_rank.append(f"{member.player.first_name} {member.player.last_name}")
             if not member.player.egd_pin:
                 players_without_pin.append(f"{member.player.first_name} {member.player.last_name}")
-        
+
         # Prepare error information if needed
         has_errors = bool(players_without_rank or players_without_pin)
         if has_errors:
@@ -291,23 +284,23 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
                 headers={"Content-Disposition": f'attachment; filename="{filename}"'},
             )
             response.write("Cannot generate EGD export: Missing required player information.\n\n")
-            
+
             if players_without_rank:
                 response.write("The following players need ranks assigned:\n")
                 for player in players_without_rank:
                     response.write(f"- {player}\n")
                 response.write("\n")
-            
+
             if players_without_pin:
                 response.write("The following players need EGD PINs assigned:\n")
                 for player in players_without_pin:
                     response.write(f"- {player}\n")
                 response.write("\n")
-            
+
             response.write("Please update this information in the admin panel or fetch data from the EGD website.")
             response.write("\nPlayers can find their EGD PINs at: https://www.europeangodatabase.eu/EGD/")
             return response
-        
+
         member_id_to_egd_player = {
             member.id: EGDPlayer(
                 first_name=member.player.first_name,
@@ -319,19 +312,19 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
             )
             for member in members
         }
-        
+
         # Organize games by round
         rounds_data = []
         current_round = None
         current_round_games = []
-        
+
         for game in sorted(egd_eligible_games, key=lambda g: g.round.number):
             if current_round != game.round.number:
                 if current_round is not None:
                     rounds_data.append(current_round_games)
                 current_round = game.round.number
                 current_round_games = []
-            
+
             current_round_games.append(
                 EGDGame(
                     white=member_id_to_egd_player[game.white.id] if game.white else None,
@@ -339,11 +332,11 @@ class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
                     winner=member_id_to_egd_player[game.winner.id] if game.winner else None,
                 )
             )
-        
+
         # Add the last round
         if current_round_games:
             rounds_data.append(current_round_games)
-        
+
         data = create_tournament_table(
             klass=settings.EGD_SETTINGS["CLASS"],
             name=settings.EGD_SETTINGS["NAME"].format(season_number=group.season.number, group_name=group.name),

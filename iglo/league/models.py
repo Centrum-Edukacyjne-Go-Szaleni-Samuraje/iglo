@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from league import texts
-from league.utils.paring import round_robin, shuffle_colors
+from league.utils.paring import round_robin, shuffle_colors, banded_round_robin, Bye
 from macmahon import macmahon as mm
 
 DAYS_PER_GAME = 7
@@ -36,8 +36,15 @@ class SeasonState(TextChoices):
     FINISHED = "finished", texts.SEASON_STATE_FINISHED
 
 
+class PairingType(TextChoices):
+    DEFAULT = "default", texts.PAIRING_TYPE_DEFAULT
+    BANDED = "banded", texts.PAIRING_TYPE_BANDED
+
+
 class SeasonManager(models.Manager):
-    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int, use_igor: bool=False) -> "Season":
+    def prepare_season(self, start_date: datetime.date, players_per_group: int, promotion_count: int,
+                       use_igor: bool=False, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
+                       point_difference: float=1.0) -> "Season":
         previous_season = Season.objects.first()
         if previous_season and previous_season.state != SeasonState.FINISHED:
             raise ValueError(texts.PREVIOUS_SEASON_NOT_CLOSED_ERROR)
@@ -49,7 +56,8 @@ class SeasonManager(models.Manager):
             promotion_count=promotion_count,
             players_per_group=players_per_group,
         )
-        season.create_groups(use_igor=use_igor)
+        season.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size,
+                            point_difference=point_difference)
         return season
 
     def get_latest(self) -> Optional["Season"]:
@@ -85,12 +93,49 @@ class Season(models.Model):
 
     def start(self) -> None:
         self.validate_state(state=SeasonState.DRAFT)
+        # First, calculate initial scores for each group based on its type
+        for group in self.groups.all():
+            if group.type == GroupType.MCMAHON:
+                # McMahon groups - Use the MacMahon algorithm
+                members = group.members.all()
+                registered_players = [(member.player.nick, member.rank) for member in members]
+                initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
+                initial_ordering = {p.name: p for p in initial_ordering}
+                for member in members:
+                    ordered_player = initial_ordering[member.player.nick]
+                    member.initial_score = ordered_player.initial_score
+                Member.objects.bulk_update(members, ["initial_score"])
+            elif group.type == GroupType.BANDED:
+                # Banded group - Set scores based on position and point difference
+                members = list(group.members.all())
+                total_players = len(members)
+                for member in members:
+                    # Calculate points using the provided point difference
+                    # First player (position 1) gets (total_players-1) * point_difference points
+                    # Last player gets 0 points
+                    base_points = (total_players - member.order) * group.point_difference
+                    member.initial_score = base_points
+                Member.objects.bulk_update(members, ["initial_score"])
+            # Round Robin groups have default initial_score = 0, no need to set it
+
+        # Now update the state and generate the pairings
         self.state = SeasonState.IN_PROGRESS
         self.save()
-        for group in self.groups.filter(type=GroupType.ROUND_ROBIN):
+
+        for group in self.groups.all():
             members = list(group.members.all())
             current_date = self.start_date
-            for round_number, round_pairs in enumerate(shuffle_colors(paring=round_robin(n=len(members))), start=1):
+
+            if group.type == GroupType.BANDED:
+                pairing = banded_round_robin(player_count=len(members), band_size=group.band_size, add_byes=True)
+            elif group.type == GroupType.MCMAHON:
+                continue
+            elif group.type == GroupType.ROUND_ROBIN:
+                pairing = round_robin(n=len(members))
+            else:
+                raise ValueError(f"Unhandled group type: {group.type} - this should not happen")
+
+            for round_number, round_pairs in enumerate(shuffle_colors(paring=pairing), start=1):
                 round = Round.objects.create(
                     number=round_number,
                     group=group,
@@ -98,15 +143,36 @@ class Season(models.Model):
                     end_date=current_date + datetime.timedelta(days=DAYS_PER_GAME - 1),
                 )
                 current_date += datetime.timedelta(days=DAYS_PER_GAME)
+
                 for pair in round_pairs:
-                    game_members = [members[pair[0]], members[pair[1]]]
-                    Game.objects.create(
-                        group=group,
-                        round=round,
-                        black=game_members[0],
-                        white=game_members[1],
-                        date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
-                    )
+                    if isinstance(pair[0], Bye):
+                        # We could implement it but it is not needed in Banded, because it always assigns player as black and shuffle skips byes.
+                        raise ValueError("not implemented, should not happen.")
+                    if group.type == GroupType.BANDED and isinstance(pair[1], Bye):
+                        # Special player-with-result pair (player, bye_result) typically for the top and bottom players.
+                        player = members[pair[0]]
+                        bye_result = pair[1]
+
+                        # Design choice: Create a BYE game with player as black and winner based on bye result.
+                        # Note that this game will typically  provide a point depending whether ByeWin/ByeLoss.
+                        Game.objects.create(
+                            group=group,
+                            round=round,
+                            black=player,
+                            white=None,
+                            winner=player if bye_result == Bye.ByeWin else None,
+                            win_type=WinType.BYE,
+                            date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
+                        )
+                    else:
+                        game_members = [members[pair[0]], members[pair[1]]]
+                        Game.objects.create(
+                            group=group,
+                            round=round,
+                            black=game_members[0],
+                            white=game_members[1],
+                            date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
+                        )
 
     def finish(self) -> None:
         self.validate_state(state=SeasonState.IN_PROGRESS)
@@ -123,13 +189,18 @@ class Season(models.Model):
         if self.state != state:
             raise WrongSeasonStateError()
 
-    def reset_groups(self, use_igor: bool) -> None:
+    def reset_groups(self, use_igor: bool, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
+                   point_difference: float=1.0) -> None:
         self.validate_state(state=SeasonState.DRAFT)
         self.groups.all().delete()
-        self.create_groups(use_igor)
+        self.create_groups(use_igor=use_igor, pairing_type=pairing_type, band_size=band_size,
+                         point_difference=point_difference)
 
-    def create_groups(self, use_igor: bool) -> None:
+    def create_groups(self, use_igor: bool, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
+                      point_difference: float=1.0) -> None:
         self.validate_state(state=SeasonState.DRAFT)
+
+        # Get the players
         if use_igor:
             players = Player.objects.filter(auto_join=True).order_by("-igor")
         else:
@@ -140,7 +211,40 @@ class Season(models.Model):
             except Season.DoesNotExist:
                 players = []
             players = self._redistribute_new_players(players=players, players_per_group=self.players_per_group)
-        self._assign_players_to_groups(players=players)
+
+        # Handle banded pairing type
+        if pairing_type == PairingType.BANDED:
+            group = Group.objects.create(
+                name='A',
+                season=self,
+                type=GroupType.BANDED,
+                is_egd=False,
+                band_size=band_size,
+                point_difference=point_difference,
+            )
+            group.save()
+
+            # Add all players to the single group without setting initial scores
+            # Initial scores will be calculated in the start() method
+            members_to_create = []
+
+            for player_order, player in enumerate(players, start=1):
+                members_to_create.append(
+                    Member(
+                        group=group,
+                        order=player_order,
+                        player=player,
+                        rank=player.rank,
+                        egd_approval=player.egd_approval  # Copy EGD approval from player
+                    )
+                )
+
+            # Bulk create all members at once
+            members = Member.objects.bulk_create(members_to_create)
+        else:
+            # Default behavior - create multiple groups
+            self._assign_players_to_groups(players=players)
+
 
     def get_leaderboard(self) -> list["Player"]:
         players = []
@@ -179,18 +283,20 @@ class Season(models.Model):
         last_group = None
         for group_order in range(math.ceil(len(players) / self.players_per_group)):
             group_players = players[group_order * self.players_per_group : (group_order + 1) * self.players_per_group]
+            # Note: is_egd is deprecated, we now check per-game eligibility
+            # but we keep this for backward compatibility
             is_egd = all(p.egd_approval for p in group_players)
             if len(group_players) < max((self.players_per_group - 1), 2) and last_group:
                 group = last_group
                 group.type = GroupType.MCMAHON
-                group.is_egd = group.is_egd and is_egd
+                group.is_egd = group.is_egd and is_egd  # Deprecated - games are now eligible based on individual player approvals
                 group.save()
             else:
                 group = Group.objects.create(
                     name=string.ascii_uppercase[group_order],
                     season=self,
                     type=GroupType.ROUND_ROBIN,
-                    is_egd=is_egd,
+                    is_egd=is_egd,  # Deprecated - games are now eligible based on individual player approvals
                 )
                 last_group = group
             for player_order, player in enumerate(group_players, start=group.members.count() + 1):
@@ -199,9 +305,9 @@ class Season(models.Model):
                     order=player_order,
                     player=player,
                     rank=player.rank,
+                    egd_approval=player.egd_approval,  # Copy EGD approval from player
                 )
-            if group.type == GroupType.MCMAHON:
-                group.set_initial_score()
+            # Initial scores will be calculated during season start
 
     def get_groups(self):
         return (
@@ -238,6 +344,7 @@ class GameResult(Enum):
 class GroupType(models.TextChoices):
     ROUND_ROBIN = "round_robin", _("Każdy z każdym")
     MCMAHON = "mcmahon", _("McMahon")
+    BANDED = "banded", _("Banded Round Robin")
 
 
 class NotMcmahonGroupError(Exception):
@@ -250,12 +357,17 @@ class ResultSymbol(str, Enum):
     not_played = "?"
     no_result = "X"
 
+    def __str__(self):
+        return str(self.value)
+
 
 class Group(models.Model):
     name = models.CharField(max_length=1)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="groups")
     type = models.CharField(choices=GroupType.choices, max_length=16)
-    is_egd = models.BooleanField(default=False)
+    is_egd = models.BooleanField(default=False, help_text="Deprecated. Games are now eligible for EGD export based on individual player approvals.")
+    band_size = models.IntegerField(null=True, blank=True, help_text="Band size for banded round robin pairing")
+    point_difference = models.FloatField(null=True, blank=True, help_text="Points difference between consecutive players in ranking", default=1.0)
     teacher = models.ForeignKey(
         "review.Teacher", null=True, on_delete=models.SET_NULL, related_name="groups", blank=True
     )
@@ -318,17 +430,33 @@ class Group(models.Model):
 
     @cached_property
     def members_qualification(self) -> list["Member"]:
-        return sorted(
-            [
-                member
-                for member in self.members.select_related("player")
-                .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
-                .all()
-            ],
-            key=lambda member: (member.final_order, -member.points, -member.sodos, member.order)
-            if self.type == GroupType.ROUND_ROBIN
-            else (member.final_order, -member.score, -member.sos, -member.sosos),
-        )
+        members = list(self.members.select_related("player")
+                       .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
+                       .all())
+
+        # Note different sorting based on group type.
+        if self.type == GroupType.ROUND_ROBIN:
+            members.sort(key=lambda member: (
+                member.final_order if member.final_order is not None else float('inf'),
+                -member.points,
+                -member.sodos,
+                member.order
+            ))
+        elif self.type == GroupType.BANDED:
+            members.sort(key=lambda member: (
+                member.final_order if member.final_order is not None else float('inf'),
+                -member.score,
+                member.order
+            ))
+        else:
+            members.sort(key=lambda member: (
+                member.final_order if member.final_order is not None else float('inf'),
+                -member.score,
+                -member.sos,
+                -member.sosos
+            ))
+
+        return members
 
     def delete_member(self, member_id: int) -> None:
         self.season.validate_state(state=SeasonState.DRAFT)
@@ -336,27 +464,64 @@ class Group(models.Model):
         self.members.filter(order__gt=member_to_remove.order).update(order=F("order") - 1)
         member_to_remove.delete()
 
-    def move_member_up(self, member_id: int) -> None:
+    def move_member(self, member_id: int, positions: int) -> None:
+        """
+        Move a member up or down by the specified number of positions.
+
+        Args:
+            member_id: The ID of the member to move
+            positions: Number of positions to move (negative = up, positive = down)
+        """
         self.season.validate_state(state=SeasonState.DRAFT)
-        member_to_move_up = self.members.get(id=member_id)
-        if member_to_move_up.order == 1:
+        member = self.members.get(id=member_id)
+        max_order = self.members.count()
+
+        # Calculate new order position
+        new_order = member.order + positions
+        # Ensure it's within bounds
+        new_order = max(1, min(max_order, new_order))
+
+        # If no change needed, return early
+        if new_order == member.order:
             return
-        member_to_move_down = self.members.get(order=member_to_move_up.order - 1)
-        member_to_move_down.order += 1
-        member_to_move_down.save()
-        member_to_move_up.order -= 1
-        member_to_move_up.save()
+
+        # Determine if we're moving up or down
+        moving_up = new_order < member.order
+
+        if moving_up:
+            # Moving up: Get members that need to move down
+            members_to_adjust = self.members.filter(
+                order__gte=new_order,
+                order__lt=member.order
+            ).order_by('-order')
+
+            # Move affected members down
+            for other_member in members_to_adjust:
+                other_member.order += 1
+                other_member.save()
+        else:
+            # Moving down: Get members that need to move up
+            members_to_adjust = self.members.filter(
+                order__gt=member.order,
+                order__lte=new_order
+            ).order_by('order')
+
+            # Move affected members up
+            for other_member in members_to_adjust:
+                other_member.order -= 1
+                other_member.save()
+
+        # Set member to new position
+        member.order = new_order
+        member.save()
+
+    def move_member_up(self, member_id: int) -> None:
+        """Move a member up by 1 position."""
+        self.move_member(member_id, -1)
 
     def move_member_down(self, member_id: int) -> None:
-        self.season.validate_state(state=SeasonState.DRAFT)
-        member_to_move_down = self.members.get(id=member_id)
-        if member_to_move_down.order == self.members.count():
-            return
-        member_to_move_up = self.members.get(order=member_to_move_down.order + 1)
-        member_to_move_up.order -= 1
-        member_to_move_up.save()
-        member_to_move_down.order += 1
-        member_to_move_down.save()
+        """Move a member down by 1 position."""
+        self.move_member(member_id, 1)
 
     def add_member(self, player_nick: str) -> None:
         self.season.validate_state(state=SeasonState.DRAFT)
@@ -374,6 +539,7 @@ class Group(models.Model):
             player=player,
             rank=player.rank,
             order=self.members.count() + 1,
+            egd_approval=player.egd_approval,
         )
 
     def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
@@ -385,6 +551,7 @@ class Group(models.Model):
             player=player_to_add,
             rank=player_to_add.rank,
             order=self.members.count(),
+            egd_approval=player_to_add.egd_approval,
         )
         member_to_remove.games_as_white.update(white=new_member)
         member_to_remove.games_as_black.update(black=new_member)
@@ -393,18 +560,6 @@ class Group(models.Model):
     def validate_type(self, group_type: GroupType):
         if self.type != group_type:
             raise NotMcmahonGroupError()
-
-    def set_initial_score(self):
-        self.season.validate_state(SeasonState.DRAFT)
-        self.validate_type(GroupType.MCMAHON)
-        members = self.members.all()
-        registered_players = [(member.player.nick, member.rank) for member in members]
-        initial_ordering = mm.BasicInitialOrdering(number_of_bars=NUMBER_OF_BARS).order(registered_players)
-        initial_ordering = {p.name: p for p in initial_ordering}
-        for member in members:
-            ordered_player = initial_ordering[member.player.nick]
-            member.initial_score = ordered_player.initial_score
-        Member.objects.bulk_update(members, ["initial_score"])
 
     def start_macmahon_round(self):
         self.validate_type(GroupType.MCMAHON)
@@ -529,7 +684,8 @@ class Member(models.Model):
     rank = models.IntegerField(null=True)
     order = models.SmallIntegerField()
     final_order = models.SmallIntegerField(null=True)
-    initial_score = models.SmallIntegerField(default=0)
+    initial_score = models.FloatField(default=0.0)
+    egd_approval = models.BooleanField(default=False)  # Store EGD approval status for this season
 
     objects = MemberManager()
 
@@ -573,18 +729,26 @@ class Member(models.Model):
     def sos(self) -> float:
         result = 0.0
         for game in self.games_as_white.all():
-            result += game.get_opponent(self).score
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.score
         for game in self.games_as_black.all():
-            result += game.get_opponent(self).score
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.score
         return result
 
     @cached_property
     def sosos(self) -> float:
         result = 0.0
         for game in self.games_as_white.all():
-            result += game.get_opponent(self).sos
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.sos
         for game in self.games_as_black.all():
-            result += game.get_opponent(self).sos
+            opponent = game.get_opponent(self)
+            if opponent is not None:  # Skip BYE games
+                result += opponent.sos
         return result
 
     @cached_property
@@ -699,7 +863,7 @@ class GameManager(models.Manager):
             win_type=WinType.BYE,
             date=datetime.datetime.combine(round.end_date, settings.DEFAULT_GAME_TIME),
         )
-        
+
     def get_immediate_games(self):
         now = datetime.datetime.now()
         start = now + datetime.timedelta(hours=2)
@@ -883,6 +1047,17 @@ class Game(models.Model):
     @property
     def is_editable_by_player(self):
         return not self.round.is_closed() and self.group.season.state == SeasonState.IN_PROGRESS
+
+    @property
+    def is_egd_eligible(self) -> bool:
+        """
+        Determine if a game is eligible for EGD/EGF submission based on member approvals.
+        Both players must exist (not BYE games) and have egd_approval set for this season.
+        The game doesn't need to be played yet to be marked as eligible in the UI.
+        """
+        return (self.black and self.white and
+                self.black.egd_approval and
+                self.white.egd_approval)
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

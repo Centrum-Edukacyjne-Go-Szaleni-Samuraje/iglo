@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static i18n %}
+{% load static i18n range_tags %}
 
 {% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %}
     {{ object.name }}{% endblock %}
@@ -25,7 +25,6 @@
             </nav>
             <div class="d-flex align-items-center mb-3 flex-wrap">
                 <h2>{% translate "Grupa" %} {{ object.name }}</h2>
-                {% if group.is_egd %}<span class="badge bg-info ms-2">EGD</span>{% endif %}
                 <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>
 
                 {% if group.teacher %}
@@ -33,6 +32,13 @@
                         {% translate "Nauczyciel" %}: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
                     </div>
                 {% endif %}
+            </div>
+            
+            <div class="d-flex mb-2 small text-muted align-items-center">
+                <i class="fas fa-info-circle me-1"></i>
+                <span>{% translate "Gry oznaczone" %} <span class="badge bg-info">EGD</span> {% translate "są raportowane do European Go Database." %}</span>
+                <i class="fas fa-globe-europe text-info ms-2 me-1"></i>
+                <span>{% translate "Ikona wskazuje graczy, którzy zgadzają się na raportowanie do EGD." %}</span>
             </div>
             {% if object.season.state != "draft" %}
                 <div class="d-flex justify-content-center">
@@ -69,6 +75,40 @@
                                                 <td>{{ member.points }}</td>
                                                 <td>{{ member.sodos }}</td>
                                                 <td>{{ member.order }}</td>
+                                                <td>{{ member.igor }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                {% elif object.type == "banded" %}
+                                    <thead>
+                                        <tr>
+                                            <th class="group-table__header">{% translate "Pozycja" %}</th>
+                                            <th class="group-table__header">{% translate "Gracz" %}</th>
+                                            {% if object.rounds_number %}
+                                                <th colspan="{{ object.rounds_number }}"
+                                                    class="group-table__header">{% translate "Rundy" %}</th>
+                                            {% endif %}
+                                            <th class="group-table__header">
+                                                {% translate "Punkty" %}
+                                            </th>
+                                            <th class="group-table__header">{% translate "IGoR" %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for position, member, results in object.results_table %}
+                                            <tr class="group-table__row group-table__row--result-{{ member.result.value.lower }}"
+                                                data-position="{{ position }}">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="group-table__header group-table__cell-name">
+                                                    {% include "league/includes/player_badge.html" with player=member.player member=member %}
+                                                </td>
+                                                {% for result, url in results %}
+                                                    <td class="group-table__cell-result{% if "+" in result %} group-table__result--win{% endif %}">
+                                                        <a class="group-table__result-link" data-result="{{ result }}"
+                                                           href="{{ url }}">{{ result }}</a>
+                                                    </td>
+                                                {% endfor %}
+                                                <td>{{ member.score|floatformat:2 }}</td>
                                                 <td>{{ member.igor }}</td>
                                             </tr>
                                         {% endfor %}
@@ -135,7 +175,7 @@
                                     </button>
                                 </form>
                             {% endif %}
-                            {% if group.all_games_finished and group.is_egd %}
+                            {% if group.all_games_finished %}
                                 <a href="{% url "group-egd-export" season_number=group.season.number group_name=group.name %}"
                                    class="btn btn-primary">
                                     <i class="fa fa-file-export"></i> {% blocktrans %}Eksport EGD{% endblocktrans %}
@@ -164,14 +204,17 @@
                         <div class="card-body collapse {% if round.is_current %}show{% endif %}"
                              id="round-{{ forloop.counter }}">
                             {% for game in round.games.all %}
-                                <div class="card mb-3">
-                                    <div class="card-header d-flex justify-content-between">
+                                <div class="card mb-3 {% if not game.is_bye and game.is_egd_eligible %}border-info{% endif %}">
+                                    <div class="card-header d-flex justify-content-between {% if not game.is_bye and game.is_egd_eligible %}bg-light{% endif %}">
                                     <span>
                                         {% if game.is_bye %}
                                             {% translate "Bye" %}:
                                             {% include "league/includes/player_badge.html" with player=game.winner.player member=game.winner %}
                                         {% else %}
                                             {% include "league/includes/game_players.html" with game=game %}
+                                            {% if game.is_egd_eligible %}
+                                                <span class="badge bg-info ms-2" title="{% translate 'This game is eligible for EGD export' %}">EGD</span>
+                                            {% endif %}
                                         {% endif %}
                                     </span>
                                         {% if game.date and not game.is_bye %}
@@ -237,15 +280,31 @@
                             <div class="card-body">
                                 <form method="post">{% csrf_token %}
                                     <input type="hidden" value="{{ member.id }}" name="member_id">
-                                    <button type="submit" class="btn btn-primary" name="action-up"
-                                            {% if forloop.first %}disabled{% endif %}>▲
-                                    </button>
-                                    <button type="submit" class="btn btn-primary" name="action-down"
-                                            {% if forloop.last %}disabled{% endif %}>▼
-                                    </button>
-                                    <button type="submit" class="btn btn-danger" name="action-delete">
-                                        {% translate "Usuń" %}
-                                    </button>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <button type="submit" class="btn btn-sm btn-primary me-1" name="action-up"
+                                                    {% if forloop.first %}disabled{% endif %} title="{% translate 'Move up 1 position' %}">▲
+                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-primary me-1" name="action-down"
+                                                    {% if forloop.last %}disabled{% endif %} title="{% translate 'Move down 1 position' %}">▼
+                                            </button>
+                                            <select class="form-select form-select-sm me-1" name="target_position" aria-label="{% translate 'Move to position' %}" style="width: auto;">
+                                                {% for i in group.members.count|get_range %}
+                                                    {% with position=i|add:1 %}
+                                                    <option value="{{ position }}" {% if position == member.order %}selected{% endif %}>
+                                                        {{ position }}
+                                                    </option>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-info me-1" name="action-move-to-position" title="{% translate 'Move to position' %}">
+                                                {% translate 'Move' %}
+                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-danger" name="action-delete">
+                                                {% translate "Usuń" %}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         {% endif %}

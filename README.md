@@ -35,19 +35,35 @@ poetry install
 
 export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
 export CELERY_TASK_ALWAYS_EAGER=True
+export ENABLE_PROFILING=False  # Uncomment to enable performance profiling
 alias manage="poetry run python3 iglo/manage.py"
 
+# Start Postgres
 
 # docker stop iglo-db; docker rm iglo-db
 docker ps -a
 docker run -e POSTGRES_PASSWORD=postgres --name iglo-db -p ${IGLO_DB_PORT}:5432 -d postgres
 manage migrate
-manage load_seasons fixtures/seasons.json
-manage createsuperuser
 
-# Run server
+# Populate Postgres v1
+
+## Method 1
+
+# We can't commit fixtures/iglo_db.dump to github, due to GPDR law.
+ssh apps@iglo.szalenisamuraje.org 'docker exec iglo-production_db_1 pg_dump -Fc -U postgres' > fixtures/iglo_db.dump
+cat fixtures/iglo_db.dump | docker exec -i iglo-db pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers
+
+## Method 2
+
+manage load_seasons fixtures/seasons.json
+
+# Run IGLO web server
+
+echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
+# manage createsuperuser # more manual method.
 
 manage runserver
+
 ```
 
 Now you can go to `http://127.0.0.1:8000/`
@@ -68,6 +84,29 @@ Method for accurating only:
 poetry cache clear PyPI --all  # sometimes
 poetry add accurating@latest
 ```
+
+### Performance Profiling
+
+IGLO includes a performance profiling system that helps identify and fix bottlenecks like N+1 query issues.
+To enable the profiling system:
+
+```bash
+export ENABLE_PROFILING=True
+```
+
+After enabling profiling and running some pages, you can view a performance summary in the Django shell:
+
+```bash
+manage shell
+```
+
+```python
+from logging import getLogger
+logger = getLogger('misc.middleware')
+print(logger.dump_profile_stats())  # Shows performance stats summary
+```
+
+**Note**: Only enable profiling during development as it adds overhead to request processing.
 
 ### Celery dev run.
 Should not be needed because we run iglo with CELERY_TASK_ALWAYS_EAGER=True
@@ -118,7 +157,7 @@ Global logs:
 `less -R logs.txt`
 
 Iglo dockers on the server:
-`docker ps -a | grep iglo` 
+`docker ps -a | grep iglo`
 (staging = devel)
 
 Get into dev web docker:
@@ -133,6 +172,21 @@ Postgres nice commands:
 - `\dt`
 - `select * from league_player limit 1;`
 - `copy (select nick, rank, igor from league_player) to stdout with csv header;`
+
+### Postgres dumps and restores
+
+Dumps:
+```
+apps@iglo:~$ docker exec iglo-staging_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-staging_db_1.$(date +%Y%m%d).pg_dump
+apps@iglo:~$ docker exec iglo-production_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump
+```
+
+Copy prod to dev:
+```
+apps@iglo:~$ cat iglo_dumps/iglo-production_db_1.(date +%Y%m%d).pg_dump | docker exec -i iglo-staging_db_1 pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers--no-acl
+```
+NOTE: Double check that `docker exec -i iglo-staging_db_1 ...`, don't run on prod db!
+
 
 ## Old instructions:
 

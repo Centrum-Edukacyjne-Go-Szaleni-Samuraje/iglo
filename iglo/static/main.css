@@ -81,6 +81,16 @@
     font-weight: bold;
 }
 
+.egd-eligible-game {
+    border-left: 2px solid #17a2b8;
+}
+
+.egd-icon {
+    color: #17a2b8;
+    font-size: 0.8em;
+    margin-left: 2px;
+}
+
 .language-dropdown {
     min-width: 0;
 }

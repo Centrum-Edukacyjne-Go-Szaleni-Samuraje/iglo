@@ -126,6 +126,7 @@ class Command(BaseCommand):
                             group=group,
                             order=player_order,
                             rank=None,
+                            egd_approval=player.egd_approval,  # Copy EGD approval from player
                         )
                         players.append(member)
                     if group_type == GroupType.MCMAHON:

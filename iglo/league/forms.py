@@ -7,7 +7,7 @@ from django.db.models import BLANK_CHOICE_DASH
 from django.utils.translation import gettext_lazy as _
 
 from league import texts
-from league.models import Game, Member, Player, WinType
+from league.models import Game, Member, PairingType, Player, WinType
 
 
 class PrepareSeasonForm(forms.Form):
@@ -15,6 +15,27 @@ class PrepareSeasonForm(forms.Form):
     players_per_group = forms.IntegerField(label=texts.PLAYERS_PER_GROUP_LABEL)
     promotion_count = forms.IntegerField(label=texts.PROMOTION_COUNT_LABEL)
     use_igor = forms.BooleanField(label=texts.USE_IGOR_LABEL)
+    pairing_type = forms.ChoiceField(
+        label=texts.PAIRING_TYPE_LABEL,
+        choices=PairingType.choices,
+        initial=PairingType.DEFAULT,
+        widget=forms.RadioSelect,
+        help_text=texts.PAIRING_TYPE_HELP_TEXT
+    )
+    band_size = forms.IntegerField(
+        label="Band Size",
+        initial=2,
+        help_text="Number of players above and below to play with (so half the number of games, only applicable when banded pairing is selected)",
+        required=True,
+    )
+    point_difference = forms.FloatField(
+        label="Point Difference",
+        initial=1.0,
+        help_text="Points difference between consecutive players in banded groups (e.g., 1.0 means each player starts with 1 point less than the player above)",
+        required=True,
+        min_value=0.0,
+        max_value=10.0,
+    )
 
 
 def ogs_game_link_validator(value: str) -> None:

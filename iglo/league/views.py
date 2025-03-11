@@ -566,15 +566,29 @@ class LeagueAdminView(TemplateView, UserRoleRequired):
     required_roles = [UserRole.TEACHER]
 
     def post(self, request, *args, **kwargs):
+        triggering_user_email = self.request.user.email if hasattr(self.request.user, 'email') else None
+        
         if "action-update-gor" in request.POST:
-            tasks.update_gor.delay(triggering_user_email=self.request.user.email)
+            tasks.update_gor.delay(triggering_user_email=triggering_user_email)
             messages.add_message(
                 request=request,
                 level=messages.SUCCESS,
                 message=texts.UPDATE_GOR_MESSAGE,
             )
+        elif "action-update-ogs" in request.POST:
+            tasks.update_ogs_data.delay(triggering_user_email=triggering_user_email)
+            messages.add_message(
+                request=request,
+                level=messages.SUCCESS,
+                message=texts.UPDATE_OGS_MESSAGE,
+            )
         elif "action-recalculate-igor" in request.POST:
             tasks.recalculate_igor.delay()
+            messages.add_message(
+                request=request,
+                level=messages.SUCCESS,
+                message="IGoR jest przeliczany. To może zająć kilka minut.",
+            )
         context = self.get_context_data()
         return self.render_to_response(context)
 

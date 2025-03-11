@@ -354,6 +354,11 @@ def emails(game):
     return [player.user.email for player in [game.white.player, game.black.player] if player.user]
 
 def send_game_email(path, to, game):
+    # Skip sending player notification emails in DEBUG mode
+    if settings.DEBUG:
+        logger.info(f"DEBUG mode: Skipping email to {to} about game {game.id} ({path})")
+        return
+        
     send_email(
         subject_template=path+"/subject.txt",
         body_template=path+"/body.html",

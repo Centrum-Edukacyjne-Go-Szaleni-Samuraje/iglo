@@ -2,19 +2,20 @@
 
 [[package]]
 name = "accurating"
-version = "0.6.1"
+version = "0.7.0"
 description = "AccuRating is a library for accurate player ranking based on match results."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "accurating-0.6.1-py3-none-any.whl", hash = "sha256:a277aa27a07446339d21cee2a441a7ceff0a03fce881ae7133b3d103c6300a19"},
-    {file = "accurating-0.6.1.tar.gz", hash = "sha256:882aea5e1fbd1e091d0ab4b0cd0214ccf8dc3a123c51380b3cc25217617bdcd4"},
+    {file = "accurating-0.7.0-py3-none-any.whl", hash = "sha256:0161f6caff6cb436960f3dcac4b0e4c3aa2811c83c0ad03a89173416fb37a8fd"},
+    {file = "accurating-0.7.0.tar.gz", hash = "sha256:a28f56beceaec8d7b32322e222d27c2b9f2ae095d073d59fa941ccebceb48619"},
 ]
 
 [package.dependencies]
 jax = ">=0.4.8,<0.5.0"
 jaxlib = ">=0.4.7,<0.5.0"
+requests = ">=2.32.3,<3.0.0"
 tabulate = ">=0.9.0,<0.10.0"
 types-requests = ">=2.30.0.0,<3.0.0.0"
 types-tabulate = ">=0.9.0.2,<0.10.0.0"
@@ -1560,4 +1561,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "1d22b5b52b9b54dd2f8a8cd9fd00d102b81aa002796e52dd12044473dc8a110d"
+content-hash = "e13cf84dddedee0390b3dc802f3f919ee5930fdf76784fce35e2ef86772a2dc4"

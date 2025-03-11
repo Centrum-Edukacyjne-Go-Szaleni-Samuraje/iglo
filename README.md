@@ -36,6 +36,7 @@ poetry install
 export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
 export CELERY_TASK_ALWAYS_EAGER=True
 export ENABLE_PROFILING=False  # Uncomment to enable performance profiling
+export FAST_IGOR=True  # Cuts IGOR iterations to 30
 alias manage="poetry run python3 iglo/manage.py"
 
 # Start Postgres
@@ -62,7 +63,10 @@ manage load_seasons fixtures/seasons.json
 echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
 # manage createsuperuser # more manual method.
 
+# Dev commands
+
 manage runserver
+manage test iglo
 
 ```
 
@@ -175,15 +179,17 @@ Postgres nice commands:
 
 ### Postgres dumps and restores
 
+`ssh apps@iglo.szalenisamuraje.org`
+
 Dumps:
 ```
-apps@iglo:~$ docker exec iglo-staging_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-staging_db_1.$(date +%Y%m%d).pg_dump
-apps@iglo:~$ docker exec iglo-production_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump
+docker exec iglo-staging_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-staging_db_1.$(date +%Y%m%d).pg_dump
+docker exec iglo-production_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump
 ```
 
 Copy prod to dev:
 ```
-apps@iglo:~$ cat iglo_dumps/iglo-production_db_1.(date +%Y%m%d).pg_dump | docker exec -i iglo-staging_db_1 pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers--no-acl
+cat iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump | docker exec -i iglo-staging_db_1 pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers --no-acl
 ```
 NOTE: Double check that `docker exec -i iglo-staging_db_1 ...`, don't run on prod db!
 

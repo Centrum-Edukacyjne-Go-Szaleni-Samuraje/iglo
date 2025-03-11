@@ -288,6 +288,7 @@ ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default
 ENABLE_UPCOMING_GAMES_REMINDER = env("ENABLE_UPCOMING_GAMES_REMINDER", as_bool=True, default=True)
 ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)
 ENABLE_PROFILING = env("ENABLE_PROFILING", as_bool=True, default=False)
+FAST_IGOR = env("FAST_IGOR", as_bool=True, default=False)
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -296,13 +297,13 @@ REST_FRAMEWORK = {
 
 # Small IGOR_MAX_STEPS is useful when CELERY is eager and we want just some fast iteration for IGoR recalculation.
 # In debug mode, limit to 30 iterations for faster results during development
-if DEBUG:
+if FAST_IGOR:
     IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=30, as_int=True)
 else:
-    IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000000, as_int=True)
+    IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000, as_int=True)
 IGOR_CONFIG = {
-    'season_rating_stability': 0.25,
-    'smoothing': 0.05,
+    'season_rating_stability': 0.5,
+    'smoothing': 0.25,
     'initial_lr': 1.0,
     'do_log': True,
     'max_steps': IGOR_MAX_STEPS,

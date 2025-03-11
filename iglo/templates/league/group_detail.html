@@ -261,9 +261,10 @@
                     <div class="card mb-3">
                         <div class="card-header">
                             <small class="text-muted">#{{ member.order }}</small>
-                            <strong class="d-inline-block" style="min-width: 150px;"><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
-                            <span class="text-muted d-inline-block" style="min-width: 80px;">EGD: {{ member.rank }}</span>
-                            <span class="text-muted d-inline-block" style="min-width: 80px;">{% if member.player.igor %}IGoR: {{ member.player.igor }}{% endif %}</span>
+                            <strong class="d-inline-block" style="min-width: 200px;"><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
+                            <span class="text-muted d-inline-block" style="min-width: 120px;">EGD: {{ member.rank }}</span>
+                            <span class="text-muted d-inline-block" style="min-width: 120px;">IGoR: {% if member.player.igor %}{{ member.player.igor }}{% else %}-{% endif %}</span>
+                            <span class="text-muted d-inline-block" style="min-width: 160px;">OGS: {% if member.ogs_rating %}{{ member.ogs_rating|floatformat:0 }}±{{ member.ogs_deviation|floatformat:0 }}{% else %}-{% endif %}</span>
                             {% if member.membership_history == "NEWBIE" %}
                             <span class="badge bg-success">NOWY</span>
                             {% elif member.membership_history == "CONTINUING" %}

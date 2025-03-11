@@ -235,7 +235,10 @@ class Season(models.Model):
                         order=player_order,
                         player=player,
                         rank=player.rank,
-                        egd_approval=player.egd_approval  # Copy EGD approval from player
+                        egd_approval=player.egd_approval,  # Copy EGD approval from player
+                        ogs_id=player.ogs_id,  # Copy OGS data from player
+                        ogs_rating=player.ogs_rating,
+                        ogs_deviation=player.ogs_deviation
                     )
                 )
 
@@ -306,6 +309,9 @@ class Season(models.Model):
                     player=player,
                     rank=player.rank,
                     egd_approval=player.egd_approval,  # Copy EGD approval from player
+                    ogs_id=player.ogs_id,  # Copy OGS data from player
+                    ogs_rating=player.ogs_rating,
+                    ogs_deviation=player.ogs_deviation
                 )
             # Initial scores will be calculated during season start
 
@@ -540,6 +546,9 @@ class Group(models.Model):
             rank=player.rank,
             order=self.members.count() + 1,
             egd_approval=player.egd_approval,
+            ogs_id=player.ogs_id,
+            ogs_rating=player.ogs_rating,
+            ogs_deviation=player.ogs_deviation,
         )
 
     def swap_member(self, player_nick_to_remove: str, player_nick_to_add: str) -> None:
@@ -552,6 +561,9 @@ class Group(models.Model):
             rank=player_to_add.rank,
             order=self.members.count(),
             egd_approval=player_to_add.egd_approval,
+            ogs_id=player_to_add.ogs_id,
+            ogs_rating=player_to_add.ogs_rating,
+            ogs_deviation=player_to_add.ogs_deviation,
         )
         member_to_remove.games_as_white.update(white=new_member)
         member_to_remove.games_as_black.update(black=new_member)
@@ -625,6 +637,9 @@ class Player(models.Model):
         default=list, blank=True, null=True
     )
     ogs_username = models.CharField(max_length=32, null=True, blank=True)
+    ogs_rating = models.FloatField(null=True, blank=True)
+    ogs_deviation = models.FloatField(null=True, blank=True)
+    ogs_id = models.IntegerField(null=True, blank=True)
     kgs_username = models.CharField(max_length=32, null=True, blank=True)
     auto_join = models.BooleanField(default=True)
     egd_pin = models.CharField(max_length=8, null=True, blank=True, validators=[MinLengthValidator(8)])
@@ -686,6 +701,11 @@ class Member(models.Model):
     final_order = models.SmallIntegerField(null=True)
     initial_score = models.FloatField(default=0.0)
     egd_approval = models.BooleanField(default=False)  # Store EGD approval status for this season
+    
+    # OGS data copied from player
+    ogs_rating = models.FloatField(null=True, blank=True)
+    ogs_deviation = models.FloatField(null=True, blank=True)
+    ogs_id = models.IntegerField(null=True, blank=True)
 
     objects = MemberManager()
 

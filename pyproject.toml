@@ -24,7 +24,7 @@ redis = "^4.1.3"
 djangorestframework = "^3.14.0"
 drf-extensions = "^0.7.1"
 urllib3 = "1.26.15"
-accurating = "^0.6.1"
+accurating = "^0.7.0"
 setuptools = "^75.8.0"
 
 [tool.poetry.dev-dependencies]

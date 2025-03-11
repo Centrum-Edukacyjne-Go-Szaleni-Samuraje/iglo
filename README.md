@@ -62,7 +62,10 @@ manage load_seasons fixtures/seasons.json
 echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
 # manage createsuperuser # more manual method.
 
+# Dev commands
+
 manage runserver
+manage test iglo
 
 ```
 

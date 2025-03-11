@@ -164,6 +164,9 @@ Iglo dockers on the server:
 `docker ps -a | grep iglo`
 (staging = devel)
 
+Logs of the worker (eg igor recalc)
+`docker logs iglo-staging_worker_1`
+
 Get into dev web docker:
 `docker exec -it iglo-staging_web_1 bash`
 

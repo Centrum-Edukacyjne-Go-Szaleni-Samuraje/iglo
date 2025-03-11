@@ -299,10 +299,10 @@ REST_FRAMEWORK = {
 if DEBUG:
     IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=30, as_int=True)
 else:
-    IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000000, as_int=True)
+    IGOR_MAX_STEPS = env("IGOR_MAX_STEPS", default=1000, as_int=True)
 IGOR_CONFIG = {
-    'season_rating_stability': 0.25,
-    'smoothing': 0.05,
+    'season_rating_stability': 0.5,
+    'smoothing': 0.25,
     'initial_lr': 1.0,
     'do_log': True,
     'max_steps': IGOR_MAX_STEPS,

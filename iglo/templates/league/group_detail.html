@@ -261,8 +261,9 @@
                     <div class="card mb-3">
                         <div class="card-header">
                             <small class="text-muted">#{{ member.order }}</small>
-                            <strong><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
-                            <span class="text-muted">[{{ member.rank }}]</span>
+                            <strong class="d-inline-block" style="min-width: 150px;"><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
+                            <span class="text-muted d-inline-block" style="min-width: 80px;">EGD: {{ member.rank }}</span>
+                            <span class="text-muted d-inline-block" style="min-width: 80px;">{% if member.player.igor %}IGoR: {{ member.player.igor }}{% endif %}</span>
                             {% if member.membership_history == "NEWBIE" %}
                             <span class="badge bg-success">NOWY</span>
                             {% elif member.membership_history == "CONTINUING" %}

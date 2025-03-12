@@ -8,6 +8,7 @@ from celery import shared_task
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.mail import send_mail
+from django.db import models
 from requests.exceptions import HTTPError
 
 from league import texts
@@ -33,7 +34,7 @@ def retry_on_rate_limit(func: Callable, *args, **kwargs) -> Tuple[bool, Any, str
     Returns:
         Tuple of (success: bool, result: Any, error_message: str)
     """
-    retry_delays = [5, 10, 20, 40]  # Seconds to wait between retries
+    retry_delays = [5, 10, 20, 40, 60, 100]  # Seconds to wait between retries
     last_error = None
     
     for attempt, delay in enumerate(retry_delays + [0]):  # +[0] for one more attempt after last delay
@@ -45,9 +46,10 @@ def retry_on_rate_limit(func: Callable, *args, **kwargs) -> Tuple[bool, Any, str
             error_str = str(err)
             
             # Check if it's a rate limit error (HTTP 429)
-            if "429" in error_str or "Too Many Requests" in error_str:
+            error_str_lower = error_str.lower()
+            if "429" in error_str_lower or "too many requests" in error_str_lower or "rate limit" in error_str_lower:
                 if attempt < len(retry_delays):  # If we have retries left
-                    logger.info(f"Rate limited. Retrying in {delay} seconds...")
+                    logger.info(f"Rate limited. Retrying in {delay} seconds (attempt {attempt+1}/{len(retry_delays)})...")
                     time.sleep(delay)
                     continue
             
@@ -165,6 +167,13 @@ def update_gor(triggering_user_email: Optional[str] = None):
     logger.info("Updating players ranks from EGD")
     players = Player.objects.filter(egd_pin__isnull=False).all()
     total_players = len(players)
+    
+    # In DEBUG mode, limit to 15 players to avoid rate limits during development
+    if settings.DEBUG:
+        players = players[:15]
+        logger.info(f"DEBUG mode: limiting update to 15 players (out of {total_players})")
+        total_players = len(players)
+    
     logger.info(f"Found {total_players} players to update")
     
     # Track successes and failures for reporting
@@ -196,6 +205,11 @@ def update_gor(triggering_user_email: Optional[str] = None):
     
     # Generate report
     success_message = f"{updated_count} out of {total_players} players successfully updated."
+    
+    # Add debug mode notice to email if applicable
+    if settings.DEBUG:
+        success_message += " [DEBUG MODE: Limited to 15 players]"
+        
     error_report = format_error_report(failed_updates)
     full_report = f"{success_message}\n\n{error_report}"
     
@@ -216,15 +230,39 @@ def update_ogs_data(triggering_user_email: Optional[str] = None):
     """Update OGS ratings and IDs for all players."""
     # Update OGS ratings and IDs for all players
     logger.info("Updating players data from OGS")
-    ogs_players = Player.objects.filter(ogs_username__isnull=False).exclude(ogs_username='').all()
+    
+    # Get all players for reporting
+    all_players = Player.objects.all()
+    ogs_players = all_players.filter(ogs_username__isnull=False).exclude(ogs_username='')
+    missing_ogs_players = all_players.filter(models.Q(ogs_username__isnull=True) | models.Q(ogs_username=''))
+    
     total_players = len(ogs_players)
+    
+    # In DEBUG mode, limit to 15 players to avoid rate limits during development
+    if settings.DEBUG:
+        original_count = total_players
+        ogs_players = ogs_players[:15]
+        total_players = len(ogs_players)
+        logger.info(f"DEBUG mode: limiting update to 15 players (out of {original_count})")
+        
+        # Also limit the missing players count for report brevity in debug mode
+        missing_ogs_players = missing_ogs_players[:15]
+        logger.info(f"DEBUG mode: limiting missing players report to 15 players")
+    
     logger.info(f"Found {total_players} players with OGS usernames to update")
+    logger.info(f"Found {len(missing_ogs_players)} players without OGS usernames")
     
     # Track successes and failures for reporting
     updated_count = 0
     failed_updates = []
+    missing_ogs_list = []
     
+    # Process players with OGS usernames
     for idx, player in enumerate(ogs_players, start=1):
+        # Get player email for reporting
+        player_email = player.user.email if hasattr(player, 'user') and player.user else "No email"
+        ogs_link = f"https://online-go.com/player/{player.ogs_id}" if player.ogs_id else "No OGS link"
+        
         # Wrap the OGS API call with retry logic
         def fetch_ogs_data():
             return get_player_data(player.ogs_username)
@@ -238,20 +276,62 @@ def update_ogs_data(triggering_user_email: Optional[str] = None):
             player.ogs_deviation = player_data['deviation']
             player.save()
             updated_count += 1
-            logger.info(f"{idx}/{total_players} Updated {player.nick} [{player.ogs_username}] OGS data: ID={player.ogs_id}, rating={player.ogs_rating}±{player.ogs_deviation}")
+            rating_str = f"{player.ogs_rating}±{player.ogs_deviation}" if player.ogs_rating is not None and player.ogs_deviation is not None else "Not available"
+            logger.info(f"{idx}/{total_players} Updated {player.nick} [{player.ogs_username}] OGS data: ID={player.ogs_id}, rating={rating_str}")
         else:
             # Update failed
             failed_updates.append({
                 'name': player.nick,
+                'email': player_email,
                 'id': player.ogs_username,
+                'ogs_link': ogs_link,
                 'error': error_message
             })
             logger.info(f"{idx}/{total_players} Failed to update {player.nick} [{player.ogs_username}] OGS data - {error_message}")
     
+    # Track players without OGS usernames
+    for player in missing_ogs_players:
+        player_email = player.user.email if hasattr(player, 'user') and player.user else "No email"
+        missing_ogs_list.append({
+            'name': player.nick,
+            'email': player_email,
+            'rank': player.rank
+        })
+    
     # Generate report
     success_message = f"{updated_count} out of {total_players} players successfully updated."
-    error_report = format_error_report(failed_updates)
-    full_report = f"{success_message}\n\n{error_report}"
+    
+    # Add debug mode notice to email if applicable
+    if settings.DEBUG:
+        success_message += " [DEBUG MODE: Limited to 15 players]"
+    
+    # Generate detailed error report
+    error_report = ""
+    if failed_updates:
+        error_report += "The following players could not be updated:\n\n"
+        # Group errors by type
+        errors_by_type = {}
+        for item in failed_updates:
+            error = item['error']
+            if error not in errors_by_type:
+                errors_by_type[error] = []
+            errors_by_type[error].append(item)
+        
+        # Format the error report
+        for error, players in errors_by_type.items():
+            error_report += f"Error: {error}\n"
+            for player in players:
+                error_report += f"- {player['name']} (Email: {player['email']}, OGS: {player['id']}, Link: {player['ogs_link']})\n"
+            error_report += "\n"
+    
+    # Generate missing OGS username report
+    missing_report = ""
+    if missing_ogs_list:
+        missing_report += f"\n\n{len(missing_ogs_list)} players do not have OGS usernames:\n\n"
+        for player in missing_ogs_list:
+            missing_report += f"- {player['name']} (Email: {player['email']}, Rank: {player['rank']})\n"
+    
+    full_report = f"{success_message}\n\n{error_report}{missing_report}"
     
     logger.info(f"OGS update completed. {success_message}")
     
@@ -274,6 +354,11 @@ def emails(game):
     return [player.user.email for player in [game.white.player, game.black.player] if player.user]
 
 def send_game_email(path, to, game):
+    # Skip sending player notification emails in DEBUG mode
+    if settings.DEBUG:
+        logger.info(f"DEBUG mode: Skipping email to {to} about game {game.id} ({path})")
+        return
+        
     send_email(
         subject_template=path+"/subject.txt",
         body_template=path+"/body.html",

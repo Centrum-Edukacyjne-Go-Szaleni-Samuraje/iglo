@@ -29,8 +29,7 @@ def get_player_data(username: str) -> Dict[str, Any]:
     try:
         # First get the player ID
         response = requests.get(f"https://online-go.com/api/v1/players?username={username}")
-        if response.status_code != 200:
-            raise OGSException(f"Failed to fetch player data: HTTP {response.status_code}")
+        response.raise_for_status()
 
         data = response.json()
         if data.get('count', 0) == 0 or not data.get('results'):

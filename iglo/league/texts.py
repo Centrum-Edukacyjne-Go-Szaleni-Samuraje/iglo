@@ -56,6 +56,10 @@ AI_ANALYSE_LINK_HELP_TEXT = _("Pole zostanie wypełnione automatycznie jeżeli p
 UPDATE_GOR_MESSAGE = _("Ranking są aktualizowane. O zakończeniu procesu zostaniesz poinformowany emailem.")
 UPDATE_GOR_MAIL_SUBJECT = _("Aktualizacja GOR")
 UPDATE_GOR_MAIL_CONTENT = _("Aktualizacja rankingów graczy została zakończona")
+
+UPDATE_OGS_MESSAGE = _("Rankingi OGS są aktualizowane. O zakończeniu procesu zostaniesz poinformowany emailem.")
+UPDATE_OGS_MAIL_SUBJECT = _("Aktualizacja OGS")
+UPDATE_OGS_MAIL_CONTENT = _("Aktualizacja rankingów OGS graczy została zakończona")
 MEMBER_WITHDRAW_SUCCESS = _("Gracz został wycofany z aktualnego sezonu.")
 ALREADY_PLAYED_GAMES_ERROR = _("Gracz już rozegrał gry w akutlanym sezonie. Wycofanie jest niemożliwe.")
 SEASON_DELETE_SUCCESS = _("Sezon {} został usunięty.")

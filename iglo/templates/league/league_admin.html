@@ -18,10 +18,51 @@
             </div>
             <div>
                 <button type="submit" class="btn btn-warning" name="action-update-gor">
+                    <i class="fas fa-globe-europe"></i>
                     <span class="d-none d-md-inline">
-                        {% blocktrans %}Zaktualizuj rankingi{% endblocktrans %}
+                        {% blocktrans %}Zaktualizuj EGD{% endblocktrans %}
                     </span>
                 </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <strong>{% blocktrans %}Zaktualizuj rankingi OGS{% endblocktrans %}</strong>
+            </div>
+        </div>
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                {% blocktrans trimmed %}
+                    Zaktualizuj rankingi OGS wszystkich graczy, którzy podali swoje konto OGS.
+                {% endblocktrans %}
+            </div>
+            <div>
+                <button type="submit" class="btn btn-info" name="action-update-ogs">
+                    <i class="fas fa-chess-board"></i>
+                    <span class="d-none d-md-inline">
+                        {% blocktrans %}Zaktualizuj OGS{% endblocktrans %}
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <strong>{% blocktrans %}Przelicz IGoR{% endblocktrans %}</strong>
+            </div>
+        </div>
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                {% blocktrans trimmed %}
+                    Przelicz wewnętrzny ranking IGLO (IGoR) na podstawie wszystkich rozegranych gier.
+                {% endblocktrans %}
+            </div>
+            <div>
                 <button type="submit" class="btn btn-warning" name="action-recalculate-igor">
                     <i class="fas fa-undo"></i>
                     <span class="d-none d-md-inline">{% translate "Przelicz IGoR" %}</span>

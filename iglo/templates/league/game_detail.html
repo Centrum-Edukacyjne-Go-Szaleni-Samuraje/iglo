@@ -116,12 +116,12 @@
                                 {% endif %}
                             </p>
                             
-                            <p>{% translate "For a game to be eligible for EGD export, both players must have agreed to EGD reporting:" %}</p>
+                            <p>{% translate "For a game to be eligible for EGD export, both players must have agreed to EGD reporting for this season:" %}</p>
                             
                             <ul>
                                 <li>
                                     {{ object.black.player.nick }}: 
-                                    {% if object.black.player.egd_approval %}
+                                    {% if object.black.egd_approval %}
                                         <i class="fas fa-check text-success"></i> {% translate "Has approved EGD reporting" %}
                                     {% else %}
                                         <i class="fas fa-times text-danger"></i> {% translate "Has not approved EGD reporting" %}
@@ -129,7 +129,7 @@
                                 </li>
                                 <li>
                                     {{ object.white.player.nick }}: 
-                                    {% if object.white.player.egd_approval %}
+                                    {% if object.white.egd_approval %}
                                         <i class="fas fa-check text-success"></i> {% translate "Has approved EGD reporting" %}
                                     {% else %}
                                         <i class="fas fa-times text-danger"></i> {% translate "Has not approved EGD reporting" %}
@@ -138,7 +138,7 @@
                             </ul>
                             
                             <p>
-                                {% translate "Players can update their EGD reporting preferences in their account settings." %}
+                                {% translate "Players can update their EGD reporting preferences in their account settings, which will apply to future seasons. The current season's EGD settings were established when the season began." %}
                             </p>
                         </div>
                     </div>

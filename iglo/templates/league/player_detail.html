@@ -26,6 +26,18 @@
                            title="Ten gracz jest patronem IGLO!"></i>{% endif %}{% if object.rank %}
                         <small class="text-muted">[{{ object.rank }}]</small>{% endif %}
                 </h2>
+                <div class="d-flex align-items-center gap-3">
+                    {% if object.ogs_username %}
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">OGS:</span>
+                        {% if object.ogs_id %}
+                        <a href="https://online-go.com/player/{{ object.ogs_id }}" target="_blank">{{ object.ogs_username }}</a>
+                        {% else %}
+                        {{ object.ogs_username }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
                 <div>
                     {% if user|has_role:'referee' and current_membership %}
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal"

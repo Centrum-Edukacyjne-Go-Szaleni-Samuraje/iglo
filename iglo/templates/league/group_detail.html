@@ -56,6 +56,7 @@
                                             <th class="group-table__header">{% translate "SODOS" %}</th>
                                             <th class="group-table__header">{% translate "Start" %}</th>
                                             <th class="group-table__header">{% translate "IGoR" %}</th>
+                                            <th class="group-table__header">{% translate "OGS" %}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -76,6 +77,7 @@
                                                 <td>{{ member.sodos }}</td>
                                                 <td>{{ member.order }}</td>
                                                 <td>{{ member.igor }}</td>
+                                                <td>{% if member.player.ogs_username and member.player.ogs_id %}<a href="https://online-go.com/player/{{ member.player.ogs_id }}" target="_blank">{{ member.player.ogs_username }}</a>{% elif member.player.ogs_username %}{{ member.player.ogs_username }}{% else %}-{% endif %}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -92,6 +94,7 @@
                                                 {% translate "Punkty" %}
                                             </th>
                                             <th class="group-table__header">{% translate "IGoR" %}</th>
+                                            <th class="group-table__header">{% translate "OGS" %}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -110,6 +113,7 @@
                                                 {% endfor %}
                                                 <td>{{ member.score|floatformat:2 }}</td>
                                                 <td>{{ member.igor }}</td>
+                                                <td>{% if member.player.ogs_username and member.player.ogs_id %}<a href="https://online-go.com/player/{{ member.player.ogs_id }}" target="_blank">{{ member.player.ogs_username }}</a>{% elif member.player.ogs_username %}{{ member.player.ogs_username }}{% else %}-{% endif %}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -131,6 +135,8 @@
                                             <th class="group-table__header">
                                                 {% translate "SOSOS" %}</th>
                                             <th class="group-table__header">{% translate "Start" %}</th>
+                                            <th class="group-table__header">{% translate "IGoR" %}</th>
+                                            <th class="group-table__header">{% translate "OGS" %}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -151,6 +157,8 @@
                                                 <td>{{ member.sos }}</td>
                                                 <td>{{ member.sosos }}</td>
                                                 <td>{{ member.order }}</td>
+                                                <td>{{ member.player.igor }}</td>
+                                                <td>{% if member.player.ogs_username and member.player.ogs_id %}<a href="https://online-go.com/player/{{ member.player.ogs_id }}" target="_blank">{{ member.player.ogs_username }}</a>{% elif member.player.ogs_username %}{{ member.player.ogs_username }}{% else %}-{% endif %}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -261,9 +269,10 @@
                     <div class="card mb-3">
                         <div class="card-header">
                             <small class="text-muted">#{{ member.order }}</small>
-                            <strong class="d-inline-block" style="min-width: 150px;"><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
-                            <span class="text-muted d-inline-block" style="min-width: 80px;">EGD: {{ member.rank }}</span>
-                            <span class="text-muted d-inline-block" style="min-width: 80px;">{% if member.player.igor %}IGoR: {{ member.player.igor }}{% endif %}</span>
+                            <strong class="d-inline-block" style="min-width: 200px;"><a href="{{ member.player.get_absolute_url }}">{{ member.player.nick }}</a></strong>
+                            <span class="text-muted d-inline-block" style="min-width: 120px;">EGD: {{ member.rank }}</span>
+                            <span class="text-muted d-inline-block" style="min-width: 120px;">IGoR: {% if member.player.igor %}{{ member.player.igor }}{% else %}-{% endif %}</span>
+                            <span class="text-muted d-inline-block" style="min-width: 160px;">OGS: {% if member.ogs_rating %}{{ member.ogs_rating|floatformat:0 }}±{{ member.ogs_deviation|floatformat:0 }}{% else %}-{% endif %}</span>
                             {% if member.membership_history == "NEWBIE" %}
                             <span class="badge bg-success">NOWY</span>
                             {% elif member.membership_history == "CONTINUING" %}

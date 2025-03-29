@@ -6,6 +6,7 @@ from league.views import (
     SeasonDetailView,
     SeasonDeleteView,
     GroupDetailView,
+    GroupGamesView,
     GameDetailView,
     PlayerDetailView,
     PlayerUpdateView,
@@ -31,6 +32,7 @@ urlpatterns = [
         RedirectView.as_view(permanent=True, pattern_name="group-detail"),
         name="deprecated-group-detail",
     ),
+    path("seasons/<int:season_number>/groups/<group_name>/games", GroupGamesView.as_view(), name="group-games"),
     path("seasons/<int:season_number>/groups/<group_name>/egd", GroupEGDExportView.as_view(), name="group-egd-export"),
     path(
         "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>",

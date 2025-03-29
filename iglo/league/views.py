@@ -220,6 +220,18 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
+class GroupGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
+    model = Group
+    required_roles = [UserRole.REFEREE]
+    template_name = 'league/group_games.html'
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if "action-pairing" in request.POST:
+            self.object.start_macmahon_round()
+        return super().get(request, *args, **kwargs)
+
+
 class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
     model = Group
     required_roles = [UserRole.REFEREE]

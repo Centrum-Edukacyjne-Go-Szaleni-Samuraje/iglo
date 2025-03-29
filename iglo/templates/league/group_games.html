@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% load static i18n %}
+
+{% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %}
+    {{ object.name }} - {% translate "Gry" %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "season-detail" object.season.number %}">
+                            {% translate "Sezon" %} #{{ object.season.number }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "group-detail" season_number=object.season.number group_name=object.name %}">
+                            {% translate "Grupa" %} {{ object.name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% translate "Gry" %}
+                    </li>
+                </ol>
+            </nav>
+            <div class="d-flex align-items-center mb-3 flex-wrap">
+                <h2>{% translate "Grupa" %} {{ object.name }} - {% translate "Gry" %}</h2>
+                <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>
+            </div>
+            
+            <div class="d-flex mb-2 small text-muted align-items-center">
+                <i class="fas fa-info-circle me-1"></i>
+                <span>{% translate "Gry oznaczone" %} <span class="badge bg-info">EGD</span> {% translate "są raportowane do European Go Database." %}</span>
+            </div>
+            
+            <div class="d-flex justify-content-between mb-4">
+                <h3>{% translate "Gry" %}</h3>
+                <div>
+                    <a href="{% url 'group-detail' season_number=object.season.number group_name=object.name %}" class="btn btn-secondary">
+                        <i class="fa fa-arrow-left"></i> {% translate "Powrót do widoku grupy" %}
+                    </a>
+                    {% if user|has_role:'referee' %}
+                        {% if group.season.state == "in_progress" and group.type == "mcmahon" and group.all_games_finished %}
+                            <form method="post" class="d-inline-block">{% csrf_token %}
+                                <button type="submit" class="btn btn-primary" name="action-pairing">
+                                    <i class="fa fa-table"></i> {% blocktrans %}Nowa runda{% endblocktrans %}
+                                </button>
+                            </form>
+                        {% endif %}
+                        {% if group.all_games_finished %}
+                            <a href="{% url "group-egd-export" season_number=group.season.number group_name=group.name %}"
+                               class="btn btn-primary">
+                                <i class="fa fa-file-export"></i> {% blocktrans %}Eksport EGD{% endblocktrans %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% for round in object.rounds.all %}
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center clickable flex-column flex-md-row align-items-stretch align-items-md-baseline"
+                         onClick="toggle_collapse(event)" data-target="round-{{ forloop.counter }}">
+                        <div class="d-flex flex-grow-1">
+                            <strong class="flex-grow-1">{% translate "Runda" %} #{{ round.number }}</strong>
+                            <div>
+                                {% if round.start_date and round.end_date %}{{ round.start_date }} -
+                                    {{ round.end_date }}{% endif %}
+                            </div>
+                        </div>
+                        <button class="btn" onClick="toggle_collapse(event)"
+                                data-target="round-{{ forloop.counter }}">
+                            <i id="collapse-round-{{ forloop.counter }}" style="pointer-events: none;" class="fas
+                               {% if round.is_current %} fa-chevron-up {% else %} fa-chevron-down {% endif %}"></i>
+                        </button>
+                    </div>
+                    <div class="card-body collapse {% if round.is_current %}show{% endif %}"
+                         id="round-{{ forloop.counter }}">
+                        {% for game in round.games.all %}
+                            <div class="card mb-3 {% if not game.is_bye and game.is_egd_eligible %}border-info{% endif %}">
+                                <div class="card-header d-flex justify-content-between {% if not game.is_bye and game.is_egd_eligible %}bg-light{% endif %}">
+                                <span>
+                                    {% if game.is_bye %}
+                                        {% translate "Bye" %}:
+                                        {% include "league/includes/player_badge.html" with player=game.winner.player member=game.winner %}
+                                    {% else %}
+                                        {% include "league/includes/game_players.html" with game=game %}
+                                        {% if game.is_egd_eligible %}
+                                            <span class="badge bg-info ms-2" title="{% translate 'This game is eligible for EGD export' %}">EGD</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                                    {% if game.date and not game.is_bye %}
+                                        <span>
+                                            {{ game.date }}
+                                            {% if game.is_delayed %}
+                                                <i class="fas fa-exclamation-triangle text-danger"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   title="{% translate "Ta gra nie została rozegrana w terminie" %}"></i>
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body d-flex justify-content-between align-items-baseline flex-wrap">
+                                    <p>
+                                        {% if game.is_played %}
+                                            {{ game | result }}
+                                        {% else %}
+                                            {% blocktrans trimmed %}Gra jeszcze się nie odbyła.{% endblocktrans %}
+                                        {% endif %}
+                                    </p>
+                                    <div>
+                                        {% include "league/includes/game_actions.html" with show_link=True %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        function toggle_collapse(event) {
+            event.stopPropagation();
+            element_id = event.target.getAttribute('data-target');
+            document.getElementById(element_id).classList.toggle('show');
+            icon_id = 'collapse-' + element_id;
+            document.getElementById(icon_id).classList.toggle('fa-chevron-down');
+            document.getElementById(icon_id).classList.toggle('fa-chevron-up');
+        }
+    </script>
+{% endblock %}

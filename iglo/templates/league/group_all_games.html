@@ -62,7 +62,8 @@
                         <th>{% translate "Biały" %}</th>
                         <th>{% translate "Wynik" %}</th>
                         <th>{% translate "Data" %}</th>
-                        <th></th>
+                        <th>{% translate "Recenzja" %}</th>
+                        <th>{% translate "Akcje" %}</th>
                         <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Grupa Nauczycielska" %}</th>
                     </tr>
                 </thead>
@@ -71,15 +72,23 @@
                         <tr>
                             <td>{{ game.round.number }}</td>
                             <td>
-                                {{ game.black.player.nick }} ({{ game.black.rank }})
+                                <a href="{{ game.black.player.get_absolute_url }}">
+                                    {{ game.black.player.nick }} ({{ game.black.rank }})
+                                </a>
                                 {% if game.black.player.is_supporter %}
-                                    <i class="fas fa-award text-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}"></i>
+                                    <span class="badge bg-warning text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}">
+                                        <i class="fas fa-award"></i> Patron
+                                    </span>
                                 {% endif %}
                             </td>
                             <td>
-                                {{ game.white.player.nick }} ({{ game.white.rank }})
+                                <a href="{{ game.white.player.get_absolute_url }}">
+                                    {{ game.white.player.nick }} ({{ game.white.rank }})
+                                </a>
                                 {% if game.white.player.is_supporter %}
-                                    <i class="fas fa-award text-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}"></i>
+                                    <span class="badge bg-warning text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}">
+                                        <i class="fas fa-award"></i> Patron
+                                    </span>
                                 {% endif %}
                             </td>
                             <td>
@@ -99,6 +108,15 @@
                                 {% endif %}
                             </td>
                             <td>
+                                {% if game.review_video_link %}
+                                    <a href="{{ game.review_video_link }}" target="_blank" class="badge bg-success text-decoration-none">
+                                        <i class="fas fa-video"></i> {% translate "Zobacz recenzję" %}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">{% translate "Brak recenzji" %}</span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 <a href="{{ game.get_absolute_url }}" class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -107,7 +125,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center">{% translate "Brak gier w tej grupie." %}</td>
+                            <td colspan="8" class="text-center">{% translate "Brak gier w tej grupie." %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

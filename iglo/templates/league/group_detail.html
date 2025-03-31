@@ -27,8 +27,17 @@
                 <h2>{% translate "Grupa" %} {{ object.name }}</h2>
                 <span class="badge bg-secondary ms-2">{{ group.get_type_display | upper }}</span>
 
+                <div class="ms-auto">
+                    <a href="{% url 'group-games' season_number=object.season.number group_name=object.name %}" class="btn btn-primary me-2">
+                        <i class="fa fa-list"></i> {% translate "Gry według rund" %}
+                    </a>
+                    <a href="{% url 'group-all-games' season_number=object.season.number group_name=object.name %}" class="btn btn-primary">
+                        <i class="fa fa-th-list"></i> {% translate "Wszystkie gry" %}
+                    </a>
+                </div>
+
                 {% if group.teacher %}
-                    <div class="ms-auto">
+                    <div class="ms-3">
                         {% translate "Nauczyciel" %}: {% include "review/includes/teacher_badge.html" with teacher=group.teacher %}
                     </div>
                 {% endif %}
@@ -176,15 +185,9 @@
                 <div class="d-flex justify-content-between mb-4">
                     <h3>Gry</h3>
                     <div>
-                        <a href="{% url 'group-games' season_number=object.season.number group_name=object.name %}" class="btn btn-primary me-2">
-                            <i class="fa fa-list"></i> {% translate "Gry według rund" %}
-                        </a>
-                        <a href="{% url 'group-all-games' season_number=object.season.number group_name=object.name %}" class="btn btn-primary">
-                            <i class="fa fa-th-list"></i> {% translate "Wszystkie gry" %}
-                        </a>
                         {% if user|has_role:'referee' %}
                             {% if group.season.state == "in_progress" and group.type == "mcmahon" and group.all_games_finished %}
-                                <form method="post" class="d-inline-block ms-2">{% csrf_token %}
+                                <form method="post" class="d-inline-block">{% csrf_token %}
                                     <button type="submit" class="btn btn-primary" name="action-pairing">
                                         <i class="fa fa-table"></i> {% blocktrans %}Nowa runda{% endblocktrans %}
                                     </button>

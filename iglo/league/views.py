@@ -250,6 +250,12 @@ class GroupAllGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView)
         ))
         
         context['all_games'] = games
+        
+        # Generate options for grouping dropdown based on number of games
+        game_count = len(games)
+        group_options = list(range(1, game_count + 1))  # All possible options
+        context['group_options'] = group_options
+        
         return context
 
 

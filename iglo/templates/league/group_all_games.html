@@ -29,19 +29,31 @@
             
             <div class="d-flex justify-content-between mb-2">
                 <h3>{% translate "Wszystkie gry" %} - {% translate "Grupa" %} {{ object.name }}</h3>
-                <div>
-                    <a href="{% url 'group-games' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-primary me-1">
-                        <i class="fa fa-list"></i> {% translate "Widok rund" %}
-                    </a>
-                    <a href="{% url 'group-detail' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-secondary">
-                        <i class="fa fa-arrow-left"></i> {% translate "Grupa" %}
-                    </a>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <label for="groupSize" class="me-2">{% translate "Grupuj po" %}:</label>
+                        <select id="groupSize" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                            <option value="0">{% translate "Brak" %}</option>
+                            {% for i in group_options %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <a href="{% url 'group-games' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-primary me-1">
+                            <i class="fa fa-list"></i> {% translate "Widok rund" %}
+                        </a>
+                        <a href="{% url 'group-detail' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-secondary">
+                            <i class="fa fa-arrow-left"></i> {% translate "Grupa" %}
+                        </a>
+                    </div>
                 </div>
             </div>
 
             <table class="table table-sm table-hover table-striped">
                 <thead class="table-light">
                     <tr>
+                        <th class="group-column" style="display: none;">{% translate "Grupa" %}</th>
                         <th>R</th>
                         <th>{% translate "Czarny" %}</th>
                         <th>{% translate "Biały" %}</th>
@@ -53,9 +65,20 @@
                 <tbody>
                     {% for game in all_games %}
                         <tr>
+                            <td class="group-column" style="display: none;"></td>
                             <td>{{ game.round.number }}</td>
-                            <td>{{ game.black.player.nick }} ({{ game.black.rank }})</td>
-                            <td>{{ game.white.player.nick }} ({{ game.white.rank }})</td>
+                            <td>
+                                {{ game.black.player.nick }} ({{ game.black.rank }})
+                                {% if game.black.player.is_supporter %}
+                                    <i class="fas fa-award text-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ game.white.player.nick }} ({{ game.white.rank }})
+                                {% if game.white.player.is_supporter %}
+                                    <i class="fas fa-award text-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}"></i>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if game.is_played %}
                                     {{ game | result }}
@@ -87,4 +110,71 @@
             </table>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const groupSizeSelect = document.getElementById('groupSize');
+            const gameRows = document.querySelectorAll('tbody tr');
+            const groupColumns = document.querySelectorAll('.group-column');
+            const groupColors = [
+                'rgba(255, 99, 132, 0.2)',   // Red
+                'rgba(54, 162, 235, 0.2)',   // Blue
+                'rgba(255, 206, 86, 0.2)',   // Yellow
+                'rgba(75, 192, 192, 0.2)',   // Teal
+                'rgba(153, 102, 255, 0.2)',  // Purple
+                'rgba(255, 159, 64, 0.2)',   // Orange
+                'rgba(199, 199, 199, 0.2)',  // Grey
+                'rgba(83, 123, 156, 0.2)',   // Blue Grey
+                'rgba(172, 212, 89, 0.2)',   // Light Green
+                'rgba(250, 160, 160, 0.2)'   // Light Red
+            ];
+            
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Function to apply group coloring and numbering
+            function applyGrouping() {
+                const groupSize = parseInt(groupSizeSelect.value, 10);
+                
+                // Reset all row backgrounds and hide group columns
+                gameRows.forEach(row => {
+                    row.style.backgroundColor = '';
+                });
+                
+                groupColumns.forEach(col => {
+                    col.style.display = 'none';
+                });
+                
+                // If groupSize is 0, exit early
+                if (groupSize === 0) return;
+                
+                // Show group columns
+                groupColumns.forEach(col => {
+                    col.style.display = '';
+                });
+                
+                // Apply colors and group numbers for each group
+                gameRows.forEach((row, index) => {
+                    if (row.cells.length > 1) { // Skip "No games" row if present
+                        const groupIndex = Math.floor(index / groupSize);
+                        const colorIndex = groupIndex % groupColors.length;
+                        
+                        // Set background color
+                        row.style.backgroundColor = groupColors[colorIndex];
+                        
+                        // Set group number (add 1 for human-readable group numbers starting at 1)
+                        if (row.cells[0].classList.contains('group-column')) {
+                            row.cells[0].textContent = groupIndex + 1;
+                        }
+                    }
+                });
+            }
+            
+            // Apply grouping on dropdown change
+            groupSizeSelect.addEventListener('change', applyGrouping);
+        });
+    </script>
 {% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% load static i18n %}
+{% load game_result %}
+
+{% block page_title %}{% translate "Sezon" %} #{{ object.season.number }} - {% translate "Grupa" %}
+    {{ object.name }} - {% translate "Wszystkie gry" %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url "seasons-list" %}">{% translate "Sezony" %}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "season-detail" object.season.number %}">
+                            {% translate "Sezon" %} #{{ object.season.number }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url "group-detail" season_number=object.season.number group_name=object.name %}">
+                            {% translate "Grupa" %} {{ object.name }}
+                        </a>
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between mb-2">
+                <h3>{% translate "Wszystkie gry" %} - {% translate "Grupa Nauczycielska" %} {{ object.name }}</h3>
+                <div class="d-flex align-items-center">
+                    <div>
+                        <a href="{% url 'group-games' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-primary me-1">
+                            <i class="fa fa-list"></i> {% translate "Widok rund" %}
+                        </a>
+                        <a href="{% url 'group-detail' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-secondary">
+                            <i class="fa fa-arrow-left"></i> {% translate "Grupa Nauczycielska" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3 p-3 bg-light rounded">
+                <div class="d-flex align-items-center">
+                    <label for="groupSize" class="form-label fw-bold me-3 mb-0">{% translate "Grupuj dla Nauczycieli" %}:</label>
+                    <select id="groupSize" class="form-select" style="width: auto;">
+                        <option value="0">{% translate "Brak" %}</option>
+                        {% for i in group_options %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="ms-3 text-muted">{% translate "Wybierz liczbę gier w grupie dla łatwego przydzielenia zadań nauczycielskich" %}</span>
+                </div>
+            </div>
+
+            <table class="table table-sm table-hover table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>R</th>
+                        <th>{% translate "Czarny" %}</th>
+                        <th>{% translate "Biały" %}</th>
+                        <th>{% translate "Wynik" %}</th>
+                        <th>{% translate "Data" %}</th>
+                        <th>{% translate "Recenzja" %}</th>
+                        <th>{% translate "Akcje" %}</th>
+                        <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Grupa Nauczycielska" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in all_games %}
+                        <tr>
+                            <td>{{ game.round.number }}</td>
+                            <td>
+                                <a href="{{ game.black.player.get_absolute_url }}">
+                                    {{ game.black.player.nick }} ({{ game.black.rank }})
+                                </a>
+                                {% if game.black.player.is_supporter %}
+                                    <span class="badge bg-warning text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}">
+                                        <i class="fas fa-award"></i> Patron
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ game.white.player.get_absolute_url }}">
+                                    {{ game.white.player.nick }} ({{ game.white.rank }})
+                                </a>
+                                {% if game.white.player.is_supporter %}
+                                    <span class="badge bg-warning text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="{% translate "Ten gracz jest patronem IGLO!" %}">
+                                        <i class="fas fa-award"></i> Patron
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if game.is_played %}
+                                    {{ game | result }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                                {% if game.is_egd_eligible %}
+                                    <span class="badge bg-info ms-1" title="{% translate 'This game is eligible for EGD export' %}">EGD</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ game.date|date:"Y-m-d" }}
+                                {% if game.is_delayed %}
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if game.review_video_link %}
+                                    <a href="{{ game.review_video_link }}" target="_blank" class="badge bg-success text-decoration-none">
+                                        <i class="fas fa-video"></i> {% translate "Zobacz recenzję" %}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">{% translate "Brak recenzji" %}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ game.get_absolute_url }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                            <td class="group-column text-center fw-bold" style="display: none;"></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">{% translate "Brak gier w tej grupie." %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const groupSizeSelect = document.getElementById('groupSize');
+            const gameRows = document.querySelectorAll('tbody tr');
+            const groupColumns = document.querySelectorAll('.group-column');
+            const groupColors = [
+                'rgba(255, 99, 132, 0.2)',   // Red
+                'rgba(54, 162, 235, 0.2)',   // Blue
+                'rgba(255, 206, 86, 0.2)',   // Yellow
+                'rgba(75, 192, 192, 0.2)',   // Teal
+                'rgba(153, 102, 255, 0.2)',  // Purple
+                'rgba(255, 159, 64, 0.2)',   // Orange
+                'rgba(199, 199, 199, 0.2)',  // Grey
+                'rgba(83, 123, 156, 0.2)',   // Blue Grey
+                'rgba(172, 212, 89, 0.2)',   // Light Green
+                'rgba(250, 160, 160, 0.2)'   // Light Red
+            ];
+            
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Function to apply group coloring and numbering
+            function applyGrouping() {
+                const groupSize = parseInt(groupSizeSelect.value, 10);
+                
+                // Reset all row backgrounds and hide group columns
+                gameRows.forEach(row => {
+                    row.style.backgroundColor = '';
+                });
+                
+                groupColumns.forEach(col => {
+                    col.style.display = 'none';
+                });
+                
+                // If groupSize is 0, exit early
+                if (groupSize === 0) return;
+                
+                // Show group columns
+                groupColumns.forEach(col => {
+                    col.style.display = '';
+                });
+                
+                // Apply colors and group numbers for each group
+                gameRows.forEach((row, index) => {
+                    if (row.cells.length > 1) { // Skip "No games" row if present
+                        const groupIndex = Math.floor(index / groupSize);
+                        const colorIndex = groupIndex % groupColors.length;
+                        
+                        // Set background color
+                        row.style.backgroundColor = groupColors[colorIndex];
+                        
+                        // Set group number (add 1 for human-readable group numbers starting at 1)
+                        // Find the group column (last cell)
+                        const groupCell = row.querySelector('.group-column');
+                        if (groupCell) {
+                            groupCell.textContent = groupIndex + 1;
+                        }
+                    }
+                });
+            }
+            
+            // Apply grouping on dropdown change
+            groupSizeSelect.addEventListener('change', applyGrouping);
+        });
+    </script>
+{% endblock %}

@@ -220,6 +220,45 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
+class GroupGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
+    model = Group
+    required_roles = [UserRole.REFEREE]
+    template_name = 'league/group_games.html'
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if "action-pairing" in request.POST:
+            self.object.start_macmahon_round()
+        return super().get(request, *args, **kwargs)
+
+
+class GroupAllGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
+    model = Group
+    required_roles = [UserRole.REFEREE]
+    template_name = 'league/group_all_games.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get all games from the group and exclude byes
+        games = Game.objects.filter(group=self.object).exclude(win_type=WinType.BYE)
+        
+        # Custom sort by initial order of both players, higher player first
+        games = sorted(games, key=lambda game: (
+            min(game.black.order, game.white.order),
+            max(game.black.order, game.white.order)
+        ))
+        
+        context['all_games'] = games
+        
+        # Generate options for grouping dropdown based on number of games
+        game_count = len(games)
+        group_options = list(range(1, game_count + 1))  # All possible options
+        context['group_options'] = group_options
+        
+        return context
+
+
 class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
     model = Group
     required_roles = [UserRole.REFEREE]

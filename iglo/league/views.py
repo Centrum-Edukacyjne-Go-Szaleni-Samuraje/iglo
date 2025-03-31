@@ -232,6 +232,27 @@ class GroupGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
+class GroupAllGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
+    model = Group
+    required_roles = [UserRole.REFEREE]
+    template_name = 'league/group_all_games.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get all games from the group and exclude byes
+        games = Game.objects.filter(group=self.object).exclude(win_type=WinType.BYE)
+        
+        # Custom sort by initial order of both players, higher player first
+        games = sorted(games, key=lambda game: (
+            min(game.black.order, game.white.order),
+            max(game.black.order, game.white.order)
+        ))
+        
+        context['all_games'] = games
+        return context
+
+
 class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):
     model = Group
     required_roles = [UserRole.REFEREE]

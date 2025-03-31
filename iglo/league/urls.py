@@ -7,6 +7,7 @@ from league.views import (
     SeasonDeleteView,
     GroupDetailView,
     GroupGamesView,
+    GroupAllGamesView,
     GameDetailView,
     PlayerDetailView,
     PlayerUpdateView,
@@ -33,6 +34,7 @@ urlpatterns = [
         name="deprecated-group-detail",
     ),
     path("seasons/<int:season_number>/groups/<group_name>/games", GroupGamesView.as_view(), name="group-games"),
+    path("seasons/<int:season_number>/groups/<group_name>/all-games", GroupAllGamesView.as_view(), name="group-all-games"),
     path("seasons/<int:season_number>/groups/<group_name>/egd", GroupEGDExportView.as_view(), name="group-egd-export"),
     path(
         "seasons/<int:season_number>/groups/<group_name>/games/<black_player>-<white_player>",

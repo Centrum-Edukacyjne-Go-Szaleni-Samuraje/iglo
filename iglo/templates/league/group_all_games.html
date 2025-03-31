@@ -28,44 +28,47 @@
             </nav>
             
             <div class="d-flex justify-content-between mb-2">
-                <h3>{% translate "Wszystkie gry" %} - {% translate "Grupa" %} {{ object.name }}</h3>
+                <h3>{% translate "Wszystkie gry" %} - {% translate "Grupa Nauczycielska" %} {{ object.name }}</h3>
                 <div class="d-flex align-items-center">
-                    <div class="me-3">
-                        <label for="groupSize" class="me-2">{% translate "Grupuj po" %}:</label>
-                        <select id="groupSize" class="form-select form-select-sm" style="width: auto; display: inline-block;">
-                            <option value="0">{% translate "Brak" %}</option>
-                            {% for i in group_options %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
                     <div>
                         <a href="{% url 'group-games' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-primary me-1">
                             <i class="fa fa-list"></i> {% translate "Widok rund" %}
                         </a>
                         <a href="{% url 'group-detail' season_number=object.season.number group_name=object.name %}" class="btn btn-sm btn-secondary">
-                            <i class="fa fa-arrow-left"></i> {% translate "Grupa" %}
+                            <i class="fa fa-arrow-left"></i> {% translate "Grupa Nauczycielska" %}
                         </a>
                     </div>
+                </div>
+            </div>
+            
+            <div class="mb-3 p-3 bg-light rounded">
+                <div class="d-flex align-items-center">
+                    <label for="groupSize" class="form-label fw-bold me-3 mb-0">{% translate "Grupuj dla Nauczycieli" %}:</label>
+                    <select id="groupSize" class="form-select" style="width: auto;">
+                        <option value="0">{% translate "Brak" %}</option>
+                        {% for i in group_options %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="ms-3 text-muted">{% translate "Wybierz liczbę gier w grupie dla łatwego przydzielenia zadań nauczycielskich" %}</span>
                 </div>
             </div>
 
             <table class="table table-sm table-hover table-striped">
                 <thead class="table-light">
                     <tr>
-                        <th class="group-column" style="display: none;">{% translate "Grupa" %}</th>
                         <th>R</th>
                         <th>{% translate "Czarny" %}</th>
                         <th>{% translate "Biały" %}</th>
                         <th>{% translate "Wynik" %}</th>
                         <th>{% translate "Data" %}</th>
                         <th></th>
+                        <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Grupa Nauczycielska" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for game in all_games %}
                         <tr>
-                            <td class="group-column" style="display: none;"></td>
                             <td>{{ game.round.number }}</td>
                             <td>
                                 {{ game.black.player.nick }} ({{ game.black.rank }})
@@ -100,10 +103,11 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>
+                            <td class="group-column text-center fw-bold" style="display: none;"></td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center">{% translate "Brak gier w tej grupie." %}</td>
+                            <td colspan="7" class="text-center">{% translate "Brak gier w tej grupie." %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -166,8 +170,10 @@
                         row.style.backgroundColor = groupColors[colorIndex];
                         
                         // Set group number (add 1 for human-readable group numbers starting at 1)
-                        if (row.cells[0].classList.contains('group-column')) {
-                            row.cells[0].textContent = groupIndex + 1;
+                        // Find the group column (last cell)
+                        const groupCell = row.querySelector('.group-column');
+                        if (groupCell) {
+                            groupCell.textContent = groupIndex + 1;
                         }
                     }
                 });

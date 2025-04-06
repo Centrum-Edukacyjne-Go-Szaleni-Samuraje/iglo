@@ -896,37 +896,35 @@ msgstr ""
 
 #: iglo/templates/league/group_all_games.html:76
 msgid "Dodaj grupę"
-msgstr ""
+msgstr "Add group"
 
 #: iglo/templates/league/group_all_games.html:79
 msgid "Przypisz liczbę gier w grupie i odpowiedzialnego nauczyciela."
-msgstr ""
+msgstr "Assign number of games in the group and the responsible teacher."
 
 #: iglo/templates/league/group_all_games.html:88
 msgid "Czarny"
-msgstr ""
+msgstr "Black"
 
 #: iglo/templates/league/group_all_games.html:89
 msgid "Biały"
-msgstr ""
+msgstr "White"
 
 #: iglo/templates/league/group_all_games.html:90
-#, fuzzy
-#| msgid "Wyniki"
 msgid "Wynik"
-msgstr "Results"
+msgstr "Result"
 
 #: iglo/templates/league/group_all_games.html:91
 msgid "Data"
-msgstr ""
+msgstr "Date"
 
 #: iglo/templates/league/group_all_games.html:92
 msgid "Recenzja"
-msgstr ""
+msgstr "Review"
 
 #: iglo/templates/league/group_all_games.html:93
 msgid "Akcje"
-msgstr ""
+msgstr "Actions"
 
 #: iglo/templates/league/group_all_games.html:106
 #: iglo/templates/league/group_all_games.html:116

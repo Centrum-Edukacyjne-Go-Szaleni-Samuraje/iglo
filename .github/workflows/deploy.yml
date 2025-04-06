@@ -9,6 +9,10 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    # Ensure only one deploy runs at a time per branch
+    concurrency:
+      group: deploy-${{ github.event.workflow_run.head_branch }}
+      cancel-in-progress: false
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Set env to staging

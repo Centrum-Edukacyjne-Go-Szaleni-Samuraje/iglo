@@ -7,33 +7,48 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            <h1>{% translate "Kontakt" %}</h1>
-            <p>
-                <h3>{% translate "Administracja ligą" %}</h3>
-                <strong>Oleksandr Yeroshkin i zespół</strong><br>
-                <a href="mailto:iglo-admin@googlegroups.com">iglo-admin@googlegroups.com</a><br>
-                {% blocktrans trimmed %}
-                Kontakt w sprawach: <i>rezygnacja z gry w lidze, brak kontaktu z przeciwnikiem, podejrzenie dopingu elektronicznego, sporna sytuacja dot. gry, etc.</i>
-                {% endblocktrans %}
-            </p>
-            <p>
-                <h3>{% translate "Strona WWW i rozwój ligi" %}</h3>
-                <strong>Łukasz Lew i zespół</strong><br>
-                <a href="mailto:iglo-devel@googlegroups.com">iglo-devel@googlegroups.com</a><br>
-                <a href="https://discord.gg/nJrq2Egk" target="_blank">Kanał Discord iglo-devel</a><br>
-                Kontakt w sprawach: <i>problemy i błędy związane ze stroną WWW, pomysły usprawnień strony lub ligi, etc.</i>
-            </p>
-            <p>
-                <h3>{% translate "Ogólna dyskusja" %}</h3>
-                <a href="https://discord.gg/PuWcU9CJ" target="_blank">Kanał Discord iglo</a><br>
-            </p>
-            <p>
-                <h1>{% translate "Zarządca" %}</h1>
+            <h1 class="mb-4">{% translate "Kontakt" %}</h1>
 
-                {% blocktrans trimmed %}
-                    Zarządcą IGLO jest  <a href="https://psg.go.art.pl/pl/" target="_blank">Polskie Stowarzyszenie Go</a>.
-                {% endblocktrans %}
-            </p>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{% translate "Administracja ligą" %}</h3>
+                    <p class="mb-2"><strong>Oleksandr Yeroshkin i zespół</strong></p>
+                    <p class="mb-2"><a href="mailto:sasha.yeroshkin@go.art.pl">sasha.yeroshkin@go.art.pl</a></p>
+                    <p class="mb-2"><a href="mailto:iglo-admin@googlegroups.com">iglo-admin@googlegroups.com</a></p>
+                    <p class="mb-0">
+                        {% blocktrans trimmed %}
+                        <strong>Kontakt w sprawach:</strong> <i>rezygnacja z gry w lidze, brak kontaktu z przeciwnikiem, podejrzenie dopingu elektronicznego, sporna sytuacja dot. gry, etc.</i>
+                        {% endblocktrans %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{% translate "Strona WWW i rozwój ligi" %}</h3>
+                    <p class="mb-2"><strong>Łukasz Lew i zespół</strong></p>
+                    <p class="mb-2"><a href="mailto:iglo-devel@googlegroups.com">iglo-devel@googlegroups.com</a></p>
+                    <p class="mb-2"><a href="https://discord.gg/nJrq2Egk" target="_blank">Kanał Discord iglo-devel</a></p>
+                    <p class="mb-0"><strong>Kontakt w sprawach:</strong> <i>problemy i błędy związane ze stroną WWW, pomysły usprawnień strony lub ligi, etc.</i></p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{% translate "Ogólna dyskusja" %}</h3>
+                    <p class="mb-0"><a href="https://discord.gg/PuWcU9CJ" target="_blank">Kanał Discord iglo</a></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <p class="mb-0">
+                        {% blocktrans trimmed %}
+                        Zarządcą IGLO jest <a href="https://psg.go.art.pl/pl/" target="_blank">Polskie Stowarzyszenie Go</a>.
+                        {% endblocktrans %}
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

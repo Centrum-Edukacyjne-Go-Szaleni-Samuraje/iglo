@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 21:35+0200\n"
+"POT-Creation-Date: 2025-04-06 21:41+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -111,8 +111,8 @@ msgid "Sędzia"
 msgstr "Arbiter"
 
 #: iglo/accounts/texts.py:28 iglo/templates/league/group_all_games.html:62
-#: iglo/templates/league/group_all_games.html:94
-#: iglo/templates/league/group_all_games.html:245
+#: iglo/templates/league/group_all_games.html:98
+#: iglo/templates/league/group_all_games.html:249
 #: iglo/templates/league/group_detail.html:41
 #: iglo/templates/league/season_detail.html:87
 #: iglo/templates/review/review_list.html:23
@@ -752,9 +752,9 @@ msgstr "Season"
 #: iglo/templates/league/group_all_games.html:6
 #: iglo/templates/league/group_all_games.html:24
 #: iglo/templates/league/group_all_games.html:50
-#: iglo/templates/league/group_all_games.html:211
-#: iglo/templates/league/group_all_games.html:312
-#: iglo/templates/league/group_all_games.html:489
+#: iglo/templates/league/group_all_games.html:215
+#: iglo/templates/league/group_all_games.html:316
+#: iglo/templates/league/group_all_games.html:493
 #: iglo/templates/league/group_detail.html:5
 #: iglo/templates/league/group_detail.html:22
 #: iglo/templates/league/group_detail.html:27
@@ -781,7 +781,7 @@ msgstr "No opponent this round."
 
 #: iglo/templates/league/game_detail.html:63
 #: iglo/templates/league/game_detail.html:107
-#: iglo/templates/league/group_all_games.html:128
+#: iglo/templates/league/group_all_games.html:132
 #: iglo/templates/league/group_games.html:97
 msgid "This game is eligible for EGD export"
 msgstr ""
@@ -885,12 +885,12 @@ msgid "Przypisz nauczycieli do grup"
 msgstr "Assign teachers to groups"
 
 #: iglo/templates/league/group_all_games.html:54
-#: iglo/templates/league/group_all_games.html:190
+#: iglo/templates/league/group_all_games.html:194
 msgid "Brak"
 msgstr "None"
 
 #: iglo/templates/league/group_all_games.html:63
-#: iglo/templates/league/group_all_games.html:250
+#: iglo/templates/league/group_all_games.html:254
 msgid "Imię i nazwisko"
 msgstr ""
 
@@ -902,56 +902,64 @@ msgstr "Add group"
 msgid "Przypisz liczbę gier w grupie i odpowiedzialnego nauczyciela."
 msgstr "Assign number of games in the group and the responsible teacher."
 
-#: iglo/templates/league/group_all_games.html:88
+#: iglo/templates/league/group_all_games.html:84
+msgid ""
+"URL strony jest aktualizowany automatycznie i może być skopiowany i "
+"udostępniony innym. Konfiguracja nie jest zapisywana w bazie danych."
+msgstr ""
+"The page URL is automatically updated and can be copied and shared with others. "
+"This configuration is not stored in the database."
+
+#: iglo/templates/league/group_all_games.html:92
 msgid "Czarny"
 msgstr "Black"
 
-#: iglo/templates/league/group_all_games.html:89
+#: iglo/templates/league/group_all_games.html:93
 msgid "Biały"
 msgstr "White"
 
-#: iglo/templates/league/group_all_games.html:90
+#: iglo/templates/league/group_all_games.html:94
 msgid "Wynik"
 msgstr "Result"
 
-#: iglo/templates/league/group_all_games.html:91
+#: iglo/templates/league/group_all_games.html:95
 msgid "Data"
 msgstr "Date"
 
-#: iglo/templates/league/group_all_games.html:92
+#: iglo/templates/league/group_all_games.html:96
 msgid "Recenzja"
 msgstr "Review"
 
-#: iglo/templates/league/group_all_games.html:93
+#: iglo/templates/league/group_all_games.html:97
 msgid "Akcje"
 msgstr "Actions"
 
-#: iglo/templates/league/group_all_games.html:106
-#: iglo/templates/league/group_all_games.html:116
+#: iglo/templates/league/group_all_games.html:110
+#: iglo/templates/league/group_all_games.html:120
 #: iglo/templates/league/includes/player_badge.html:3
 msgid "Ten gracz jest patronem IGLO!"
 msgstr "This player is an IGLO patreon!"
 
-#: iglo/templates/league/group_all_games.html:140
+#: iglo/templates/league/group_all_games.html:144
 msgid "Zobacz recenzję"
 msgstr ""
 
-#: iglo/templates/league/group_all_games.html:143
+#: iglo/templates/league/group_all_games.html:147
 msgid "Brak recenzji"
 msgstr ""
 
-#: iglo/templates/league/group_all_games.html:155
+#: iglo/templates/league/group_all_games.html:159
 #, fuzzy
 #| msgid "Brak przeciwnika w tej rundzie."
 msgid "Brak gier w tej grupie."
 msgstr "No opponent this round."
 
-#: iglo/templates/league/group_all_games.html:405
-#: iglo/templates/league/group_all_games.html:418
+#: iglo/templates/league/group_all_games.html:409
+#: iglo/templates/league/group_all_games.html:422
 msgid "Kopiuj link"
 msgstr ""
 
-#: iglo/templates/league/group_all_games.html:416
+#: iglo/templates/league/group_all_games.html:420
 msgid "Skopiowano!"
 msgstr ""
 

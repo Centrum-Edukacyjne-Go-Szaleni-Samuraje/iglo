@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 21:41+0200\n"
+"POT-Creation-Date: 2025-04-06 21:47+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -423,6 +423,8 @@ msgid ""
 "Wybierz 'Banded Round Robin' aby utworzyć jedną grupę z parami tworzonymi "
 "algorytmem banded round robin. To nie utworzy grup McMahon."
 msgstr ""
+"Choose 'Banded Round Robin' to create a single group with pairs formed using "
+"the banded round robin algorithm. This will not create McMahon groups."
 
 #: iglo/templates/404.html:5
 msgid "Brak strony"
@@ -784,7 +786,7 @@ msgstr "No opponent this round."
 #: iglo/templates/league/group_all_games.html:132
 #: iglo/templates/league/group_games.html:97
 msgid "This game is eligible for EGD export"
-msgstr ""
+msgstr "This game is eligible for EGD export"
 
 #: iglo/templates/league/game_detail.html:71
 #: iglo/templates/league/player_detail.html:83
@@ -805,33 +807,37 @@ msgstr "This game is delayed"
 
 #: iglo/templates/league/game_detail.html:102
 msgid "EGD Status"
-msgstr ""
+msgstr "EGD Status"
 
 #: iglo/templates/league/game_detail.html:111
 msgid ""
 "The game will be exported to EGD once it has been played and a result is "
 "recorded."
 msgstr ""
+"The game will be exported to EGD once it has been played and a result is "
+"recorded."
 
 #: iglo/templates/league/game_detail.html:115
 msgid "This game is not eligible for EGD export"
-msgstr ""
+msgstr "This game is not eligible for EGD export"
 
 #: iglo/templates/league/game_detail.html:119
 msgid ""
 "For a game to be eligible for EGD export, both players must have agreed to "
 "EGD reporting for this season:"
 msgstr ""
+"For a game to be eligible for EGD export, both players must have agreed to "
+"EGD reporting for this season:"
 
 #: iglo/templates/league/game_detail.html:125
 #: iglo/templates/league/game_detail.html:133
 msgid "Has approved EGD reporting"
-msgstr ""
+msgstr "Has approved EGD reporting"
 
 #: iglo/templates/league/game_detail.html:127
 #: iglo/templates/league/game_detail.html:135
 msgid "Has not approved EGD reporting"
-msgstr ""
+msgstr "Has not approved EGD reporting"
 
 #: iglo/templates/league/game_detail.html:141
 msgid ""
@@ -839,6 +845,9 @@ msgid ""
 "settings, which will apply to future seasons. The current season's EGD "
 "settings were established when the season began."
 msgstr ""
+"Players can update their EGD reporting preferences in their account "
+"settings, which will apply to future seasons. The current season's EGD "
+"settings were established when the season began."
 
 #: iglo/templates/league/game_form.html:36
 msgid "Edycja"
@@ -892,7 +901,7 @@ msgstr "None"
 #: iglo/templates/league/group_all_games.html:63
 #: iglo/templates/league/group_all_games.html:254
 msgid "Imię i nazwisko"
-msgstr ""
+msgstr "Full name"
 
 #: iglo/templates/league/group_all_games.html:76
 msgid "Dodaj grupę"
@@ -907,8 +916,8 @@ msgid ""
 "URL strony jest aktualizowany automatycznie i może być skopiowany i "
 "udostępniony innym. Konfiguracja nie jest zapisywana w bazie danych."
 msgstr ""
-"The page URL is automatically updated and can be copied and shared with others. "
-"This configuration is not stored in the database."
+"The page URL is automatically updated and can be copied and shared with "
+"others. This configuration is not stored in the database."
 
 #: iglo/templates/league/group_all_games.html:92
 msgid "Czarny"
@@ -942,26 +951,24 @@ msgstr "This player is an IGLO patreon!"
 
 #: iglo/templates/league/group_all_games.html:144
 msgid "Zobacz recenzję"
-msgstr ""
+msgstr "View review"
 
 #: iglo/templates/league/group_all_games.html:147
 msgid "Brak recenzji"
-msgstr ""
+msgstr "No review"
 
 #: iglo/templates/league/group_all_games.html:159
-#, fuzzy
-#| msgid "Brak przeciwnika w tej rundzie."
 msgid "Brak gier w tej grupie."
-msgstr "No opponent this round."
+msgstr "No games in this group."
 
 #: iglo/templates/league/group_all_games.html:409
 #: iglo/templates/league/group_all_games.html:422
 msgid "Kopiuj link"
-msgstr ""
+msgstr "Copy link"
 
 #: iglo/templates/league/group_all_games.html:420
 msgid "Skopiowano!"
-msgstr ""
+msgstr "Copied!"
 
 #: iglo/templates/league/group_detail.html:32
 #: iglo/templates/league/group_games.html:42
@@ -1106,7 +1113,7 @@ msgstr "AI analysis"
 
 #: iglo/templates/league/includes/player_badge.html:4
 msgid "Ten gracz zgadza się na raportowanie do EGD"
-msgstr ""
+msgstr "This player agrees to EGD reporting"
 
 #: iglo/templates/league/includes/result_table_modal.html:8
 msgid "Jak czytać tabelę z wynikami?"
@@ -1233,6 +1240,7 @@ msgid ""
 "Przelicz wewnętrzny ranking IGLO (IGoR) na podstawie wszystkich rozegranych "
 "gier."
 msgstr ""
+"Recalculate internal IGLO ranking (IGoR) based on all played games."
 
 #: iglo/templates/league/player_detail.html:47
 #: iglo/templates/league/player_detail.html:70
@@ -1336,38 +1344,39 @@ msgstr ""
 #: iglo/templates/league/season_delete_confirm.html:5
 #: iglo/templates/league/season_delete_confirm.html:21
 msgid "Potwierdź usunięcie sezonu"
-msgstr ""
+msgstr "Confirm season deletion"
 
 #: iglo/templates/league/season_delete_confirm.html:15
 #: iglo/templates/league/season_delete_confirm.html:38
-#, fuzzy
-#| msgid "Usuń"
 msgid "Usuń sezon"
-msgstr "Remove"
+msgstr "Delete season"
 
 #: iglo/templates/league/season_delete_confirm.html:24
 msgid "Czy na pewno chcesz usunąć sezon"
-msgstr ""
+msgstr "Are you sure you want to delete the season"
 
 #: iglo/templates/league/season_delete_confirm.html:25
 msgid ""
 "Ta operacja jest nieodwracalna. Wszystkie grupy i dane związane z tym "
 "sezonem zostaną usunięte."
 msgstr ""
+"This operation is irreversible. All groups and data associated with this "
+"season will be deleted."
 
 #: iglo/templates/league/season_delete_confirm.html:28
 msgid "Uwaga"
-msgstr ""
+msgstr "Warning"
 
 #: iglo/templates/league/season_delete_confirm.html:28
 msgid ""
 "Można usuwać tylko sezony w stanie roboczym (draft), które nie zostały "
 "jeszcze rozpoczęte."
 msgstr ""
+"Only seasons in draft state that have not yet been started can be deleted."
 
 #: iglo/templates/league/season_delete_confirm.html:35
 msgid "Anuluj"
-msgstr ""
+msgstr "Cancel"
 
 #: iglo/templates/league/season_detail.html:27
 msgid "Eksport CSV"
@@ -1430,6 +1439,10 @@ msgstr "Upcoming games"
 #: iglo/templates/misc/contact.html:14
 msgid "Administracja ligą"
 msgstr "League Administration"
+
+#: iglo/templates/misc/contact.html:15 iglo/templates/misc/contact.html:29
+msgid "i zespół"
+msgstr "and team"
 
 #: iglo/templates/misc/contact.html:19
 msgid ""

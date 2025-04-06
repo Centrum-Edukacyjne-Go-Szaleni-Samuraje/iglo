@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 21:27+0200\n"
+"POT-Creation-Date: 2025-04-06 21:35+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -133,7 +133,7 @@ msgstr "McMahon"
 
 #: iglo/league/models.py:353 iglo/league/texts.py:68
 msgid "Banded Round Robin"
-msgstr ""
+msgstr "Banded Round Robin"
 
 #: iglo/league/texts.py:7
 msgid "Konto OGS"
@@ -412,11 +412,11 @@ msgstr "Previous season has not been closed yet."
 
 #: iglo/league/texts.py:67
 msgid "Standardowy"
-msgstr ""
+msgstr "Standard"
 
 #: iglo/league/texts.py:69
 msgid "Typ parowania"
-msgstr ""
+msgstr "Pairing type"
 
 #: iglo/league/texts.py:70
 msgid ""
@@ -665,7 +665,7 @@ msgstr "Results"
 msgid "Sezony"
 msgstr "Seasons"
 
-#: iglo/templates/base.html:58 iglo/templates/league/group_detail.html:207
+#: iglo/templates/base.html:58 iglo/templates/league/group_detail.html:206
 #: iglo/templates/league/player_detail.html:17
 #: iglo/templates/league/player_list.html:5
 #: iglo/templates/league/player_list.html:12
@@ -869,29 +869,25 @@ msgstr "Player"
 #: iglo/templates/league/group_detail.html:35
 #: iglo/templates/league/group_games.html:45
 msgid "Wszystkie gry"
-msgstr ""
+msgstr "All games"
 
 #: iglo/templates/league/group_all_games.html:31
 #: iglo/templates/league/group_all_games.html:38
-#, fuzzy
-#| msgid "Nauczyciel"
 msgid "Grupa Nauczycielska"
-msgstr "Teacher"
+msgstr "Teacher Group"
 
 #: iglo/templates/league/group_all_games.html:35
-#, fuzzy
-#| msgid "Nowa runda"
 msgid "Widok rund"
-msgstr "New round"
+msgstr "Rounds view"
 
 #: iglo/templates/league/group_all_games.html:45
 msgid "Przypisz nauczycieli do grup"
-msgstr ""
+msgstr "Assign teachers to groups"
 
 #: iglo/templates/league/group_all_games.html:54
 #: iglo/templates/league/group_all_games.html:190
 msgid "Brak"
-msgstr ""
+msgstr "None"
 
 #: iglo/templates/league/group_all_games.html:63
 #: iglo/templates/league/group_all_games.html:250
@@ -964,21 +960,21 @@ msgstr ""
 #: iglo/templates/league/group_detail.html:32
 #: iglo/templates/league/group_games.html:42
 msgid "Gry według rund"
-msgstr ""
+msgstr "Games by rounds"
 
 #: iglo/templates/league/group_detail.html:48
 #: iglo/templates/league/group_games.html:38
 msgid "Gry oznaczone"
-msgstr ""
+msgstr "Games marked"
 
 #: iglo/templates/league/group_detail.html:48
 #: iglo/templates/league/group_games.html:38
 msgid "są raportowane do European Go Database."
-msgstr ""
+msgstr "are reported to the European Go Database."
 
 #: iglo/templates/league/group_detail.html:50
 msgid "Ikona wskazuje graczy, którzy zgadzają się na raportowanie do EGD."
-msgstr ""
+msgstr "Icon indicates players who agree to reporting to EGD."
 
 #: iglo/templates/league/group_detail.html:60
 msgid "Miejsce"
@@ -1040,56 +1036,54 @@ msgstr "Group type unknown"
 msgid "Jak czytać wyniki?"
 msgstr "How to read results?"
 
-#: iglo/templates/league/group_detail.html:192
+#: iglo/templates/league/group_detail.html:191
 #: iglo/templates/league/group_games.html:54
 msgid "Nowa runda"
 msgstr "New round"
 
-#: iglo/templates/league/group_detail.html:199
+#: iglo/templates/league/group_detail.html:198
 #: iglo/templates/league/group_games.html:61
 msgid "Eksport EGD"
 msgstr "Export EDG"
 
-#: iglo/templates/league/group_detail.html:212
+#: iglo/templates/league/group_detail.html:211
 msgid "Dodaj"
 msgstr "Add"
 
-#: iglo/templates/league/group_detail.html:234
+#: iglo/templates/league/group_detail.html:233
 msgid "Punkty początkowe"
 msgstr "Starting points"
 
-#: iglo/templates/league/group_detail.html:245
+#: iglo/templates/league/group_detail.html:244
 msgid "Move up 1 position"
-msgstr ""
+msgstr "Move up 1 position"
 
-#: iglo/templates/league/group_detail.html:248
+#: iglo/templates/league/group_detail.html:247
 msgid "Move down 1 position"
-msgstr ""
+msgstr "Move down 1 position"
 
-#: iglo/templates/league/group_detail.html:250
-#: iglo/templates/league/group_detail.html:259
+#: iglo/templates/league/group_detail.html:249
+#: iglo/templates/league/group_detail.html:258
 msgid "Move to position"
-msgstr ""
+msgstr "Move to position"
 
-#: iglo/templates/league/group_detail.html:260
+#: iglo/templates/league/group_detail.html:259
 msgid "Move"
-msgstr ""
+msgstr "Move"
 
-#: iglo/templates/league/group_detail.html:263
+#: iglo/templates/league/group_detail.html:262
 msgid "Usuń"
 msgstr "Remove"
 
 #: iglo/templates/league/group_games.html:6
 #: iglo/templates/league/group_games.html:27
 #: iglo/templates/league/group_games.html:32
-#, fuzzy
-#| msgid "Grupy"
 msgid "Gry"
-msgstr "Groups"
+msgstr "Games"
 
 #: iglo/templates/league/group_games.html:48
 msgid "Powrót do widoku grupy"
-msgstr ""
+msgstr "Return to group view"
 
 #: iglo/templates/league/group_games.html:73
 msgid "Runda"

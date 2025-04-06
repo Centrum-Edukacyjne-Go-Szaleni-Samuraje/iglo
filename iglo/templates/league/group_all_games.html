@@ -42,23 +42,42 @@
             </div>
             
             <div class="mb-3 p-3 bg-light rounded">
-                <div class="form-label fw-bold mb-2">{% translate "Grupuj dla Nauczycieli" %}:</div>
-                <div id="group-selectors" class="d-flex flex-wrap align-items-center gap-2">
+                <div class="form-label fw-bold mb-2">{% translate "Przypisz nauczycieli do grup" %}:</div>
+                <div id="group-selectors" class="d-flex flex-column gap-2">
                     <div class="d-flex align-items-center group-selector">
-                        <label for="groupSize-1" class="me-2 mb-0">{% translate "Grupa" %} 1:</label>
-                        <select id="groupSize-1" class="form-select group-size-select" style="width: auto;">
-                            <option value="0">{% translate "Brak" %}</option>
-                            {% for i in group_options %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-group-btn" style="display: none;">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <div class="row w-100 align-items-center">
+                            <div class="col-auto">
+                                <label for="groupSize-1" class="me-2 mb-0">{% translate "Grupa" %} 1:</label>
+                            </div>
+                            <div class="col-md-2">
+                                <select id="groupSize-1" class="form-select group-size-select">
+                                    <option value="0">{% translate "Brak" %}</option>
+                                    {% for i in group_options %}
+                                        <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">{% translate "Nauczyciel" %}</span>
+                                    <input type="text" class="form-control teacher-name" placeholder="{% translate "Imię i nazwisko" %}">
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-group-btn" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-2 text-muted">
-                    {% translate "Wybierz liczbę gier w grupach dla łatwego przydzielenia zadań nauczycielskich. Kolejne grupy będą dodawane automatycznie." %}
+                <div class="mt-3">
+                    <button type="button" id="add-group-btn" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus"></i> {% translate "Dodaj grupę" %}
+                    </button>
+                    <span class="ms-3 text-muted">
+                        {% translate "Przypisz liczbę gier w grupie i odpowiedzialnego nauczyciela." %}
+                    </span>
                 </div>
             </div>
 
@@ -72,7 +91,7 @@
                         <th>{% translate "Data" %}</th>
                         <th>{% translate "Recenzja" %}</th>
                         <th>{% translate "Akcje" %}</th>
-                        <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Grupa Nauczycielska" %}</th>
+                        <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Nauczyciel" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -144,6 +163,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const groupSelectorsContainer = document.getElementById('group-selectors');
+            const addGroupBtn = document.getElementById('add-group-btn');
             const gameRows = document.querySelectorAll('tbody tr');
             const groupColumns = document.querySelectorAll('.group-column');
             const groupColors = [
@@ -178,15 +198,27 @@
                 const selector = document.createElement('div');
                 selector.className = 'd-flex align-items-center group-selector';
                 
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row w-100 align-items-center';
+                
+                // Label column
+                const labelCol = document.createElement('div');
+                labelCol.className = 'col-auto';
+                
                 const label = document.createElement('label');
                 label.setAttribute('for', `groupSize-${groupNumber}`);
                 label.className = 'me-2 mb-0';
                 label.textContent = `{% translate "Grupa" %} ${groupNumber}:`;
                 
+                labelCol.appendChild(label);
+                
+                // Select column
+                const selectCol = document.createElement('div');
+                selectCol.className = 'col-md-2';
+                
                 const select = document.createElement('select');
                 select.id = `groupSize-${groupNumber}`;
                 select.className = 'form-select group-size-select';
-                select.style.width = 'auto';
                 
                 // Add options
                 groupOptions.forEach(opt => {
@@ -196,10 +228,35 @@
                     select.appendChild(option);
                 });
                 
-                // Create remove button
+                selectCol.appendChild(select);
+                
+                // Teacher name column
+                const teacherCol = document.createElement('div');
+                teacherCol.className = 'col-md-4';
+                
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'input-group';
+                
+                const inputGroupText = document.createElement('span');
+                inputGroupText.className = 'input-group-text';
+                inputGroupText.textContent = '{% translate "Nauczyciel" %}';
+                
+                const teacherInput = document.createElement('input');
+                teacherInput.type = 'text';
+                teacherInput.className = 'form-control teacher-name';
+                teacherInput.placeholder = '{% translate "Imię i nazwisko" %}';
+                
+                inputGroup.appendChild(inputGroupText);
+                inputGroup.appendChild(teacherInput);
+                teacherCol.appendChild(inputGroup);
+                
+                // Button column
+                const buttonCol = document.createElement('div');
+                buttonCol.className = 'col-auto';
+                
                 const removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
-                removeBtn.className = 'btn btn-sm btn-outline-danger ms-2 remove-group-btn';
+                removeBtn.className = 'btn btn-sm btn-outline-danger remove-group-btn';
                 if (groupNumber === 1) {
                     removeBtn.style.display = 'none';
                 }
@@ -208,22 +265,25 @@
                 icon.className = 'fas fa-times';
                 removeBtn.appendChild(icon);
                 
-                // Add event listener for remove button
+                buttonCol.appendChild(removeBtn);
+                
+                // Assemble the row
+                rowDiv.appendChild(labelCol);
+                rowDiv.appendChild(selectCol);
+                rowDiv.appendChild(teacherCol);
+                rowDiv.appendChild(buttonCol);
+                
+                selector.appendChild(rowDiv);
+                
+                // Add event listeners
                 removeBtn.addEventListener('click', function() {
                     selector.remove();
                     renumberGroups();
                     applyGrouping();
                 });
                 
-                // Add event listener for select
-                select.addEventListener('change', function() {
-                    handleSelectChange(select);
-                    applyGrouping();
-                });
-                
-                selector.appendChild(label);
-                selector.appendChild(select);
-                selector.appendChild(removeBtn);
+                select.addEventListener('change', applyGrouping);
+                teacherInput.addEventListener('input', applyGrouping);
                 
                 return selector;
             }
@@ -250,29 +310,32 @@
                 });
             }
             
-            // Handle select change - add new selector if last one is not 0
-            function handleSelectChange(select) {
-                const selectors = document.querySelectorAll('.group-selector');
-                const lastSelector = selectors[selectors.length - 1];
-                const lastSelect = lastSelector.querySelector('select');
-                
-                // If the last selector is set to a non-zero value, add a new selector
-                if (lastSelect === select && parseInt(select.value, 10) > 0) {
-                    const newGroupNumber = selectors.length + 1;
-                    const newSelector = createGroupSelector(newGroupNumber);
-                    groupSelectorsContainer.appendChild(newSelector);
-                }
-            }
+            // Add group button handler
+            addGroupBtn.addEventListener('click', function() {
+                const newGroupNumber = document.querySelectorAll('.group-selector').length + 1;
+                const newSelector = createGroupSelector(newGroupNumber);
+                groupSelectorsContainer.appendChild(newSelector);
+            });
             
-            // Function to apply group coloring and numbering based on multiple size selectors
+            // Function to apply group coloring and display teacher names
             function applyGrouping() {
-                // Get all group sizes from selectors
-                const groupSizes = [];
-                const selectors = document.querySelectorAll('.group-size-select');
-                selectors.forEach(select => {
-                    const size = parseInt(select.value, 10);
+                // Build the group data from selectors
+                const groups = [];
+                const selectors = document.querySelectorAll('.group-selector');
+                
+                selectors.forEach((selector, index) => {
+                    const sizeSelect = selector.querySelector('.group-size-select');
+                    const teacherInput = selector.querySelector('.teacher-name');
+                    
+                    const size = parseInt(sizeSelect.value, 10);
+                    const teacherName = teacherInput.value.trim();
+                    
                     if (size > 0) {
-                        groupSizes.push(size);
+                        groups.push({
+                            groupNumber: index + 1,
+                            size: size,
+                            teacher: teacherName || `{% translate "Grupa" %} ${index + 1}`
+                        });
                     }
                 });
                 
@@ -285,37 +348,35 @@
                     col.style.display = 'none';
                 });
                 
-                // If no valid group sizes, exit early
-                if (groupSizes.length === 0) return;
+                // If no valid groups, exit early
+                if (groups.length === 0) return;
                 
                 // Show group columns
                 groupColumns.forEach(col => {
                     col.style.display = '';
                 });
                 
-                // Apply colors and group numbers for each game
+                // Apply colors and teacher names for each game
                 let currentIndex = 0;
-                let currentGroupNumber = 1;
                 
-                for (let size of groupSizes) {
-                    for (let i = 0; i < size && currentIndex < gameRows.length; i++) {
+                for (let group of groups) {
+                    for (let i = 0; i < group.size && currentIndex < gameRows.length; i++) {
                         const row = gameRows[currentIndex];
                         if (row.cells.length > 1) { // Skip "No games" row if present
-                            const colorIndex = (currentGroupNumber - 1) % groupColors.length;
+                            const colorIndex = (group.groupNumber - 1) % groupColors.length;
                             
                             // Set background color
                             row.style.backgroundColor = groupColors[colorIndex];
                             
-                            // Set group number
+                            // Set teacher name
                             const groupCell = row.querySelector('.group-column');
                             if (groupCell) {
-                                groupCell.textContent = currentGroupNumber;
+                                groupCell.textContent = group.teacher;
                             }
                             
                             currentIndex++;
                         }
                     }
-                    currentGroupNumber++;
                 }
                 
                 // Handle remaining games if any
@@ -326,7 +387,7 @@
                         
                         const groupCell = row.querySelector('.group-column');
                         if (groupCell) {
-                            groupCell.textContent = '?'; // Mark as ungrouped
+                            groupCell.textContent = '-'; // Mark as ungrouped
                         }
                         
                         currentIndex++;
@@ -334,14 +395,19 @@
                 }
             }
             
-            // Initialize event listeners for existing elements
-            const initialSelect = document.querySelector('.group-size-select');
-            if (initialSelect) {
-                initialSelect.addEventListener('change', function() {
-                    handleSelectChange(initialSelect);
-                    applyGrouping();
-                });
-            }
+            // Initialize grouping
+            applyGrouping();
+            
+            // Initial event listeners setup
+            const teacherInputs = document.querySelectorAll('.teacher-name');
+            teacherInputs.forEach(input => {
+                input.addEventListener('input', applyGrouping);
+            });
+            
+            const groupSelects = document.querySelectorAll('.group-size-select');
+            groupSelects.forEach(select => {
+                select.addEventListener('change', applyGrouping);
+            });
         });
     </script>
 {% endblock %}

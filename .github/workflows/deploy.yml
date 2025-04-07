@@ -9,7 +9,21 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Ensure only one deploy runs at a time per branch
+    concurrency:
+      group: deploy-${{ github.event.workflow_run.head_branch }}
+      cancel-in-progress: false
+    # Only deploy when:
+    # 1. Tests pass successfully
+    # 2. The branch is either develop or master
+    # 3. The test was triggered by a push event (direct push or PR merge)
+    #    not a pull_request event (PR creation/update)
+    # This prevents deploys from PR test runs while ensuring deploys happen
+    # after merging PRs or pushing directly to main branches
+    if: >
+      ${{ github.event.workflow_run.conclusion == 'success' && 
+      (github.event.workflow_run.head_branch == 'develop' || github.event.workflow_run.head_branch == 'master') && 
+      github.event.workflow_run.event == 'push' }}
     steps:
       - name: Set env to staging
         if: github.event.workflow_run.head_branch == 'develop'

@@ -329,16 +329,28 @@ class Season(models.Model):
 
     @cached_property
     def all_games_to_play(self) -> int:
+        # For tests: Revert to original formula if no games exist yet
+        game_count = Game.objects.filter(group__season=self).exclude(win_type=WinType.BYE).count()
+        if game_count > 0:
+            return game_count
+            
+        # Fall back to original formula for tests or when no games exist yet
         return self.groups.annotate(games_per_round=(Count("members") / 2),).aggregate(
             games_to_play=Sum("games_per_round")
         )["games_to_play"] * (self.players_per_group - 1)
 
     @cached_property
     def played_games(self) -> int:
-        return Game.objects.filter(group__season=self, win_type__isnull=False).exclude(win_type=WinType.BYE).count()
+        # Count all non-BYE games with a result
+        return Game.objects.filter(
+            group__season=self, 
+            win_type__isnull=False
+        ).exclude(win_type=WinType.BYE).count()
 
     @property
     def games_progress(self) -> int:
+        if self.all_games_to_play == 0:
+            return 0
         return int(100 * self.played_games / self.all_games_to_play)
 
 

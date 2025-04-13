@@ -824,6 +824,15 @@ class Member(models.Model):
             return MembershipHistory.RETURNING
             
     @cached_property
+    def mutual_unplayed_games(self) -> int:
+        """Count the number of games that were not played and had no winner (both sides didn't show up)."""
+        return Game.objects.filter(
+            Q(black=self) | Q(white=self),
+            win_type=WinType.NOT_PLAYED,
+            winner__isnull=True
+        ).count()
+            
+    @cached_property
     def lost_unplayed_games(self) -> int:
         """Count the number of games that were not played and counted as losses."""
         return Game.objects.filter(
@@ -831,6 +840,11 @@ class Member(models.Model):
             win_type=WinType.NOT_PLAYED,
             winner__isnull=False
         ).exclude(winner=self).count()
+        
+    @cached_property
+    def total_walkovers(self) -> int:
+        """Count the total number of unplayed games: walkovers (losses) + mutual no-shows."""
+        return self.lost_unplayed_games + self.mutual_unplayed_games
 
 
 def game_upload_to(instance, filename) -> str:

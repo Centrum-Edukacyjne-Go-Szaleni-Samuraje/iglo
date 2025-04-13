@@ -70,3 +70,58 @@ class SendUpcomingGamesRemindersTask(TestCase):
         game.refresh_from_db()
         self.assertIsNotNone(game.upcoming_reminder_sent)
         self.assertEqual(len(mail.outbox), 1)
+        
+        
+@override_settings(ENABLE_AUTO_MARK_UNPLAYED_GAMES=True)
+class MarkOverdueGamesAsUnplayedTask(TestCase):
+
+    def test_task(self):
+        now = datetime.datetime.now()
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS)
+        
+        # Create games with different dates
+        
+        # Game 1: Scheduled 8 days ago (should be marked as unplayed)
+        overdue_date = now - datetime.timedelta(days=8)
+        overdue_game = GameFactory(
+            group__season=season,
+            date=overdue_date,
+            win_type=None
+        )
+        
+        # Game 2: Scheduled 6 days ago (should NOT be marked as unplayed)
+        recent_date = now - datetime.timedelta(days=6)
+        recent_game = GameFactory(
+            group__season=season,
+            date=recent_date,
+            win_type=None
+        )
+        
+        # Game 3: Overdue but already has a result (should not be changed)
+        played_game = GameFactory(
+            group__season=season,
+            date=overdue_date,
+            win_type="points",
+            winner=overdue_game.black
+        )
+        
+        # Run the task
+        from league.tasks import mark_overdue_games_as_unplayed
+        mark_overdue_games_as_unplayed()
+        
+        # Refresh the game instances from the database
+        overdue_game.refresh_from_db()
+        recent_game.refresh_from_db()
+        played_game.refresh_from_db()
+        
+        # Check that only the overdue game was marked as unplayed
+        self.assertEqual(overdue_game.win_type, "not_played")
+        self.assertIsNone(overdue_game.winner)
+        
+        # Recent game should still have no result
+        self.assertIsNone(recent_game.win_type)
+        self.assertIsNone(recent_game.winner)
+        
+        # Played game should maintain its original result
+        self.assertEqual(played_game.win_type, "points")
+        self.assertEqual(played_game.winner, overdue_game.black)

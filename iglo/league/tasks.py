@@ -12,7 +12,7 @@ from django.db import models
 from requests.exceptions import HTTPError
 
 from league import texts
-from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, Player
+from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, Player, WinType
 from league.utils.aisensei import upload_sgf, AISenseiConfig, AISenseiException
 from league.utils.egd import get_gor_by_pin, EGDException
 from league.utils.ogs import fetch_sgf, OGSException, get_player_data

@@ -822,6 +822,15 @@ class Member(models.Model):
             return MembershipHistory.CONTINUING
         else:
             return MembershipHistory.RETURNING
+            
+    @cached_property
+    def lost_unplayed_games(self) -> int:
+        """Count the number of games that were not played and counted as losses."""
+        return Game.objects.filter(
+            Q(black=self) | Q(white=self),
+            win_type=WinType.NOT_PLAYED,
+            winner__isnull=False
+        ).exclude(winner=self).count()
 
 
 def game_upload_to(instance, filename) -> str:

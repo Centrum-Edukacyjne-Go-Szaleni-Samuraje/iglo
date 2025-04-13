@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 21:47+0200\n"
+"POT-Creation-Date: 2025-04-13 18:28+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -123,15 +123,15 @@ msgstr "Teacher"
 msgid "Gra musi zostać rozegrana w trakcie trwania sezonu."
 msgstr "You have to play this game during the season."
 
-#: iglo/league/models.py:351
+#: iglo/league/models.py:363
 msgid "Każdy z każdym"
 msgstr "Round robin"
 
-#: iglo/league/models.py:352
+#: iglo/league/models.py:364
 msgid "McMahon"
 msgstr "McMahon"
 
-#: iglo/league/models.py:353 iglo/league/texts.py:68
+#: iglo/league/models.py:365 iglo/league/texts.py:68
 msgid "Banded Round Robin"
 msgstr "Banded Round Robin"
 
@@ -267,7 +267,7 @@ msgstr ""
 "later)"
 
 #: iglo/league/texts.py:34 iglo/templates/league/group_detail.html:64
-#: iglo/templates/league/group_detail.html:103
+#: iglo/templates/league/group_detail.html:105
 msgid "Punkty"
 msgstr "Points"
 
@@ -667,7 +667,7 @@ msgstr "Results"
 msgid "Sezony"
 msgstr "Seasons"
 
-#: iglo/templates/base.html:58 iglo/templates/league/group_detail.html:206
+#: iglo/templates/base.html:58 iglo/templates/league/group_detail.html:212
 #: iglo/templates/league/player_detail.html:17
 #: iglo/templates/league/player_list.html:5
 #: iglo/templates/league/player_list.html:12
@@ -867,8 +867,8 @@ msgstr "Groups"
 
 #: iglo/templates/league/game_list.html:20
 #: iglo/templates/league/group_detail.html:61
-#: iglo/templates/league/group_detail.html:97
-#: iglo/templates/league/group_detail.html:133
+#: iglo/templates/league/group_detail.html:99
+#: iglo/templates/league/group_detail.html:137
 #: iglo/templates/review/review_list.html:20
 msgid "Gracz"
 msgstr "Player"
@@ -994,8 +994,8 @@ msgid "Miejsce"
 msgstr "Place"
 
 #: iglo/templates/league/group_detail.html:63
-#: iglo/templates/league/group_detail.html:100
-#: iglo/templates/league/group_detail.html:136
+#: iglo/templates/league/group_detail.html:102
+#: iglo/templates/league/group_detail.html:140
 msgid "Rundy"
 msgstr "Rounds"
 
@@ -1004,87 +1004,93 @@ msgid "SODOS"
 msgstr "SODOS"
 
 #: iglo/templates/league/group_detail.html:66
-#: iglo/templates/league/group_detail.html:146
+#: iglo/templates/league/group_detail.html:107
+#: iglo/templates/league/group_detail.html:150
+msgid "Walkowery"
+msgstr "Walkovers"
+
+#: iglo/templates/league/group_detail.html:67
+#: iglo/templates/league/group_detail.html:151
 msgid "Start"
 msgstr "Start"
 
-#: iglo/templates/league/group_detail.html:67
-#: iglo/templates/league/group_detail.html:105
-#: iglo/templates/league/group_detail.html:147
+#: iglo/templates/league/group_detail.html:68
+#: iglo/templates/league/group_detail.html:108
+#: iglo/templates/league/group_detail.html:152
 msgid "IGoR"
 msgstr "IGoR"
 
-#: iglo/templates/league/group_detail.html:68
-#: iglo/templates/league/group_detail.html:106
-#: iglo/templates/league/group_detail.html:148
+#: iglo/templates/league/group_detail.html:69
+#: iglo/templates/league/group_detail.html:109
+#: iglo/templates/league/group_detail.html:153
 #, fuzzy
 #| msgid "SOS"
 msgid "OGS"
 msgstr "SOS"
 
-#: iglo/templates/league/group_detail.html:96
-#: iglo/templates/league/group_detail.html:132
+#: iglo/templates/league/group_detail.html:98
+#: iglo/templates/league/group_detail.html:136
 #, fuzzy
 #| msgid "Edycja"
 msgid "Pozycja"
 msgstr "Edit"
 
-#: iglo/templates/league/group_detail.html:139
+#: iglo/templates/league/group_detail.html:143
 msgid "MMS"
 msgstr "MMS"
 
-#: iglo/templates/league/group_detail.html:142
+#: iglo/templates/league/group_detail.html:146
 msgid "SOS"
 msgstr "SOS"
 
-#: iglo/templates/league/group_detail.html:145
+#: iglo/templates/league/group_detail.html:149
 msgid "SOSOS"
 msgstr "SOSOS"
 
-#: iglo/templates/league/group_detail.html:175
+#: iglo/templates/league/group_detail.html:181
 msgid "Nieznany typ grupy"
 msgstr "Group type unknown"
 
-#: iglo/templates/league/group_detail.html:181
+#: iglo/templates/league/group_detail.html:187
 msgid "Jak czytać wyniki?"
 msgstr "How to read results?"
 
-#: iglo/templates/league/group_detail.html:191
+#: iglo/templates/league/group_detail.html:197
 #: iglo/templates/league/group_games.html:54
 msgid "Nowa runda"
 msgstr "New round"
 
-#: iglo/templates/league/group_detail.html:198
+#: iglo/templates/league/group_detail.html:204
 #: iglo/templates/league/group_games.html:61
 msgid "Eksport EGD"
 msgstr "Export EDG"
 
-#: iglo/templates/league/group_detail.html:211
+#: iglo/templates/league/group_detail.html:217
 msgid "Dodaj"
 msgstr "Add"
 
-#: iglo/templates/league/group_detail.html:233
+#: iglo/templates/league/group_detail.html:239
 msgid "Punkty początkowe"
 msgstr "Starting points"
 
-#: iglo/templates/league/group_detail.html:244
+#: iglo/templates/league/group_detail.html:250
 msgid "Move up 1 position"
 msgstr "Move up 1 position"
 
-#: iglo/templates/league/group_detail.html:247
+#: iglo/templates/league/group_detail.html:253
 msgid "Move down 1 position"
 msgstr "Move down 1 position"
 
-#: iglo/templates/league/group_detail.html:249
-#: iglo/templates/league/group_detail.html:258
+#: iglo/templates/league/group_detail.html:255
+#: iglo/templates/league/group_detail.html:264
 msgid "Move to position"
 msgstr "Move to position"
 
-#: iglo/templates/league/group_detail.html:259
+#: iglo/templates/league/group_detail.html:265
 msgid "Move"
 msgstr "Move"
 
-#: iglo/templates/league/group_detail.html:262
+#: iglo/templates/league/group_detail.html:268
 msgid "Usuń"
 msgstr "Remove"
 
@@ -1239,8 +1245,7 @@ msgstr "Recompute IGoR"
 msgid ""
 "Przelicz wewnętrzny ranking IGLO (IGoR) na podstawie wszystkich rozegranych "
 "gier."
-msgstr ""
-"Recalculate internal IGLO ranking (IGoR) based on all played games."
+msgstr "Recalculate internal IGLO ranking (IGoR) based on all played games."
 
 #: iglo/templates/league/player_detail.html:47
 #: iglo/templates/league/player_detail.html:70

@@ -937,6 +937,18 @@ class GameManager(models.Manager):
             delayed_reminder_sent__isnull=True,
             date__lt=datetime.date.today(),
         )
+        
+    def get_overdue_games(self):
+        """
+        Get games that are 7 days past their deadline and still have no result.
+        These games will be automatically marked as unplayed.
+        """
+        cutoff_date = datetime.datetime.now() - datetime.timedelta(days=7)
+        return self.filter(
+            win_type__isnull=True,
+            group__season__state=SeasonState.IN_PROGRESS,
+            date__lt=cutoff_date,
+        )
 
     def get_latest_finished(self, current_season=False) -> QuerySet:
         queryset = (

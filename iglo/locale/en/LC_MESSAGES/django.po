@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-14 04:32+0200\n"
+"POT-Creation-Date: 2025-04-14 04:41+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1027,12 +1027,16 @@ msgstr "SODOS"
 #: iglo/templates/league/group_detail.html:66
 #: iglo/templates/league/group_detail.html:109
 #: iglo/templates/league/group_detail.html:154
+#, fuzzy
+#| msgid ""
+#| "Suma wszystkich nierozegranych gier (gdy jeden z graczy lub obaj gracze "
+#| "nie stawili się na partię)"
 msgid ""
-"Suma wszystkich nierozegranych gier (gdy jeden z graczy lub obaj gracze nie "
+"Suma wszystkich nierozegranych gier (gdy ten gracz lub obaj gracze nie "
 "stawili się na partię)"
 msgstr ""
-"Total of all unplayed games (when one or both players did not show up for the "
-"game)"
+"Total of all unplayed games (when this player or both players did not show up for "
+"the game)"
 
 #: iglo/templates/league/group_detail.html:67
 #: iglo/templates/league/group_detail.html:110

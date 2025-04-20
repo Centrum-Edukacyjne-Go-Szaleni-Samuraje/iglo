@@ -822,6 +822,29 @@ class Member(models.Model):
             return MembershipHistory.CONTINUING
         else:
             return MembershipHistory.RETURNING
+            
+    @cached_property
+    def mutual_unplayed_games(self) -> int:
+        """Count the number of games that were not played and had no winner (both sides didn't show up)."""
+        return Game.objects.filter(
+            Q(black=self) | Q(white=self),
+            win_type=WinType.NOT_PLAYED,
+            winner__isnull=True
+        ).count()
+            
+    @cached_property
+    def lost_unplayed_games(self) -> int:
+        """Count the number of games that were not played and counted as losses."""
+        return Game.objects.filter(
+            Q(black=self) | Q(white=self),
+            win_type=WinType.NOT_PLAYED,
+            winner__isnull=False
+        ).exclude(winner=self).count()
+        
+    @cached_property
+    def total_walkovers(self) -> int:
+        """Count the total number of unplayed games: walkovers (losses) + mutual no-shows."""
+        return self.lost_unplayed_games + self.mutual_unplayed_games
 
 
 def game_upload_to(instance, filename) -> str:
@@ -913,6 +936,18 @@ class GameManager(models.Manager):
             group__season__state=SeasonState.IN_PROGRESS,
             delayed_reminder_sent__isnull=True,
             date__lt=datetime.date.today(),
+        )
+        
+    def get_overdue_games(self):
+        """
+        Get games that are 7 days past their deadline and still have no result.
+        These games will be automatically marked as unplayed.
+        """
+        cutoff_date = datetime.datetime.now() - datetime.timedelta(days=7)
+        return self.filter(
+            win_type__isnull=True,
+            group__season__state=SeasonState.IN_PROGRESS,
+            date__lt=cutoff_date,
         )
 
     def get_latest_finished(self, current_season=False) -> QuerySet:

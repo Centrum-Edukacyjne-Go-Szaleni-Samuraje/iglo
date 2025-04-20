@@ -12,7 +12,7 @@ from django.db import models
 from requests.exceptions import HTTPError
 
 from league import texts
-from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, Player
+from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, Player, WinType
 from league.utils.aisensei import upload_sgf, AISenseiConfig, AISenseiException
 from league.utils.egd import get_gor_by_pin, EGDException
 from league.utils.ogs import fetch_sgf, OGSException, get_player_data
@@ -390,3 +390,23 @@ def send_delayed_games_reminder():
         game.delayed_reminder_sent = datetime.datetime.now()
         game.save()
         send_game_email("league/emails/delayed_game_reminder", emails(game), game)
+        
+@shared_task()
+def mark_overdue_games_as_unplayed():
+    """
+    Automatically mark games as unplayed if they're 7+ days past deadline and have no result.
+    """
+    if not settings.ENABLE_AUTO_MARK_UNPLAYED_GAMES:
+        logger.info("Auto-marking unplayed games skipped - this feature is disabled")
+        return
+        
+    games = Game.objects.get_overdue_games()
+    game_count = games.count()
+    logger.info(f"Marking {game_count} overdue games as unplayed")
+    
+    if game_count > 0:
+        games.update(
+            win_type=WinType.NOT_PLAYED, 
+            winner=None
+        )
+        logger.info(f"Successfully marked {game_count} overdue games as unplayed")

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGLO\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 21:47+0200\n"
+"POT-Creation-Date: 2025-04-14 04:41+0200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -123,15 +123,15 @@ msgstr "Teacher"
 msgid "Gra musi zostać rozegrana w trakcie trwania sezonu."
 msgstr "You have to play this game during the season."
 
-#: iglo/league/models.py:351
+#: iglo/league/models.py:363
 msgid "Każdy z każdym"
 msgstr "Round robin"
 
-#: iglo/league/models.py:352
+#: iglo/league/models.py:364
 msgid "McMahon"
 msgstr "McMahon"
 
-#: iglo/league/models.py:353 iglo/league/texts.py:68
+#: iglo/league/models.py:365 iglo/league/texts.py:68
 msgid "Banded Round Robin"
 msgstr "Banded Round Robin"
 
@@ -267,7 +267,7 @@ msgstr ""
 "later)"
 
 #: iglo/league/texts.py:34 iglo/templates/league/group_detail.html:64
-#: iglo/templates/league/group_detail.html:103
+#: iglo/templates/league/group_detail.html:107
 msgid "Punkty"
 msgstr "Points"
 
@@ -667,7 +667,7 @@ msgstr "Results"
 msgid "Sezony"
 msgstr "Seasons"
 
-#: iglo/templates/base.html:58 iglo/templates/league/group_detail.html:206
+#: iglo/templates/base.html:58 iglo/templates/league/group_detail.html:218
 #: iglo/templates/league/player_detail.html:17
 #: iglo/templates/league/player_list.html:5
 #: iglo/templates/league/player_list.html:12
@@ -782,7 +782,7 @@ msgid "Brak przeciwnika w tej rundzie."
 msgstr "No opponent this round."
 
 #: iglo/templates/league/game_detail.html:63
-#: iglo/templates/league/game_detail.html:107
+#: iglo/templates/league/game_detail.html:113
 #: iglo/templates/league/group_all_games.html:132
 #: iglo/templates/league/group_games.html:97
 msgid "This game is eligible for EGD export"
@@ -805,11 +805,26 @@ msgstr "The game has not taken place yet."
 msgid "Ta gra nie została rozegrana w terminie"
 msgstr "This game is delayed"
 
-#: iglo/templates/league/game_detail.html:102
+#: iglo/templates/league/game_detail.html:93
+#: iglo/templates/league/game_form.html:47
+#: iglo/templates/league/upcoming_games_list.html:18
+#, fuzzy
+#| msgid ""
+#| "Gry bez wyniku będą automatycznie oznaczane jako nierozegrane po 7 dniach "
+#| "od terminu."
+msgid ""
+"Gry bez wyniku będą automatycznie oznaczane jako nierozegrane po 7 dniach od "
+"terminu. Gry nadal można rozegrać, dopóki sezon nie zostanie zamknięty."
+msgstr ""
+"Games without a result will be automatically marked as unplayed after 7 days "
+"from the deadline. Games can still be played as long as the season remains "
+"open."
+
+#: iglo/templates/league/game_detail.html:108
 msgid "EGD Status"
 msgstr "EGD Status"
 
-#: iglo/templates/league/game_detail.html:111
+#: iglo/templates/league/game_detail.html:117
 msgid ""
 "The game will be exported to EGD once it has been played and a result is "
 "recorded."
@@ -817,11 +832,11 @@ msgstr ""
 "The game will be exported to EGD once it has been played and a result is "
 "recorded."
 
-#: iglo/templates/league/game_detail.html:115
+#: iglo/templates/league/game_detail.html:121
 msgid "This game is not eligible for EGD export"
 msgstr "This game is not eligible for EGD export"
 
-#: iglo/templates/league/game_detail.html:119
+#: iglo/templates/league/game_detail.html:125
 msgid ""
 "For a game to be eligible for EGD export, both players must have agreed to "
 "EGD reporting for this season:"
@@ -829,17 +844,17 @@ msgstr ""
 "For a game to be eligible for EGD export, both players must have agreed to "
 "EGD reporting for this season:"
 
-#: iglo/templates/league/game_detail.html:125
-#: iglo/templates/league/game_detail.html:133
+#: iglo/templates/league/game_detail.html:131
+#: iglo/templates/league/game_detail.html:139
 msgid "Has approved EGD reporting"
 msgstr "Has approved EGD reporting"
 
-#: iglo/templates/league/game_detail.html:127
-#: iglo/templates/league/game_detail.html:135
+#: iglo/templates/league/game_detail.html:133
+#: iglo/templates/league/game_detail.html:141
 msgid "Has not approved EGD reporting"
 msgstr "Has not approved EGD reporting"
 
-#: iglo/templates/league/game_detail.html:141
+#: iglo/templates/league/game_detail.html:147
 msgid ""
 "Players can update their EGD reporting preferences in their account "
 "settings, which will apply to future seasons. The current season's EGD "
@@ -853,7 +868,13 @@ msgstr ""
 msgid "Edycja"
 msgstr "Edit"
 
-#: iglo/templates/league/game_form.html:47
+#: iglo/templates/league/game_form.html:46
+#, fuzzy
+#| msgid "Uwaga"
+msgid "Uwaga!"
+msgstr "Warning"
+
+#: iglo/templates/league/game_form.html:54
 #: iglo/templates/league/player_form.html:16
 msgid "Zapisz"
 msgstr "Save"
@@ -867,8 +888,8 @@ msgstr "Groups"
 
 #: iglo/templates/league/game_list.html:20
 #: iglo/templates/league/group_detail.html:61
-#: iglo/templates/league/group_detail.html:97
-#: iglo/templates/league/group_detail.html:133
+#: iglo/templates/league/group_detail.html:101
+#: iglo/templates/league/group_detail.html:141
 #: iglo/templates/review/review_list.html:20
 msgid "Gracz"
 msgstr "Player"
@@ -994,8 +1015,8 @@ msgid "Miejsce"
 msgstr "Place"
 
 #: iglo/templates/league/group_detail.html:63
-#: iglo/templates/league/group_detail.html:100
-#: iglo/templates/league/group_detail.html:136
+#: iglo/templates/league/group_detail.html:104
+#: iglo/templates/league/group_detail.html:144
 msgid "Rundy"
 msgstr "Rounds"
 
@@ -1004,87 +1025,107 @@ msgid "SODOS"
 msgstr "SODOS"
 
 #: iglo/templates/league/group_detail.html:66
-#: iglo/templates/league/group_detail.html:146
+#: iglo/templates/league/group_detail.html:109
+#: iglo/templates/league/group_detail.html:154
+#, fuzzy
+#| msgid ""
+#| "Suma wszystkich nierozegranych gier (gdy jeden z graczy lub obaj gracze "
+#| "nie stawili się na partię)"
+msgid ""
+"Suma wszystkich nierozegranych gier (gdy ten gracz lub obaj gracze nie "
+"stawili się na partię)"
+msgstr ""
+"Total of all unplayed games (when this player or both players did not show up for "
+"the game)"
+
+#: iglo/templates/league/group_detail.html:67
+#: iglo/templates/league/group_detail.html:110
+#: iglo/templates/league/group_detail.html:155
+msgid "Walkowery"
+msgstr "Walkovers"
+
+#: iglo/templates/league/group_detail.html:69
+#: iglo/templates/league/group_detail.html:157
 msgid "Start"
 msgstr "Start"
 
-#: iglo/templates/league/group_detail.html:67
-#: iglo/templates/league/group_detail.html:105
-#: iglo/templates/league/group_detail.html:147
+#: iglo/templates/league/group_detail.html:70
+#: iglo/templates/league/group_detail.html:112
+#: iglo/templates/league/group_detail.html:158
 msgid "IGoR"
 msgstr "IGoR"
 
-#: iglo/templates/league/group_detail.html:68
-#: iglo/templates/league/group_detail.html:106
-#: iglo/templates/league/group_detail.html:148
+#: iglo/templates/league/group_detail.html:71
+#: iglo/templates/league/group_detail.html:113
+#: iglo/templates/league/group_detail.html:159
 #, fuzzy
 #| msgid "SOS"
 msgid "OGS"
 msgstr "SOS"
 
-#: iglo/templates/league/group_detail.html:96
-#: iglo/templates/league/group_detail.html:132
+#: iglo/templates/league/group_detail.html:100
+#: iglo/templates/league/group_detail.html:140
 #, fuzzy
 #| msgid "Edycja"
 msgid "Pozycja"
 msgstr "Edit"
 
-#: iglo/templates/league/group_detail.html:139
+#: iglo/templates/league/group_detail.html:147
 msgid "MMS"
 msgstr "MMS"
 
-#: iglo/templates/league/group_detail.html:142
+#: iglo/templates/league/group_detail.html:150
 msgid "SOS"
 msgstr "SOS"
 
-#: iglo/templates/league/group_detail.html:145
+#: iglo/templates/league/group_detail.html:153
 msgid "SOSOS"
 msgstr "SOSOS"
 
-#: iglo/templates/league/group_detail.html:175
+#: iglo/templates/league/group_detail.html:187
 msgid "Nieznany typ grupy"
 msgstr "Group type unknown"
 
-#: iglo/templates/league/group_detail.html:181
+#: iglo/templates/league/group_detail.html:193
 msgid "Jak czytać wyniki?"
 msgstr "How to read results?"
 
-#: iglo/templates/league/group_detail.html:191
+#: iglo/templates/league/group_detail.html:203
 #: iglo/templates/league/group_games.html:54
 msgid "Nowa runda"
 msgstr "New round"
 
-#: iglo/templates/league/group_detail.html:198
+#: iglo/templates/league/group_detail.html:210
 #: iglo/templates/league/group_games.html:61
 msgid "Eksport EGD"
 msgstr "Export EDG"
 
-#: iglo/templates/league/group_detail.html:211
+#: iglo/templates/league/group_detail.html:223
 msgid "Dodaj"
 msgstr "Add"
 
-#: iglo/templates/league/group_detail.html:233
+#: iglo/templates/league/group_detail.html:245
 msgid "Punkty początkowe"
 msgstr "Starting points"
 
-#: iglo/templates/league/group_detail.html:244
+#: iglo/templates/league/group_detail.html:256
 msgid "Move up 1 position"
 msgstr "Move up 1 position"
 
-#: iglo/templates/league/group_detail.html:247
+#: iglo/templates/league/group_detail.html:259
 msgid "Move down 1 position"
 msgstr "Move down 1 position"
 
-#: iglo/templates/league/group_detail.html:249
-#: iglo/templates/league/group_detail.html:258
+#: iglo/templates/league/group_detail.html:261
+#: iglo/templates/league/group_detail.html:270
 msgid "Move to position"
 msgstr "Move to position"
 
-#: iglo/templates/league/group_detail.html:259
+#: iglo/templates/league/group_detail.html:271
 msgid "Move"
 msgstr "Move"
 
-#: iglo/templates/league/group_detail.html:262
+#: iglo/templates/league/group_detail.html:274
 msgid "Usuń"
 msgstr "Remove"
 
@@ -1239,8 +1280,7 @@ msgstr "Recompute IGoR"
 msgid ""
 "Przelicz wewnętrzny ranking IGLO (IGoR) na podstawie wszystkich rozegranych "
 "gier."
-msgstr ""
-"Recalculate internal IGLO ranking (IGoR) based on all played games."
+msgstr "Recalculate internal IGLO ranking (IGoR) based on all played games."
 
 #: iglo/templates/league/player_detail.html:47
 #: iglo/templates/league/player_detail.html:70

@@ -87,6 +87,12 @@
                         <i class="fas fa-exclamation-triangle text-danger"
                            data-bs-toggle="tooltip" data-bs-placement="top"
                            title="{% translate "Ta gra nie została rozegrana w terminie" %}"></i>
+                        
+                        {% if not object.is_played %}
+                            <div class="alert alert-warning mt-2">
+                                <i class="fas fa-clock"></i> {% translate "Gry bez wyniku będą automatycznie oznaczane jako nierozegrane po 7 dniach od terminu. Gry nadal można rozegrać, dopóki sezon nie zostanie zamknięty." %}
+                            </div>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
                 {% if object.sgf_link %}

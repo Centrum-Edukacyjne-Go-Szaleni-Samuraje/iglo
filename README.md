@@ -44,6 +44,7 @@ alias manage="poetry run python3 iglo/manage.py"
 # docker stop iglo-db; docker rm iglo-db
 docker ps -a
 docker run -e POSTGRES_PASSWORD=postgres --name iglo-db -p ${IGLO_DB_PORT}:5432 -d postgres
+# docker restart iglo-db
 manage migrate
 
 # Populate Postgres v1

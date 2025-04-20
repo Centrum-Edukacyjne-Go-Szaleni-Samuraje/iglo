@@ -234,6 +234,10 @@ CELERY_BEAT_SCHEDULE = {
     "send-delayed-games-reminder": {
         "task": "league.tasks.send_delayed_games_reminder",
         "schedule": crontab(hour="8", minute="0"),
+    },
+    "mark-overdue-games-as-unplayed": {
+        "task": "league.tasks.mark_overdue_games_as_unplayed",
+        "schedule": crontab(minute="15", hour='*'),
     }
 }
 
@@ -287,6 +291,7 @@ LOCALE_PATHS = [
 ENABLE_AI_ANALYSE_UPLOAD = env("ENABLE_AI_ANALYSE_UPLOAD", as_bool=True, default=False)
 ENABLE_UPCOMING_GAMES_REMINDER = env("ENABLE_UPCOMING_GAMES_REMINDER", as_bool=True, default=True)
 ENABLE_DELAYED_GAMES_REMINDER = env("ENABLE_DELAYED_GAMES_REMINDER", as_bool=True, default=False)
+ENABLE_AUTO_MARK_UNPLAYED_GAMES = env("ENABLE_AUTO_MARK_UNPLAYED_GAMES", as_bool=True, default=True)
 ENABLE_PROFILING = env("ENABLE_PROFILING", as_bool=True, default=False)
 FAST_IGOR = env("FAST_IGOR", as_bool=True, default=False)
 

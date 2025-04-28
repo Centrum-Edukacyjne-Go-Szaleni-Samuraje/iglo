@@ -214,6 +214,50 @@ class GroupObjectMixin(SingleObjectMixin):
 class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
     model = Group
     required_roles = [UserRole.REFEREE]
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # If we're in the draft state, get previous positions from the last season
+        if self.object.season.state == SeasonState.DRAFT:
+            context['prev_positions'] = self.get_previous_positions()
+            
+        return context
+    
+    def get_previous_positions(self):
+        """Get the positions of players from the last finished season's banded group."""
+        try:
+            # Get the last season (excluding current one)
+            last_season = Season.objects.filter(
+                number__lt=self.object.season.number,
+                state=SeasonState.FINISHED
+            ).order_by('-number').first()
+            
+            if not last_season:
+                return {}
+                
+            # Find the banded group in the last season, if any
+            banded_group = Group.objects.filter(
+                season=last_season,
+                type=GroupType.BANDED
+            ).first()
+            
+            if not banded_group:
+                return {}
+                
+            # Create a dictionary with player_id -> position for all members with final_order
+            positions = {}
+            for member in Member.objects.filter(
+                group=banded_group
+            ).select_related('player').order_by('final_order'):
+                if member.final_order is not None:
+                    positions[member.player.id] = member.final_order
+                    
+            return positions
+            
+        except Exception:
+            # Return empty dict if any errors occur
+            return {}
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

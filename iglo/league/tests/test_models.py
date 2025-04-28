@@ -347,6 +347,48 @@ class SeasonTestCase(TestCase):
 
         season.refresh_from_db()
         self.assertEqual(season.state, SeasonState.FINISHED)
+        
+    def test_revert_to_draft(self):
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS, start_date=datetime.date(2021, 1, 1))
+        group = GroupFactory(season=season, type=GroupType.ROUND_ROBIN)
+        member_1 = MemberFactory(group=group, initial_score=1.0)
+        member_2 = MemberFactory(group=group, initial_score=0.5)
+        round_1 = Round.objects.create(group=group, number=1, start_date=season.start_date, 
+                                     end_date=season.start_date + datetime.timedelta(days=6))
+        game = Game.objects.create(group=group, round=round_1, black=member_1, white=member_2,
+                                 date=datetime.datetime.combine(round_1.end_date, settings.DEFAULT_GAME_TIME))
+        
+        # Revert the season to draft
+        season.revert_to_draft()
+        
+        # Check that the season is in draft state
+        season.refresh_from_db()
+        self.assertEqual(season.state, SeasonState.DRAFT)
+        
+        # Check that rounds and games have been deleted
+        self.assertEqual(Round.objects.filter(group__season=season).count(), 0)
+        self.assertEqual(Game.objects.filter(group__season=season).count(), 0)
+        
+        # Check that initial scores have been reset
+        member_1.refresh_from_db()
+        member_2.refresh_from_db()
+        self.assertEqual(member_1.initial_score, 0.0)
+        self.assertEqual(member_2.initial_score, 0.0)
+        
+    def test_revert_to_draft_with_played_games(self):
+        season = SeasonFactory(state=SeasonState.IN_PROGRESS, start_date=datetime.date(2021, 1, 1))
+        group = GroupFactory(season=season, type=GroupType.ROUND_ROBIN)
+        member_1 = MemberFactory(group=group)
+        member_2 = MemberFactory(group=group)
+        round_1 = Round.objects.create(group=group, number=1, start_date=season.start_date, 
+                                     end_date=season.start_date + datetime.timedelta(days=6))
+        game = Game.objects.create(group=group, round=round_1, black=member_1, white=member_2,
+                                 date=datetime.datetime.combine(round_1.end_date, settings.DEFAULT_GAME_TIME),
+                                 winner=member_1, win_type=WinType.RESIGN)
+        
+        # Revert should fail because there are played games
+        with self.assertRaises(GamesWithoutResultError):
+            season.revert_to_draft()
 
     def test_start_with_mcmahon_group(self):
         season = SeasonFactory(state=SeasonState.DRAFT, start_date=datetime.date(2021, 1, 1))

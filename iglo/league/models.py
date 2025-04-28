@@ -188,6 +188,31 @@ class Season(models.Model):
     def validate_state(self, state: SeasonState) -> None:
         if self.state != state:
             raise WrongSeasonStateError()
+            
+    def revert_to_draft(self) -> None:
+        """
+        Reverts a season from IN_PROGRESS back to DRAFT state.
+        Removes all generated games and rounds to allow reconfiguration.
+        Can only be used if no games have been played yet.
+        """
+        if self.state != SeasonState.IN_PROGRESS:
+            raise WrongSeasonStateError()
+            
+        # Check if any games have been played
+        if Game.objects.filter(group__season=self, win_type__isnull=False).exclude(win_type=WinType.BYE).exists():
+            raise GamesWithoutResultError("Cannot revert season with played games")
+            
+        # Delete all games and rounds
+        for group in self.groups.all():
+            group.games.all().delete()
+            group.rounds.all().delete()
+            
+        # Reset member initial scores that were calculated during start()
+        Member.objects.filter(group__season=self).update(initial_score=0.0)
+            
+        # Update season state
+        self.state = SeasonState.DRAFT
+        self.save()
 
     def reset_groups(self, use_igor: bool, pairing_type: str=PairingType.DEFAULT, band_size: int=2,
                    point_difference: float=1.0) -> None:

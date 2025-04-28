@@ -49,6 +49,13 @@
                                     <i class="fa fa-flag-checkered"></i>
                                     <span class="d-none d-md-inline">{% translate "Zakończ Sezon" %}</span>
                                 </button>
+                                {% if user.is_admin %}
+                                <button type="submit" class="btn btn-warning" name="action-revert-to-draft" 
+                                        onclick="return confirm('{% translate SEASON_REVERT_TO_DRAFT_CONFIRM %}')">
+                                    <i class="fas fa-undo"></i>
+                                    <span class="d-none d-md-inline">{% translate "Cofnij do Przygotowania" %}</span>
+                                </button>
+                                {% endif %}
                             {% endif %}
                         </form>
                     {% endif %}

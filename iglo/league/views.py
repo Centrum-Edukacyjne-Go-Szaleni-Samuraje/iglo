@@ -29,7 +29,9 @@ from league.models import (
     Member,
     GamesWithoutResultError,
     WinType,
-    AlreadyPlayedGamesError, GroupType,
+    AlreadyPlayedGamesError, 
+    GroupType,
+    WrongSeasonStateError,
 )
 from league.models import SeasonState
 from league.permissions import (
@@ -63,6 +65,11 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
             queryset.prefetch_related("groups__members__player", "groups__teacher"),
             number=self.kwargs["number"],
         )
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SEASON_REVERT_TO_DRAFT_CONFIRM'] = texts.SEASON_REVERT_TO_DRAFT_CONFIRM
+        return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -82,6 +89,34 @@ class SeasonDetailView(UserRoleRequiredForModify, DetailView):
                     level=messages.WARNING,
                     message=texts.GAMES_WITHOUT_RESULT_ERROR,
                 )
+        elif "action-revert-to-draft" in request.POST:
+            # Only admins can revert a season to draft
+            if not request.user.is_admin:
+                messages.add_message(
+                    request=request,
+                    level=messages.ERROR,
+                    message=texts.SEASON_REVERT_TO_DRAFT_ADMIN_ONLY,
+                )
+            else:
+                try:
+                    self.object.revert_to_draft()
+                    messages.add_message(
+                        request=request,
+                        level=messages.SUCCESS,
+                        message=texts.SEASON_REVERT_TO_DRAFT_SUCCESS,
+                    )
+                except GamesWithoutResultError:
+                    messages.add_message(
+                        request=request,
+                        level=messages.ERROR,
+                        message=texts.SEASON_REVERT_TO_DRAFT_ERROR,
+                    )
+                except WrongSeasonStateError:
+                    messages.add_message(
+                        request=request,
+                        level=messages.ERROR,
+                        message=texts.SEASON_REVERT_TO_DRAFT_WRONG_STATE,
+                    )
         return self.render_to_response(context)
 
 

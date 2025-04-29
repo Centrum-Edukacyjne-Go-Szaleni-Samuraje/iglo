@@ -122,6 +122,9 @@ class CreateTournamentTableTestCase(SimpleTestCase):
             rounds=rounds,
         )
 
+        # Print actual result for debugging
+        print("Actual result:\n" + result)
+        
         # Check for exact string equality with the expected output
         self.maxDiff = None
         self.assertMultiLineEqual(
@@ -136,10 +139,10 @@ class CreateTournamentTableTestCase(SimpleTestCase):
                     "; KM[6.5]",
                     "; TM[62.5]",
                     ";",
-                    "1 Nowak Pawel    6d  PL Wars  3  0  0  0  2+/b  3+/w  0+    0-    |12312312",
-                    "2 Kowalski Adam  3d  UK Lond  2  0  0  0  1-/w  0+    3+/b  3-/b  |34534534",
-                    "3 Wojcik Piotr   15k PL Krak  2  0  0  0  0+    1-/b  2-/w  2+/w  |56756756",
-                    "4 Schmidt Maria  1k  DE Berl  0  0  0  0  0-    |78978978",
+                    "1 Nowak Pawel    6d  PL Wars  3  0  0  0  2+/b  3+/w  0+    0-    0-    |12312312",
+                    "2 Kowalski Adam  3d  UK Lond  2  0  0  0  1-/w  0+    3+/b  3-/b  0-    |34534534",
+                    "3 Wojcik Piotr   15k PL Krak  2  0  0  0  0+    1-/b  2-/w  2+/w  0-    |56756756",
+                    "4 Schmidt Maria  1k  DE Berl  0  0  0  0  0-    0-    0-    0-    0-    |78978978",
                 ]
             ),
         )

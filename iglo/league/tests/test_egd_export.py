@@ -362,9 +362,9 @@ class ComplexEGDExportFormatTestCase(TestCase):
 ; KM[6.5]
 ; TM[52.5]
 ;
-1 Doe John       {john_rank}  PL       1  0  0  0  2+/b  |12345678
+1 Doe John       {john_rank}  PL       1  0  0  0  2+/b  0-    |12345678
 2 Smith Jane     {jane_rank}  UK       1  0  0  0  1-/w  3+/b  |87654321
-3 Johnson Alice  {alice_rank}  DE       0  0  0  0  2-/w  |13579246
+3 Johnson Alice  {alice_rank}  DE       0  0  0  0  0-    2-/w  |13579246
 """.strip()
 
         # Set self.maxDiff to None to see the full diff

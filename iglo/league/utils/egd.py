@@ -89,10 +89,18 @@ def create_tournament_table(
         results = ""
         for round in rounds:
             result_width = place_width + 5
+            player_found_in_round = False
+            
+            # Handle empty rounds (no EGD-eligible games in this round)
+            if not round:
+                results += "0-".ljust(result_width)
+                continue
+                
             for game in round:
                 if game.winner == player:
                     wins += 1
                 if player in [game.black, game.white, game.winner]:
+                    player_found_in_round = True
                     if not game.black and not game.white and game.winner == player:
                         results += "0+".ljust(result_width)
                     elif game.winner is None:
@@ -103,6 +111,10 @@ def create_tournament_table(
                         result = "+" if player == game.winner else "-"
                         color = "b" if player == game.black else "w"
                         results += f"{opponent_place}{result}/{color}".ljust(result_width)
+            
+            # Add "did not play" indicator if player didn't participate in this round
+            if not player_found_in_round:
+                results += "0-".ljust(result_width)
         stats = "  ".join(
             [
                 str(wins),

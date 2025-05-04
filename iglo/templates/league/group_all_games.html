@@ -93,7 +93,7 @@
                         <th>{% translate "Biały" %}</th>
                         <th>{% translate "Wynik" %}</th>
                         <th>{% translate "Data" %}</th>
-                        <th>{% translate "Recenzja" %}</th>
+                        <th>{% translate "Komentarz" %}</th>
                         <th>{% translate "Akcje" %}</th>
                         <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Nauczyciel" %}</th>
                     </tr>
@@ -141,10 +141,12 @@
                             <td>
                                 {% if game.review_video_link %}
                                     <a href="{{ game.review_video_link }}" target="_blank" class="badge bg-success text-decoration-none">
-                                        <i class="fas fa-video"></i> {% translate "Zobacz recenzję" %}
+                                        <i class="fab fa-youtube"></i> {% translate "Komentarz" %}
                                     </a>
+                                {% elif game.is_played %}
+                                    <span class="badge bg-light text-dark">{% translate "Brak komentarza" %}</span>
                                 {% else %}
-                                    <span class="text-muted">{% translate "Brak recenzji" %}</span>
+                                    <!-- Don't show anything for unplayed games -->
                                 {% endif %}
                             </td>
                             <td>

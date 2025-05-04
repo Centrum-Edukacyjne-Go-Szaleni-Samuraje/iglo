@@ -49,9 +49,9 @@ export ENABLE_PROFILING=False
 export FAST_IGOR=True
 export IGOR_MAX_STEPS=120  # Maximum steps for IGOR calculations
 
-# Add bin directory to PATH for easier access to the manage.sh script
+# Add bin directory to PATH for easier access to the idev script
 export PATH="$PROJECT_ROOT/bin:$PATH"
-echo "Added $PROJECT_ROOT/bin to PATH. You can now use manage.sh directly."
+echo "Added $PROJECT_ROOT/bin to PATH. You can now use idev directly."
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
@@ -86,44 +86,44 @@ if [ "$NEW_DB" = true ]; then
     
     # Apply migrations
     echo "Applying migrations..."
-    "$PROJECT_ROOT/bin/manage.sh" migrate
+    "$PROJECT_ROOT/bin/idev" migrate
     
     # Load sample data
     echo "Loading sample data..."
-    "$PROJECT_ROOT/bin/manage.sh" load_seasons fixtures/seasons.json
+    "$PROJECT_ROOT/bin/idev" load_seasons fixtures/seasons.json
     
     # Create test superuser
     echo "Creating superuser..."
-    echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | "$PROJECT_ROOT/bin/manage.sh" shell
+    echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | "$PROJECT_ROOT/bin/idev" shell
     
     echo "Database initialization complete."
 else
     echo "Using existing database. Skipping migrations and fixture loading."
-    echo "manage.sh migrate  # Run database migrations manually"
-    echo "manage.sh load_seasons fixtures/seasons.json  # Load sample data manually"
+    echo "idev migrate  # Run database migrations manually"
+    echo "idev load_seasons fixtures/seasons.json  # Load sample data manually"
 fi
 
 echo ""
 echo "Setup complete! Available commands:"
 echo ""
 echo "# Development server"
-echo "manage.sh runserver  # Start the development server"
+echo "idev runserver  # Start the development server"
 echo ""
 echo "# Database commands"
-echo "manage.sh migrate  # Apply database migrations"
-echo "manage.sh load_seasons fixtures/seasons.json  # Load sample data"
-echo "manage.sh shell  # Open Django shell"
+echo "idev migrate  # Apply database migrations"
+echo "idev load_seasons fixtures/seasons.json  # Load sample data"
+echo "idev shell  # Open Django shell"
 echo ""
 echo "# Testing"
-echo "manage.sh test iglo  # Run all tests"
-echo "manage.sh test league.tests.test_egd_export  # Run specific tests"
+echo "idev test iglo  # Run all tests"
+echo "idev test league.tests.test_egd_export  # Run specific tests"
 echo ""
 echo "# Translation"
-echo "manage.sh makemessages --all  # Update translation files"
+echo "idev makemessages --all  # Update translation files"
 echo ""
 echo "# Performance profiling"
 echo "export ENABLE_PROFILING=True  # Enable performance profiling"
-echo "manage.sh shell  # Then run: from logging import getLogger; logger = getLogger('misc.middleware'); print(logger.dump_profile_stats())"
+echo "idev shell  # Then run: from logging import getLogger; logger = getLogger('misc.middleware'); print(logger.dump_profile_stats())"
 echo ""
 echo "# PostgreSQL access"
 echo "docker exec -it iglo-db bash  # Connect to PostgreSQL container"

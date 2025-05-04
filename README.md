@@ -33,7 +33,7 @@ The setup script will:
 
 After setup, you can run the development server:
 ```bash
-manage.sh runserver
+idev runserver
 ```
 
 The setup script will print a comprehensive list of available commands after completion.
@@ -52,7 +52,7 @@ celery -A iglo worker -l INFO --concurrency 2 --max-tasks-per-child 50 --max-mem
 You can use Django's shell for interactive development:
 
 ```bash
-manage.sh shell
+idev shell
 ```
 
 Example of working with the IGOR system:

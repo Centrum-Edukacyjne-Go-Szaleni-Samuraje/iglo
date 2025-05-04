@@ -148,13 +148,78 @@ class EGDException(Exception):
     pass
 
 
-def get_gor_by_pin(pin: str) -> int:
+@dataclass(frozen=True)
+class EGDPlayerData:
+    """Comprehensive player data from EGD."""
+    pin: str
+    first_name: str
+    last_name: str
+    country_code: str
+    club: str
+    grade: str
+    gor: int
+    last_appearance: str
+    total_tournaments: int
+    egf_placement: Optional[int] = None
+
+
+def get_player_data_by_pin(pin: str) -> EGDPlayerData:
+    """
+    Fetch comprehensive player data from EGD by PIN.
+    
+    Returns:
+        EGDPlayerData object containing all relevant player information
+    
+    Raises:
+        EGDException: If the EGD API returns an error or player data cannot be fetched
+    """
     url = f'http://www.europeangodatabase.eu/EGD/GetPlayerDataByPIN.php?pin={pin}'
     response = requests.get(url)
     if response.status_code != 200:
         raise EGDException(f'EGD is responding with {response.status_code}')
+    
     content = response.json()
+    
+    if content.get('retcode') != 'Ok':
+        raise EGDException(f'EGD returned error: {content.get("retcode", "Unknown error")}')
+    
     try:
-        return int(content['Gor'])
-    except KeyError:
-        raise EGDException(f'can not fetch player data (probably invalid pin)')
+        # Use Real_Name and Real_Last_Name if available, otherwise fall back to Name and Last_Name
+        first_name = content.get('Real_Name', content.get('Name', ''))
+        last_name = content.get('Real_Last_Name', content.get('Last_Name', ''))
+        
+        return EGDPlayerData(
+            pin=pin,
+            first_name=first_name,
+            last_name=last_name,
+            country_code=content.get('Country_Code', ''),
+            club=content.get('Club', ''),
+            grade=content.get('Grade', ''),
+            gor=int(content['Gor']),
+            last_appearance=content.get('Last_Appearance', ''),
+            total_tournaments=int(content.get('Tot_Tournaments', 0)),
+            egf_placement=int(content['EGF_Placement']) if content.get('EGF_Placement') else None
+        )
+    except (KeyError, ValueError) as e:
+        raise EGDException(f'Cannot parse player data: {str(e)}')
+
+
+def get_gor_by_pin(pin: str) -> int:
+    """
+    Fetch player's GoR (Go Rating) from EGD by PIN.
+    
+    For backward compatibility. Uses get_player_data_by_pin internally.
+    
+    Returns:
+        int: Player's GoR rating
+        
+    Raises:
+        EGDException: If the player data cannot be fetched or GoR is missing
+    """
+    try:
+        player_data = get_player_data_by_pin(pin)
+        return player_data.gor
+    except EGDException:
+        raise
+    except Exception as e:
+        raise EGDException(f'Cannot fetch player GoR: {str(e)}')

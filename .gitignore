@@ -9,3 +9,6 @@ CLAUDE.md
 
 # Ignore virtual environment
 .venv/
+
+# Ignore database dumps
+iglo_dumps/

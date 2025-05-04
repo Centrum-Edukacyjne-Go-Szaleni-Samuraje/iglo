@@ -6,3 +6,6 @@ db.sqlite3
 *.mo
 .DS_Store
 CLAUDE.md
+
+# Ignore virtual environment
+.venv/

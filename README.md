@@ -2,217 +2,152 @@
 
 You need Python 3.10 to run this project.
 
-## Dev workflow and useful commands:
+## Development Setup
 
-```
+The easiest way to set up the development environment is by using the provided setup script:
 
-# One time setup/install:
+```bash
+# Install system dependencies if you haven't already
+sudo apt install -y python3-venv docker   # For Ubuntu/Debian
+# OR
+sudo dnf install -y python3-venv docker   # For Fedora/RHEL
 
-systeminstall() {
-  # sudo apt -y install $@
-  sudo dnf install -y $@
-}
+# You might need these additional packages for certain dependencies:
+# sudo apt/dnf install -y gcc gcc-c++ python3-devel gcc-gfortran openblas-devel lapack-devel cmake pkg-config libopenblas-dev
 
-
-systeminstall virtualenv
-systeminstall docker
-# systeminstall gcc-c++ python3-devel gcc-gfortran openblas-devel lapack-devel cmake pkg-config libopenblas-dev
-
+# Ensure Docker is running
 sudo systemctl start docker
-sudo usermod -aG docker $USER
-# needs logout+login
+sudo usermod -aG docker $USER  # May require logout+login to take effect
 
-
-# Virtual env
-
-# rm -fr ${HOME}/venv/iglo/
-virtualenv ${HOME}/venv/iglo
-source ${HOME}/venv/iglo/bin/activate
-pip install poetry
-poetry install
-
-# Setup
-
-export IGLO_DB_PORT=15432  # envvar needed for manage and other commands
-export CELERY_TASK_ALWAYS_EAGER=True
-export ENABLE_PROFILING=False  # Uncomment to enable performance profiling
-export FAST_IGOR=True  # Cuts IGOR iterations to 30
-alias manage="poetry run python3 iglo/manage.py"
-
-# Start Postgres
-
-# docker stop iglo-db; docker rm iglo-db
-docker ps -a
-docker run -e POSTGRES_PASSWORD=postgres --name iglo-db -p ${IGLO_DB_PORT}:5432 -d postgres
-# docker restart iglo-db
-manage migrate
-
-# Populate Postgres v1
-
-## Method 1
-
-# We can't commit fixtures/iglo_db.dump to github, due to GPDR law.
-ssh apps@iglo.szalenisamuraje.org 'docker exec iglo-production_db_1 pg_dump -Fc -U postgres' > fixtures/iglo_db.dump
-cat fixtures/iglo_db.dump | docker exec -i iglo-db pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers
-
-## Method 2
-
-manage load_seasons fixtures/seasons.json
-
-# Run IGLO web server
-
-echo "from accounts.models import User; User.objects.create_superuser(email='test@test.com', password='test')" | poetry run python3 iglo/manage.py shell
-# manage createsuperuser # more manual method.
-
-# Dev commands
-
-manage runserver
-manage test iglo
-
+# Run the setup script (must be sourced, not executed)
+source setup_dev.sh
 ```
 
-Now you can go to `http://127.0.0.1:8000/`
+The setup script will:
+1. Create a virtual environment in `.venv/`
+2. Install all dependencies
+3. Set environment variables
+4. Start PostgreSQL in Docker
+5. Apply migrations (for new databases)
+6. Create a test superuser (for new databases)
 
-### update translation file, then one can add translations
-
-`manage makemessages --all`
-
-### update lib versions
-
-```
-export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
-poetry update --lock
-```
-
-Method for accurating only:
-```
-poetry cache clear PyPI --all  # sometimes
-poetry add accurating@latest
+After setup, you can run the development server:
+```bash
+manage.sh runserver
 ```
 
-### Performance Profiling
+The setup script will print a comprehensive list of available commands after completion.
 
-IGLO includes a performance profiling system that helps identify and fix bottlenecks like N+1 query issues.
-To enable the profiling system:
+## Advanced Topics
+
+### Celery Development
+Celery is configured to run tasks eagerly by default (set with `CELERY_TASK_ALWAYS_EAGER=True`). If you need to run Celery as a separate worker:
 
 ```bash
-export ENABLE_PROFILING=True
-```
-
-After enabling profiling and running some pages, you can view a performance summary in the Django shell:
-
-```bash
-manage shell
-```
-
-```python
-from logging import getLogger
-logger = getLogger('misc.middleware')
-print(logger.dump_profile_stats())  # Shows performance stats summary
-```
-
-**Note**: Only enable profiling during development as it adds overhead to request processing.
-
-### Celery dev run.
-Should not be needed because we run iglo with CELERY_TASK_ALWAYS_EAGER=True
-
-```
-export IGOR_MAX_STEPS=120
 cd iglo
 celery -A iglo worker -l INFO --concurrency 2 --max-tasks-per-child 50 --max-memory-per-child 200000
 ```
 
-### Shell development
+### Interactive Shell Development
+You can use Django's shell for interactive development:
 
-This will run python with iglo:
-`manage shell`
+```bash
+manage.sh shell
+```
 
-And then inside you can run
-
+Example of working with the IGOR system:
 ```python
 from importlib import reload
 import league.igor as igor
 
 igor.recalculate_igor()
 
-# edit some code and reload to take new code into account:
+# After editing code, reload the module:
 reload(igor)
 igor.recalculate_igor()
-
 ```
 
-### Postgres access
-
+### Package Management
+To update dependencies:
+```bash
+export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
+poetry update --lock
 ```
-docker exec -it <container id> bash
-psql -U postgres
+
+For specific packages:
+```bash
+poetry cache clear PyPI --all  # If needed
+poetry add <package-name>@latest
 ```
 
 
-## Important links
+## Server Administration
 
-- http://localhost:8000/admin/
-- http://localhost:8000/league/admin
+### Important URLs
+- http://localhost:8000/ - Main application
+- http://localhost:8000/admin/ - Django admin interface
+- http://localhost:8000/league/admin - League admin interface
 
-## ssh debugging
-
-`ssh apps@iglo.szalenisamuraje.org`
-
-Global logs:
-`less -R logs.txt`
-
-Iglo dockers on the server:
-`docker ps -a | grep iglo`
-(staging = devel)
-
-Logs of the worker (eg igor recalc)
-`docker logs iglo-staging_worker_1`
-
-Get into dev web docker:
-`docker exec -it iglo-staging_web_1 bash`
-
-
-We get: `bash-5.1#`
-`psql -U postgres`
-
-Postgres nice commands:
-
-- `\dt`
-- `select * from league_player limit 1;`
-- `copy (select nick, rank, igor from league_player) to stdout with csv header;`
-
-### Postgres dumps and restores
-
-`ssh apps@iglo.szalenisamuraje.org`
-
-Dumps:
+### PostgreSQL Commands
+Useful PostgreSQL commands when connected to the database:
+```sql
+\dt                                           -- List tables
+SELECT * FROM league_player LIMIT 1;          -- View first player
+\copy (SELECT nick, rank, igor FROM league_player) TO stdout WITH CSV HEADER;  -- Export data
 ```
+
+### Remote Server Access
+For debugging on the production server:
+
+```bash
+# Connect to the server
+ssh apps@iglo.szalenisamuraje.org
+
+# View logs
+less -R logs.txt
+
+# Check Docker containers
+docker ps -a | grep iglo  # Note: staging = devel
+
+# View worker logs
+docker logs iglo-staging_worker_1
+
+# Access development web container
+docker exec -it iglo-staging_web_1 bash
+```
+
+### Database Dumps and Restores
+
+#### IMPORTANT: GDPR Compliance
+We can't commit database dumps to GitHub due to GDPR regulations. Always handle data exports carefully.
+
+#### Copy from Production
+To copy production data to development:
+
+```bash
+# On the server:
+ssh apps@iglo.szalenisamuraje.org 'docker exec iglo-production_db_1 pg_dump -Fc -U postgres' > fixtures/iglo_db.dump
+
+# Then locally:
+cat fixtures/iglo_db.dump | docker exec -i iglo-db pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers
+```
+
+#### Creating and Managing Dumps
+```bash
+# Create dumps with date stamps
 docker exec iglo-staging_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-staging_db_1.$(date +%Y%m%d).pg_dump
 docker exec iglo-production_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump
-```
 
-Copy prod to dev:
-```
+# Copy between environments
 cat iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump | docker exec -i iglo-staging_db_1 pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers --no-acl
 ```
-NOTE: Double check that `docker exec -i iglo-staging_db_1 ...`, don't run on prod db!
 
+⚠️ **WARNING**: Always double-check container names to avoid accidentally overwriting production data. Verify that you're running commands on the intended environment.
 
-## Old instructions:
+### Docker Deployment
+To build and deploy using Docker:
 
-Local development (inside Python venv):
-
-```
-$ pip install poetry
-$ poetry install
-$ docker run --name iglo-db -p 5432:5432 -d postgres
-$ python iglo/manage.py migrate
-$ python iglo/manage.py runserver
-```
-
-Docker build & run:
-
-```
-$ ./deploy/build.sh
-$ ./deploy/start.sh
+```bash
+./deploy/build.sh
+./deploy/start.sh
 ```

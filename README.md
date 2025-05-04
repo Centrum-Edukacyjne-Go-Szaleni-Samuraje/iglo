@@ -121,28 +121,32 @@ docker exec -it iglo-staging_web_1 bash
 #### IMPORTANT: GDPR Compliance
 We can't commit database dumps to GitHub due to GDPR regulations. Always handle data exports carefully.
 
-#### Copy from Production
-To copy production data to development:
+#### Copy from Production for Local Development
+Use the provided script to copy production data to your local environment:
 
 ```bash
-# On the server:
-ssh apps@iglo.szalenisamuraje.org 'docker exec iglo-production_db_1 pg_dump -Fc -U postgres' > fixtures/iglo_db.dump
-
-# Then locally:
-cat fixtures/iglo_db.dump | docker exec -i iglo-db pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers
+# Run from your local machine:
+./bin/copy-prod-data.sh
 ```
 
-#### Creating and Managing Dumps
+This script:
+1. Creates a backup of your current local database
+2. Fetches the production database dump
+3. Restores it to your local development environment
+
+#### Copy from Production to Staging Server
+On the server environment, use the original script:
+
 ```bash
-# Create dumps with date stamps
-docker exec iglo-staging_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-staging_db_1.$(date +%Y%m%d).pg_dump
-docker exec iglo-production_db_1 pg_dump -Fc -U postgres > iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump
-
-# Copy between environments
-cat iglo_dumps/iglo-production_db_1.$(date +%Y%m%d).pg_dump | docker exec -i iglo-staging_db_1 pg_restore -U postgres -d postgres --clean --if-exists --no-owner --no-privileges --disable-triggers --no-acl
+# Run on the server only:
+./copy_iglo_db_prod_to_dev.sh
 ```
 
-⚠️ **WARNING**: Always double-check container names to avoid accidentally overwriting production data. Verify that you're running commands on the intended environment.
+This server script:
+1. Creates backup dumps of both staging and production databases 
+2. Copies production data to the staging environment
+
+⚠️ **WARNING**: Always verify which environment you're working with and which databases will be affected. Database restore operations will overwrite existing data.
 
 ### Docker Deployment
 To build and deploy using Docker:

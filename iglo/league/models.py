@@ -1144,12 +1144,21 @@ class Game(models.Model):
     def is_egd_eligible(self) -> bool:
         """
         Determine if a game is eligible for EGD/EGF submission based on member approvals.
-        Both players must exist (not BYE games) and have egd_approval set for this season.
+        Both players must exist (not BYE games) and either:
+        1. Both players have egd_approval set for this season (new game-based logic), or
+        2. The game's group is marked as EGD-eligible (old group-based logic for backward compatibility)
         The game doesn't need to be played yet to be marked as eligible in the UI.
         """
-        return (self.black and self.white and
-                self.black.egd_approval and
-                self.white.egd_approval)
+        if self.black and self.white:
+            # New game-based eligibility (check both players' approval)
+            if self.black.egd_approval and self.white.egd_approval:
+                return True
+                
+            # Legacy group-based eligibility (for backward compatibility)
+            if self.group.is_egd:
+                return True
+                
+        return False
 
 
 class GameAIAnalyseUploadStatus(TextChoices):

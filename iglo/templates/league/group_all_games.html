@@ -7,6 +7,33 @@
     {{ object.name }} - {% translate "Wszystkie gry" %}{% endblock %}
 
 {% block content %}
+    <style>
+        /* Styles for teacher assignment UI */
+        .teacher-controls {
+            display: flex;
+            align-items: center;
+        }
+        .teacher-select-container {
+            flex: 1;
+        }
+        .apply-next-container {
+            width: auto;
+            margin-left: 0.5rem;
+        }
+        .next-games-count {
+            width: 3.5rem !important;
+            text-align: center;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+        }
+        .apply-to-next {
+            padding-left: 0.4rem;
+            padding-right: 0.4rem;
+        }
+        .highlight-updated {
+            transition: background-color 1s;
+        }
+    </style>
     <div class="row">
         <div class="col">
             <nav aria-label="breadcrumb">
@@ -41,49 +68,54 @@
                 </div>
             </div>
             
-            <div class="mb-3 p-3 bg-light rounded">
-                <div class="form-label fw-bold mb-2">{% translate "Przypisz nauczycieli do grup" %}:</div>
-                <div id="group-selectors" class="d-flex flex-column gap-2">
-                    <div class="d-flex align-items-center group-selector">
-                        <div class="row w-100 align-items-center">
-                            <div class="col-auto">
-                                <label for="groupSize-1" class="me-2 mb-0">{% translate "Grupa" %} 1:</label>
-                            </div>
-                            <div class="col-md-2">
-                                <select id="groupSize-1" class="form-select group-size-select">
-                                    <option value="0">{% translate "Brak" %}</option>
-                                    {% for i in group_options %}
-                                        <option value="{{ i }}">{{ i }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <span class="input-group-text">{% translate "Nauczyciel" %}</span>
-                                    <input type="text" class="form-control teacher-name" placeholder="{% translate "Imię i nazwisko" %}">
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-group-btn" style="display: none;">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <button type="button" id="add-group-btn" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-plus"></i> {% translate "Dodaj grupę" %}
+            {% if user.is_admin or user.is_staff or user|has_role:'referee' %}
+            <div class="mb-3">
+                <form method="post" action="" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="assignment_data" id="assignment-data" value="">
+                    <button type="submit" id="save-to-db-btn" class="btn btn-sm btn-success">
+                        <i class="fas fa-save"></i> {% translate "Zapisz przypisania nauczycieli" %}
                     </button>
-                    <span class="ms-3 text-muted">
-                        {% translate "Przypisz liczbę gier w grupie i odpowiedzialnego nauczyciela." %}
-                    </span>
+                </form>
+                
+                {% if teacher_assignment_success %}
+                <div class="mt-2 alert alert-success small">
+                    <i class="fas fa-check-circle me-1"></i> 
+                    {% translate "Przypisanie nauczycieli zostało zapisane w bazie danych." %}
+                    {% if teacher_assignment_count %}
+                    <strong>{% translate "Zaktualizowano" %}: {{ teacher_assignment_count }} {% translate "gier" %}.</strong>
+                    {% endif %}
                 </div>
-                <div class="mt-2 alert alert-info small">
-                    <i class="fas fa-info-circle me-1"></i> 
-                    {% translate "URL strony jest aktualizowany automatycznie i może być skopiowany i udostępniony innym. Konfiguracja nie jest zapisywana w bazie danych." %}
+                {% endif %}
+                {% if individual_update_success %}
+                <div class="mt-2 alert alert-success small">
+                    <i class="fas fa-check-circle me-1"></i> 
+                    {% translate "Przypisanie nauczyciela do gry zostało zapisane w bazie danych." %}
                 </div>
+                {% endif %}
+                
+                {% if permission_error %}
+                <div class="mt-2 alert alert-danger small">
+                    <i class="fas fa-exclamation-circle me-1"></i> 
+                    {% translate "Nie masz uprawnień do przypisywania nauczycieli." %}
+                </div>
+                {% endif %}
+                
+                {% if json_error %}
+                <div class="mt-2 alert alert-danger small">
+                    <i class="fas fa-exclamation-circle me-1"></i> 
+                    {% translate "Wystąpił błąd podczas przetwarzania danych. Proszę odświeżyć stronę i spróbować ponownie." %}
+                </div>
+                {% endif %}
+                
+                {% if error %}
+                <div class="mt-2 alert alert-danger small">
+                    <i class="fas fa-exclamation-circle me-1"></i> 
+                    {% translate "Wystąpił nieoczekiwany błąd. Proszę spróbować ponownie później." %}
+                </div>
+                {% endif %}
             </div>
+            {% endif %}
 
             <table class="table table-sm table-hover table-striped">
                 <thead class="table-light">
@@ -94,13 +126,13 @@
                         <th>{% translate "Wynik" %}</th>
                         <th>{% translate "Data" %}</th>
                         <th>{% translate "Komentarz" %}</th>
+                        <th>{% translate "Nauczyciel" %}</th>
                         <th>{% translate "Akcje" %}</th>
-                        <th class="group-column text-center bg-primary text-white" style="display: none;">{% translate "Nauczyciel" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for game in all_games %}
-                        <tr>
+                        <tr data-game-id="{{ game.id }}">
                             <td>{{ game.round.number }}</td>
                             <td>
                                 <a href="{{ game.black.player.get_absolute_url }}">
@@ -150,11 +182,47 @@
                                 {% endif %}
                             </td>
                             <td>
+                                {% if user.is_admin or user.is_staff or user|has_role:'referee' %}
+                                <div class="teacher-controls">
+                                    <div class="teacher-select-container">
+                                        <select class="form-select form-select-sm game-teacher-select" data-game-id="{{ game.id }}">
+                                            <option value="">{% translate "Wybierz nauczyciela" %}</option>
+                                            {% for teacher in available_teachers %}
+                                                <option value="{{ teacher.id }}" {% if game.assigned_teacher and game.assigned_teacher.id == teacher.id %}selected{% endif %}>
+                                                    {{ teacher.first_name }} {{ teacher.last_name }}{% if teacher.rank %} {{ teacher.rank|lower }}{% endif %}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="apply-next-container">
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control next-games-count" 
+                                                min="1" max="50" value="5" 
+                                                title="{% translate 'Liczba kolejnych gier do przypisania' %}"
+                                                aria-label="{% translate 'Liczba kolejnych gier' %}">
+                                            <button class="btn btn-outline-secondary apply-to-next" 
+                                                type="button" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top"
+                                                title="{% translate 'Zastosuj tego nauczyciela do kolejnych gier' %}">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                    {% if game.assigned_teacher %}
+                                        {{ game.assigned_teacher.first_name }} {{ game.assigned_teacher.last_name }}{% if game.assigned_teacher.rank %} {{ game.assigned_teacher.rank|lower }}{% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
                                 <a href="{{ game.get_absolute_url }}" class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>
-                            <td class="group-column text-center fw-bold" style="display: none;"></td>
                         </tr>
                     {% empty %}
                         <tr>
@@ -168,168 +236,40 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const groupSelectorsContainer = document.getElementById('group-selectors');
-            const addGroupBtn = document.getElementById('add-group-btn');
+            // Initialize tooltips - one simple line
+            const initializeTooltips = () => document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                .forEach(el => new bootstrap.Tooltip(el));
+                
+            // Utility function to show a toast notification
+            const showToast = (message, type = 'success') => {
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                toast.style.zIndex = '1050';
+                toast.innerHTML = `
+                    <div class="toast show" role="alert">
+                        <div class="toast-header bg-${type} text-white">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                            <strong class="me-auto">{% translate "Sukces" %}</strong>
+                            <button type="button" class="btn-close btn-close-white" aria-label="Close" 
+                                onclick="this.closest('.position-fixed').remove()"></button>
+                        </div>
+                        <div class="toast-body">${message}</div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            };
+            
+            // Initialize tooltips on page load
+            initializeTooltips();
+            
             const gameRows = document.querySelectorAll('tbody tr');
-            const groupColumns = document.querySelectorAll('.group-column');
-            const groupColors = [
-                'rgba(255, 99, 132, 0.2)',   // Red
-                'rgba(54, 162, 235, 0.2)',   // Blue
-                'rgba(255, 206, 86, 0.2)',   // Yellow
-                'rgba(75, 192, 192, 0.2)',   // Teal
-                'rgba(153, 102, 255, 0.2)',  // Purple
-                'rgba(255, 159, 64, 0.2)',   // Orange
-                'rgba(199, 199, 199, 0.2)',  // Grey
-                'rgba(83, 123, 156, 0.2)',   // Blue Grey
-                'rgba(172, 212, 89, 0.2)',   // Light Green
-                'rgba(250, 160, 160, 0.2)'   // Light Red
-            ];
             
-            // Enable tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+            // Tooltips are initialized at the top of the script
             
-            // Group options data for new selects
-            const groupOptions = [
-                { value: "0", text: "{% translate "Brak" %}" }
-            ];
-            {% for i in group_options %}
-                groupOptions.push({ value: "{{ i }}", text: "{{ i }}" });
-            {% endfor %}
+            // No group options needed
             
-            // Create a new group size selector
-            function createGroupSelector(groupNumber, size = 0, teacherName = '') {
-                const selector = document.createElement('div');
-                selector.className = 'd-flex align-items-center group-selector';
-                
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row w-100 align-items-center';
-                
-                // Label column
-                const labelCol = document.createElement('div');
-                labelCol.className = 'col-auto';
-                
-                const label = document.createElement('label');
-                label.setAttribute('for', `groupSize-${groupNumber}`);
-                label.className = 'me-2 mb-0';
-                label.textContent = `{% translate "Grupa" %} ${groupNumber}:`;
-                
-                labelCol.appendChild(label);
-                
-                // Select column
-                const selectCol = document.createElement('div');
-                selectCol.className = 'col-md-2';
-                
-                const select = document.createElement('select');
-                select.id = `groupSize-${groupNumber}`;
-                select.className = 'form-select group-size-select';
-                
-                // Add options
-                groupOptions.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.text;
-                    if (opt.value === size.toString()) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                });
-                
-                selectCol.appendChild(select);
-                
-                // Teacher name column
-                const teacherCol = document.createElement('div');
-                teacherCol.className = 'col-md-4';
-                
-                const inputGroup = document.createElement('div');
-                inputGroup.className = 'input-group';
-                
-                const inputGroupText = document.createElement('span');
-                inputGroupText.className = 'input-group-text';
-                inputGroupText.textContent = '{% translate "Nauczyciel" %}';
-                
-                const teacherInput = document.createElement('input');
-                teacherInput.type = 'text';
-                teacherInput.className = 'form-control teacher-name';
-                teacherInput.placeholder = '{% translate "Imię i nazwisko" %}';
-                teacherInput.value = teacherName;
-                
-                inputGroup.appendChild(inputGroupText);
-                inputGroup.appendChild(teacherInput);
-                teacherCol.appendChild(inputGroup);
-                
-                // Button column
-                const buttonCol = document.createElement('div');
-                buttonCol.className = 'col-auto';
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'btn btn-sm btn-outline-danger remove-group-btn';
-                if (groupNumber === 1) {
-                    removeBtn.style.display = 'none';
-                }
-                
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-times';
-                removeBtn.appendChild(icon);
-                
-                buttonCol.appendChild(removeBtn);
-                
-                // Assemble the row
-                rowDiv.appendChild(labelCol);
-                rowDiv.appendChild(selectCol);
-                rowDiv.appendChild(teacherCol);
-                rowDiv.appendChild(buttonCol);
-                
-                selector.appendChild(rowDiv);
-                
-                // Add event listeners
-                removeBtn.addEventListener('click', function() {
-                    selector.remove();
-                    renumberGroups();
-                    applyGrouping();
-                    updateUrl();
-                });
-                
-                select.addEventListener('change', function() {
-                    applyGrouping();
-                    updateUrl();
-                });
-                
-                teacherInput.addEventListener('input', function() {
-                    applyGrouping();
-                    // Use debounce for URL update to avoid excessive URL changes while typing
-                    debounce(updateUrl, 500)();
-                });
-                
-                return selector;
-            }
-            
-            // Renumber group selectors after removal
-            function renumberGroups() {
-                const selectors = document.querySelectorAll('.group-selector');
-                selectors.forEach((selector, index) => {
-                    const groupNumber = index + 1;
-                    const label = selector.querySelector('label');
-                    const select = selector.querySelector('select');
-                    
-                    label.textContent = `{% translate "Grupa" %} ${groupNumber}:`;
-                    label.setAttribute('for', `groupSize-${groupNumber}`);
-                    select.id = `groupSize-${groupNumber}`;
-                    
-                    // Hide remove button on first group
-                    const removeBtn = selector.querySelector('.remove-group-btn');
-                    if (groupNumber === 1) {
-                        removeBtn.style.display = 'none';
-                    } else {
-                        removeBtn.style.display = '';
-                    }
-                });
-            }
-            
-            // Debounce function to limit frequency of URL updates
+            // Debounce function to limit frequency of operations
             function debounce(func, wait) {
                 let timeout;
                 return function() {
@@ -342,210 +282,168 @@
                 };
             }
             
-            // Update URL with current group configuration
-            function updateUrl() {
-                const groups = getGroupsData();
-                
-                // Create URL parameters
-                const params = new URLSearchParams(window.location.search);
-                
-                // Clear existing group params
-                Array.from(params.keys()).forEach(key => {
-                    if (key.startsWith('g') || key.startsWith('t')) {
-                        params.delete(key);
-                    }
+            // Initialize teacher select dropdowns and "Apply to Next" buttons
+            const initTeacherSelects = () => {
+                // Set up all teacher select dropdowns
+                document.querySelectorAll('.game-teacher-select').forEach(select => {
+                    // Store original value for change detection
+                    select.dataset.originalValue = select.value || '';
+                    
+                    // Add change handler - highlight changed fields and show reminder
+                    select.addEventListener('change', function() {
+                        const changed = this.value !== this.dataset.originalValue;
+                        this.classList.toggle('border-warning', changed);
+                        if (changed) showSaveReminder();
+                    });
                 });
                 
-                // Add new group params
-                groups.forEach((group, index) => {
-                    params.set(`g${index + 1}`, group.size);
-                    if (group.teacher) {
-                        params.set(`t${index + 1}`, encodeURIComponent(group.teacher));
-                    }
-                });
+                // Set up "Apply to Next N" buttons
+                document.querySelectorAll('.apply-to-next').forEach(btn => 
+                    btn.addEventListener('click', function() {
+                        // Get source data
+                        const row = this.closest('tr');
+                        const select = row.querySelector('.game-teacher-select');
+                        if (!select) return;
+                        
+                        // Get parameters
+                        const teacherId = select.value;
+                        const count = parseInt(row.querySelector('.next-games-count')?.value, 10) || 5;
+                        let appliedCount = 0;
+                        let currentRow = row;
+                        
+                        // Apply to next N games
+                        for (let i = 0; i < count; i++) {
+                            // Get next row and select
+                            if (!(currentRow = currentRow.nextElementSibling)) break;
+                            const nextSelect = currentRow.querySelector('.game-teacher-select');
+                            if (!nextSelect) continue;
+                            
+                            // Update and highlight
+                            nextSelect.value = teacherId;
+                            nextSelect.dispatchEvent(new Event('change'));
+                            
+                            // Show visual feedback with brief highlight
+                            currentRow.style.transition = 'background-color 0.5s';
+                            currentRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+                            setTimeout(() => currentRow.style.backgroundColor = '', 1000);
+                            
+                            appliedCount++;
+                        }
+                        
+                        // Show result message
+                        if (appliedCount > 0) {
+                            showToast(`{% translate "Nauczyciel został przypisany do" %} ${appliedCount} {% translate "kolejnych gier." %}`);
+                        }
+                    })
+                );
                 
-                // Update URL without reloading the page
-                const newUrl = `${window.location.pathname}?${params.toString()}`;
-                window.history.replaceState({ path: newUrl }, '', newUrl);
+                // Check for any fields already changed
+                checkForChangedSelects();
             }
             
-            // Extract group data from URL parameters
-            function getGroupsFromUrl() {
-                const params = new URLSearchParams(window.location.search);
-                const groups = [];
+            // Highlight changed teacher selects and show save reminder if needed
+            const checkForChangedSelects = () => {
+                const hasChanges = [...document.querySelectorAll('.game-teacher-select')]
+                    .filter(select => {
+                        const changed = select.value !== select.dataset.originalValue;
+                        if (changed) select.classList.add('border-warning');
+                        return changed;
+                    }).length > 0;
                 
-                // Scan for group size parameters (g1, g2, etc.)
-                let groupIndex = 1;
-                while (params.has(`g${groupIndex}`)) {
-                    const size = parseInt(params.get(`g${groupIndex}`), 10);
-                    const teacher = params.has(`t${groupIndex}`) ? 
-                        decodeURIComponent(params.get(`t${groupIndex}`)) : '';
+                if (hasChanges) showSaveReminder();
+            }
+            
+            // Show a reminder to save changes
+            const showSaveReminder = () => {
+                // Don't show multiple reminders or for non-admin users
+                if (document.getElementById('save-reminder') || !document.getElementById('save-to-db-btn')) return;
+                
+                // Create and insert reminder in one operation
+                document.getElementById('save-to-db-btn').closest('form')?.insertAdjacentHTML('afterend', `
+                    <div id="save-reminder" class="alert alert-warning mt-2 small">
+                        <i class="fas fa-exclamation-triangle me-1"></i> 
+                        {% translate "Masz niezapisane zmiany. Kliknij 'Zapisz nauczycieli do bazy danych' aby zapisać." %}
+                        <button type="button" class="btn btn-sm btn-warning ms-2" 
+                            onclick="document.getElementById('save-to-db-btn').scrollIntoView({behavior:'smooth',block:'center'})">
+                            <i class="fas fa-arrow-up"></i> {% translate "Przewiń do przycisku zapisu" %}
+                        </button>
+                    </div>
+                `);
+                
+                // Auto-hide after 10 seconds
+                setTimeout(() => document.getElementById('save-reminder')?.remove(), 10000);
+            }
+            
+            // Prepare teacher assignment data for submission
+            const prepareTeacherAssignmentData = () => [...document.querySelectorAll('tbody tr[data-game-id]')]
+                .flatMap(row => {
+                    const gameId = row.getAttribute('data-game-id');
+                    const select = row.querySelector('.game-teacher-select');
+                    if (!gameId || !select) return [];
                     
-                    if (size > 0) {
-                        groups.push({ size, teacher });
+                    // Include if it has a value or was changed from original
+                    const originalValue = select.dataset.originalValue || '';
+                    const currentValue = select.value || '';
+                    
+                    return (currentValue || (originalValue && currentValue !== originalValue)) 
+                        ? [{ game_id: gameId, teacher_id: currentValue }]
+                        : [];
+                });
+            
+            // Set up form submission handling for admin users
+            document.getElementById('save-to-db-btn')?.closest('form')?.addEventListener('submit', e => {
+                try {
+                    const assignmentData = prepareTeacherAssignmentData();
+                    const dataField = document.getElementById('assignment-data');
+                    const saveBtn = e.submitter;
+                    
+                    // Stop if no data to save
+                    if (!assignmentData.length) {
+                        e.preventDefault();
+                        alert('{% translate "Brak przypisań nauczycieli do zapisania." %}');
+                        return;
                     }
                     
-                    groupIndex++;
+                    // Set data and show loading state
+                    dataField.value = JSON.stringify(assignmentData);
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% translate "Zapisywanie..." %}';
+                    
+                    // Safety timeout for long-running requests
+                    setTimeout(() => {
+                        if (saveBtn.disabled) saveBtn.innerHTML = 
+                            '<i class="fas fa-save"></i> {% translate "Zapisz nauczycieli do bazy danych" %}';
+                    }, 5000);
+                } catch (err) {
+                    e.preventDefault();
+                    console.error(err);
+                    alert('{% translate "Wystąpił błąd. Proszę odświeżyć stronę i spróbować ponownie." %}');
                 }
-                
-                return groups;
-            }
-            
-            // Add group button handler
-            addGroupBtn.addEventListener('click', function() {
-                const newGroupNumber = document.querySelectorAll('.group-selector').length + 1;
-                const newSelector = createGroupSelector(newGroupNumber);
-                groupSelectorsContainer.appendChild(newSelector);
-                updateUrl();
             });
             
-            // Share button - generate shareable URL
-            function addShareButton() {
-                const controlsDiv = document.querySelector('.mb-3.p-3.bg-light.rounded');
-                
-                // Create share button if it doesn't exist
-                if (!document.getElementById('share-groups-btn')) {
-                    const shareBtn = document.createElement('button');
-                    shareBtn.id = 'share-groups-btn';
-                    shareBtn.className = 'btn btn-sm btn-outline-info ms-2';
-                    shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> {% translate "Kopiuj link" %}';
-                    shareBtn.addEventListener('click', function() {
-                        // Create a temporary input to copy the URL
-                        const tempInput = document.createElement('input');
-                        tempInput.value = window.location.href;
-                        document.body.appendChild(tempInput);
-                        tempInput.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(tempInput);
-                        
-                        // Visual feedback
-                        shareBtn.innerHTML = '<i class="fas fa-check"></i> {% translate "Skopiowano!" %}';
-                        setTimeout(() => {
-                            shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> {% translate "Kopiuj link" %}';
-                        }, 2000);
-                    });
-                    
-                    // Add button next to "Add Group" button
-                    const buttonContainer = document.querySelector('.mt-3');
-                    buttonContainer.appendChild(shareBtn);
-                }
-            }
+            // Initialize teacher select events
+            initTeacherSelects();
             
-            // Get groups data from the UI
-            function getGroupsData() {
-                const groups = [];
-                const selectors = document.querySelectorAll('.group-selector');
-                
-                selectors.forEach((selector, index) => {
-                    const sizeSelect = selector.querySelector('.group-size-select');
-                    const teacherInput = selector.querySelector('.teacher-name');
-                    
-                    const size = parseInt(sizeSelect.value, 10);
-                    const teacherName = teacherInput.value.trim();
-                    
-                    if (size > 0) {
-                        groups.push({
-                            groupNumber: index + 1,
-                            size: size,
-                            teacher: teacherName
-                        });
-                    }
-                });
-                
-                return groups;
-            }
+            // Initialize tooltips
+            initializeTooltips();
             
-            // Function to apply group coloring and display teacher names
-            function applyGrouping() {
-                // Get group data
-                const groups = getGroupsData();
+            // Highlight recently updated game if any
+            {% if individual_updated_game_id %}
+            const updatedGameRow = document.querySelector(`tr[data-game-id="{{ individual_updated_game_id }}"]`);
+            if (updatedGameRow) {
+                // Scroll to the updated game
+                updatedGameRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                // Reset all row backgrounds and hide group columns
-                gameRows.forEach(row => {
-                    row.style.backgroundColor = '';
-                });
+                // Highlight the row briefly
+                updatedGameRow.style.transition = 'background-color 2s';
+                updatedGameRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';  // Light green
                 
-                groupColumns.forEach(col => {
-                    col.style.display = 'none';
-                });
-                
-                // If no valid groups, exit early
-                if (groups.length === 0) return;
-                
-                // Show group columns
-                groupColumns.forEach(col => {
-                    col.style.display = '';
-                });
-                
-                // Apply colors and teacher names for each game
-                let currentIndex = 0;
-                
-                for (let group of groups) {
-                    for (let i = 0; i < group.size && currentIndex < gameRows.length; i++) {
-                        const row = gameRows[currentIndex];
-                        if (row.cells.length > 1) { // Skip "No games" row if present
-                            const colorIndex = (group.groupNumber - 1) % groupColors.length;
-                            
-                            // Set background color
-                            row.style.backgroundColor = groupColors[colorIndex];
-                            
-                            // Set teacher name
-                            const groupCell = row.querySelector('.group-column');
-                            if (groupCell) {
-                                groupCell.textContent = group.teacher || `{% translate "Grupa" %} ${group.groupNumber}`;
-                            }
-                            
-                            currentIndex++;
-                        }
-                    }
-                }
-                
-                // Handle remaining games if any
-                while (currentIndex < gameRows.length) {
-                    const row = gameRows[currentIndex];
-                    if (row.cells.length > 1) {
-                        row.style.backgroundColor = ''; // No color for ungrouped games
-                        
-                        const groupCell = row.querySelector('.group-column');
-                        if (groupCell) {
-                            groupCell.textContent = '-'; // Mark as ungrouped
-                        }
-                        
-                        currentIndex++;
-                    }
-                }
+                // Reset after animation
+                setTimeout(() => {
+                    updatedGameRow.style.backgroundColor = '';
+                }, 3000);
             }
-            
-            // Initialize from URL or create default first group
-            function initializeGroups() {
-                // Clear existing groups
-                groupSelectorsContainer.innerHTML = '';
-                
-                // Check if we have groups in the URL
-                const urlGroups = getGroupsFromUrl();
-                
-                if (urlGroups.length > 0) {
-                    // Create groups from URL parameters
-                    urlGroups.forEach((group, index) => {
-                        const groupNumber = index + 1;
-                        const selector = createGroupSelector(groupNumber, group.size, group.teacher);
-                        groupSelectorsContainer.appendChild(selector);
-                    });
-                } else {
-                    // Create default first group
-                    const selector = createGroupSelector(1);
-                    groupSelectorsContainer.appendChild(selector);
-                }
-                
-                // Apply grouping
-                applyGrouping();
-                
-                // Add share button
-                addShareButton();
-            }
-            
-            // Initialize everything
-            initializeGroups();
+            {% endif %}
         });
     </script>
 {% endblock %}

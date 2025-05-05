@@ -70,13 +70,9 @@
             
             {% if user.is_admin or user.is_staff or user|has_role:'referee' %}
             <div class="mb-3">
-                <form method="post" action="" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="assignment_data" id="assignment-data" value="">
-                    <button type="submit" id="save-to-db-btn" class="btn btn-sm btn-success">
-                        <i class="fas fa-save"></i> {% translate "Zapisz przypisania nauczycieli" %}
-                    </button>
-                </form>
+                <button type="submit" form="teacher-assignment-form" id="save-to-db-btn" class="btn btn-sm btn-success">
+                    <i class="fas fa-save"></i> {% translate "Zapisz przypisania nauczycieli" %}
+                </button>
                 
                 {% if teacher_assignment_success %}
                 <div class="mt-2 alert alert-success small">
@@ -117,20 +113,22 @@
             </div>
             {% endif %}
 
-            <table class="table table-sm table-hover table-striped">
-                <thead class="table-light">
-                    <tr>
-                        <th>R</th>
-                        <th>{% translate "Czarny" %}</th>
-                        <th>{% translate "Biały" %}</th>
-                        <th>{% translate "Wynik" %}</th>
-                        <th>{% translate "Data" %}</th>
-                        <th>{% translate "Komentarz" %}</th>
-                        <th>{% translate "Nauczyciel" %}</th>
-                        <th>{% translate "Akcje" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <form method="post" action="" id="teacher-assignment-form">
+                {% csrf_token %}
+                <table class="table table-sm table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>R</th>
+                            <th>{% translate "Czarny" %}</th>
+                            <th>{% translate "Biały" %}</th>
+                            <th>{% translate "Wynik" %}</th>
+                            <th>{% translate "Data" %}</th>
+                            <th>{% translate "Komentarz" %}</th>
+                            <th>{% translate "Nauczyciel" %}</th>
+                            <th>{% translate "Akcje" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     {% for game in all_games %}
                         <tr data-game-id="{{ game.id }}">
                             <td>{{ game.round.number }}</td>
@@ -185,7 +183,9 @@
                                 {% if user.is_admin or user.is_staff or user|has_role:'referee' %}
                                 <div class="teacher-controls">
                                     <div class="teacher-select-container">
-                                        <select class="form-select form-select-sm game-teacher-select" data-game-id="{{ game.id }}">
+                                        <input type="hidden" name="game_ids[]" value="{{ game.id }}">
+                                        <select class="form-select form-select-sm game-teacher-select" name="teacher_ids[]" 
+                                                data-original-value="{% if game.assigned_teacher %}{{ game.assigned_teacher.id }}{% endif %}">
                                             <option value="">{% translate "Wybierz nauczyciela" %}</option>
                                             {% for teacher in available_teachers %}
                                                 <option value="{{ teacher.id }}" {% if game.assigned_teacher and game.assigned_teacher.id == teacher.id %}selected{% endif %}>
@@ -230,7 +230,8 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-            </table>
+                </table>
+            </form>
         </div>
     </div>
     
@@ -353,7 +354,7 @@
                 // Don't show multiple reminders or for non-admin users
                 if (document.getElementById('save-reminder') || !document.getElementById('save-to-db-btn')) return;
                 
-                const saveForm = document.getElementById('save-to-db-btn').closest('form');
+                const saveBtn = document.getElementById('save-to-db-btn');
                 const reminder = document.createElement('div');
                 reminder.id = 'save-reminder';
                 reminder.className = 'alert alert-warning mt-2 small';
@@ -362,36 +363,27 @@
                     {% translate "Masz niezapisane zmiany. Kliknij 'Zapisz nauczycieli do bazy danych' aby zapisać." %}
                 `;
                 
-                saveForm.insertAdjacentElement('afterend', reminder);
+                saveBtn.parentNode.insertAdjacentElement('beforeend', reminder);
             };
             
-            // Prepare teacher assignment data for submission - get only changed data
-            const prepareTeacherAssignmentData = () => 
-                [...document.querySelectorAll('.game-teacher-select')]
-                    .filter(select => select.value !== select.dataset.originalValue || 
-                                     (select.value && select.dataset.originalValue === ''))
-                    .map(select => {
-                        const gameId = select.closest('tr').getAttribute('data-game-id');
-                        return { game_id: gameId, teacher_id: select.value };
-                    });
-            
             // Set up form submission handling for admin users
-            const saveForm = document.getElementById('save-to-db-btn')?.closest('form');
-            if (saveForm) {
-                saveForm.addEventListener('submit', e => {
-                    const assignmentData = prepareTeacherAssignmentData();
-                    const dataField = document.getElementById('assignment-data');
-                    const saveBtn = e.submitter;
+            const teacherForm = document.getElementById('teacher-assignment-form');
+            if (teacherForm) {
+                teacherForm.addEventListener('submit', e => {
+                    const saveBtn = document.getElementById('save-to-db-btn');
                     
-                    // Stop if no data to save
-                    if (!assignmentData.length) {
+                    // Check if any teacher selections have changed from their original values
+                    const hasChanges = [...document.querySelectorAll('.game-teacher-select')]
+                        .some(select => select.value !== select.dataset.originalValue);
+                    
+                    // Stop if no data has changed
+                    if (!hasChanges) {
                         e.preventDefault();
                         alert('{% translate "Brak przypisań nauczycieli do zapisania." %}');
                         return;
                     }
                     
-                    // Set data and show loading state
-                    dataField.value = JSON.stringify(assignmentData);
+                    // Show loading state
                     saveBtn.disabled = true;
                     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% translate "Zapisywanie..." %}';
                 });

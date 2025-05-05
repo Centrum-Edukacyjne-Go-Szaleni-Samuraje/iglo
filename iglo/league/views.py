@@ -369,18 +369,18 @@ class GroupAllGamesView(GroupObjectMixin, DetailView):
         
         self.object = self.get_object()
         
-        # Check for assignment data
-        assignment_data = request.POST.get('assignment_data')
-        if not assignment_data:
+        # Check for game_ids and teacher_ids arrays in form data
+        game_ids = request.POST.getlist('game_ids[]')
+        teacher_ids = request.POST.getlist('teacher_ids[]')
+        
+        if not game_ids or len(game_ids) != len(teacher_ids):
+            request.session['error'] = True
             return self.get(request, *args, **kwargs)
         
         try:
-            # Parse JSON data from the form
-            assignments = json.loads(assignment_data)
-            
-            # Get all the teacher IDs
-            teacher_ids = [assignment.get('teacher_id') for assignment in assignments if assignment.get('teacher_id')]
-            teachers = Teacher.objects.filter(id__in=teacher_ids)
+            # Get all unique teacher IDs for bulk lookup
+            unique_teacher_ids = set(filter(None, teacher_ids))
+            teachers = Teacher.objects.filter(id__in=unique_teacher_ids)
             teachers_dict = {str(t.id): t for t in teachers}
             
             # Process assignments and prepare bulk update
@@ -389,20 +389,31 @@ class GroupAllGamesView(GroupObjectMixin, DetailView):
             
             # Use a transaction to ensure all updates succeed or fail together
             with transaction.atomic():
-                for assignment in assignments:
-                    game_id = assignment.get('game_id')
-                    teacher_id = assignment.get('teacher_id', '')
-                    
-                    if not game_id:
-                        continue
+                # Create a dictionary of existing assignments for comparison
+                existing_assignments = {}
+                games = Game.objects.filter(id__in=game_ids, group=self.object).select_related('assigned_teacher')
+                for game in games:
+                    existing_assignments[str(game.id)] = game.assigned_teacher.id if game.assigned_teacher else None
+                
+                # Process each game-teacher pair
+                for i, game_id in enumerate(game_ids):
+                    if i >= len(teacher_ids):
+                        break
+                        
+                    teacher_id = teacher_ids[i]
                     
                     try:
                         # Find the game
-                        game = Game.objects.get(id=game_id, group=self.object)
+                        game = games.get(id=game_id)
+                        
+                        # Skip if assignment hasn't changed
+                        current_teacher_id = existing_assignments.get(str(game_id))
+                        if (current_teacher_id is None and not teacher_id) or (current_teacher_id and str(current_teacher_id) == teacher_id):
+                            continue
                         
                         if teacher_id:
                             # Get the teacher from our dictionary
-                            teacher = teachers_dict.get(str(teacher_id))
+                            teacher = teachers_dict.get(teacher_id)
                             if teacher:
                                 # Update game with teacher
                                 game.assigned_teacher = teacher
@@ -430,10 +441,6 @@ class GroupAllGamesView(GroupObjectMixin, DetailView):
                     else:
                         request.session['teacher_assignment_success'] = True
                         request.session['teacher_assignment_count'] = num_updates
-            
-        except json.JSONDecodeError:
-            # Handle invalid JSON data
-            request.session['json_error'] = True
         except Exception as e:
             # Handle other unexpected errors
             import logging

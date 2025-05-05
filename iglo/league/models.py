@@ -987,7 +987,10 @@ class GameManager(models.Manager):
 
     def get_latest_reviews(self, current_season=False) -> QuerySet:
         queryset = (
-            self.prefetch_related("group", "black__player", "white__player", "group__teacher", "group__season")
+            self.prefetch_related(
+                "group", "black__player", "white__player", 
+                "group__teacher", "group__season", "assigned_teacher"
+            )
             .order_by("-review_updated")
             .filter(review_updated__isnull=False)
         )
@@ -1057,6 +1060,15 @@ class Game(models.Model):
     ai_analyse_link = models.URLField(null=True, blank=True)
     upcoming_reminder_sent = models.DateTimeField(null=True)
     delayed_reminder_sent = models.DateTimeField(null=True)
+    
+    assigned_teacher = models.ForeignKey(
+        "review.Teacher", 
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_games",
+        help_text="Teacher assigned specifically to this game"
+    )
 
     sgf_updated = models.DateTimeField(null=True)
     review_updated = models.DateTimeField(null=True)

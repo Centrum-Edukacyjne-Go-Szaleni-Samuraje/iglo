@@ -311,16 +311,15 @@ class GroupGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
-class GroupAllGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
+class GroupAllGamesView(GroupObjectMixin, DetailView):
     model = Group
-    required_roles = [UserRole.REFEREE]
     template_name = 'league/group_all_games.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
         # Get all games from the group and exclude byes
-        games = Game.objects.filter(group=self.object).exclude(win_type=WinType.BYE)
+        games = Game.objects.filter(group=self.object).exclude(win_type=WinType.BYE).select_related('assigned_teacher')
         
         # Custom sort by initial order of both players, higher player first
         games = sorted(games, key=lambda game: (
@@ -335,7 +334,117 @@ class GroupAllGamesView(UserRoleRequiredForModify, GroupObjectMixin, DetailView)
         group_options = list(range(1, game_count + 1))  # All possible options
         context['group_options'] = group_options
         
+        # Get all teachers for dropdown selection
+        from review.models import Teacher
+        context['available_teachers'] = Teacher.objects.all().order_by('first_name', 'last_name')
+        
+        # Add success/error messages from session
+        context['teacher_assignment_success'] = self.request.session.pop('teacher_assignment_success', False)
+        context['teacher_assignment_count'] = self.request.session.pop('teacher_assignment_count', None)
+        context['individual_update_success'] = self.request.session.pop('individual_update_success', False)
+        context['individual_updated_game_id'] = self.request.session.pop('individual_updated_game_id', None)
+        
+        # Error messages
+        context['permission_error'] = self.request.session.pop('permission_error', False)
+        context['json_error'] = self.request.session.pop('json_error', False)
+        context['error'] = self.request.session.pop('error', False)
+        
         return context
+        
+    def post(self, request, *args, **kwargs):
+        """Handle teacher assignment submission for games in a group.
+        
+        This method processes teacher assignments from group-based or individual selections.
+        Only users with admin, staff, or referee roles can modify teacher assignments.
+        """
+        import json
+        from django.db import transaction
+        from review.models import Teacher
+        from accounts.models import UserRole
+        
+        # Check permissions - only admin/staff/referee can modify teacher assignments
+        if not (request.user.is_admin or request.user.is_staff or request.user.has_role(UserRole.REFEREE)):
+            request.session['permission_error'] = True
+            return self.get(request, *args, **kwargs)
+        
+        self.object = self.get_object()
+        
+        # Check for assignment data
+        assignment_data = request.POST.get('assignment_data')
+        if not assignment_data:
+            return self.get(request, *args, **kwargs)
+        
+        try:
+            # Parse JSON data from the form
+            assignments = json.loads(assignment_data)
+            
+            # Get all the teacher IDs
+            teacher_ids = [assignment.get('teacher_id') for assignment in assignments if assignment.get('teacher_id')]
+            teachers = Teacher.objects.filter(id__in=teacher_ids)
+            teachers_dict = {str(t.id): t for t in teachers}
+            
+            # Process assignments and prepare bulk update
+            games_to_update = []
+            updated_game_id = None
+            
+            # Use a transaction to ensure all updates succeed or fail together
+            with transaction.atomic():
+                for assignment in assignments:
+                    game_id = assignment.get('game_id')
+                    teacher_id = assignment.get('teacher_id', '')
+                    
+                    if not game_id:
+                        continue
+                    
+                    try:
+                        # Find the game
+                        game = Game.objects.get(id=game_id, group=self.object)
+                        
+                        if teacher_id:
+                            # Get the teacher from our dictionary
+                            teacher = teachers_dict.get(str(teacher_id))
+                            if teacher:
+                                # Update game with teacher
+                                game.assigned_teacher = teacher
+                                games_to_update.append(game)
+                                updated_game_id = game_id
+                        else:
+                            # Remove teacher assignment if teacher_id is empty
+                            game.assigned_teacher = None
+                            games_to_update.append(game)
+                            updated_game_id = game_id
+                            
+                    except Game.DoesNotExist:
+                        # Skip games that don't exist
+                        continue
+                
+                # Bulk update all games at once
+                if games_to_update:
+                    Game.objects.bulk_update(games_to_update, ['assigned_teacher'])
+                    num_updates = len(games_to_update)
+                    
+                    # Check if this is an individual update
+                    if request.POST.get('individual_update') == 'true' and updated_game_id:
+                        request.session['individual_update_success'] = True
+                        request.session['individual_updated_game_id'] = updated_game_id
+                    else:
+                        request.session['teacher_assignment_success'] = True
+                        request.session['teacher_assignment_count'] = num_updates
+            
+        except json.JSONDecodeError:
+            # Handle invalid JSON data
+            request.session['json_error'] = True
+        except Exception as e:
+            # Handle other unexpected errors
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error updating teacher assignments: {str(e)}")
+            request.session['error'] = True
+        
+        # Redirect back to same page to avoid form resubmission
+        return redirect('group-all-games', 
+                       season_number=self.object.season.number, 
+                       group_name=self.object.name)
 
 
 class GroupEGDExportView(UserRoleRequired, GroupObjectMixin, DetailView):

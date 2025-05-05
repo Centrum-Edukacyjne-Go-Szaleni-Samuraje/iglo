@@ -25,9 +25,15 @@
                 </div>
                 <div class="col {% if not full %} order-md-last {% endif %}">
                     <span class="text-muted small">
-                        {% with teacher=game.group.teacher %}
-                            {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
-                        {% endwith %}
+                        {% if game.assigned_teacher %}
+                            {% with teacher=game.assigned_teacher %}
+                                {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
+                            {% endwith %}
+                        {% else %}
+                            {% with teacher=game.group.teacher %}
+                                {{ teacher.first_name }} {{ teacher.last_name }} {{ teacher.rank|lower }}
+                            {% endwith %}
+                        {% endif %}
                     </span>
                 </div>
                 <div class="col-1">

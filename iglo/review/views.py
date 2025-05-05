@@ -41,7 +41,9 @@ class ReviewListView(ListView):
         if teacher:
             queryset = queryset.filter(
                 Q(group__teacher__first_name__icontains=teacher) |
-                Q(group__teacher__last_name__icontains=teacher)
+                Q(group__teacher__last_name__icontains=teacher) |
+                Q(assigned_teacher__first_name__icontains=teacher) |
+                Q(assigned_teacher__last_name__icontains=teacher)
             )
         return queryset
 

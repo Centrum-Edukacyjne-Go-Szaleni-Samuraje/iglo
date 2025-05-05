@@ -263,86 +263,81 @@
             // Initialize tooltips on page load
             initializeTooltips();
             
-            const gameRows = document.querySelectorAll('tbody tr');
-            
-            // Tooltips are initialized at the top of the script
-            
-            // No group options needed
-            
-            // Debounce function to limit frequency of operations
-            function debounce(func, wait) {
-                let timeout;
-                return function() {
-                    const context = this;
-                    const args = arguments;
-                    clearTimeout(timeout);
-                    timeout = setTimeout(function() {
-                        func.apply(context, args);
-                    }, wait);
-                };
-            }
-            
-            // Initialize teacher select dropdowns and "Apply to Next" buttons
+            // Initialize teacher select dropdowns and "Apply to Next" buttons with event delegation
             const initTeacherSelects = () => {
-                // Set up all teacher select dropdowns
+                const tbody = document.querySelector('tbody');
+                
+                // Store original values on all selects for change detection
                 document.querySelectorAll('.game-teacher-select').forEach(select => {
-                    // Store original value for change detection
                     select.dataset.originalValue = select.value || '';
-                    
-                    // Add change handler - highlight changed fields and show reminder
-                    select.addEventListener('change', function() {
-                        const changed = this.value !== this.dataset.originalValue;
-                        this.classList.toggle('border-warning', changed);
-                        if (changed) showSaveReminder();
-                    });
                 });
                 
-                // Set up "Apply to Next N" buttons
-                document.querySelectorAll('.apply-to-next').forEach(btn => 
-                    btn.addEventListener('click', function() {
-                        // Get source data
-                        const row = this.closest('tr');
-                        const select = row.querySelector('.game-teacher-select');
-                        if (!select) return;
-                        
-                        // Get parameters
-                        const teacherId = select.value;
-                        const count = parseInt(row.querySelector('.next-games-count')?.value, 10) || 5;
-                        let appliedCount = 0;
-                        let currentRow = row;
-                        
-                        // Apply to next N games
-                        for (let i = 0; i < count; i++) {
-                            // Get next row and select
-                            if (!(currentRow = currentRow.nextElementSibling)) break;
-                            const nextSelect = currentRow.querySelector('.game-teacher-select');
-                            if (!nextSelect) continue;
-                            
-                            // Update and highlight
-                            nextSelect.value = teacherId;
-                            nextSelect.dispatchEvent(new Event('change'));
-                            
-                            // Show visual feedback with brief highlight
-                            currentRow.style.transition = 'background-color 0.5s';
-                            currentRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
-                            setTimeout(() => currentRow.style.backgroundColor = '', 1000);
-                            
-                            appliedCount++;
-                        }
-                        
-                        // Show result message
-                        if (appliedCount > 0) {
-                            showToast(`{% translate "Nauczyciel został przypisany do" %} ${appliedCount} {% translate "kolejnych gier." %}`);
-                        }
-                    })
-                );
+                // Use event delegation for teacher selects
+                tbody.addEventListener('change', e => {
+                    const select = e.target;
+                    if (select.classList.contains('game-teacher-select')) {
+                        const changed = select.value !== select.dataset.originalValue;
+                        select.classList.toggle('border-warning', changed);
+                        if (changed) showSaveReminder();
+                    }
+                });
+                
+                // Use event delegation for apply buttons
+                tbody.addEventListener('click', e => {
+                    const btn = e.target.closest('.apply-to-next');
+                    if (!btn) return;
+                    
+                    const row = btn.closest('tr');
+                    const select = row.querySelector('.game-teacher-select');
+                    if (!select) return;
+                    
+                    // Get parameters
+                    const teacherId = select.value;
+                    const count = parseInt(row.querySelector('.next-games-count')?.value, 10) || 5;
+                    
+                    // Apply to next N games
+                    applyTeacherToNextGames(row, teacherId, count);
+                });
                 
                 // Check for any fields already changed
-                checkForChangedSelects();
-            }
+                highlightChangedFields();
+            };
+            
+            // Apply teacher to the next N games
+            const applyTeacherToNextGames = (startRow, teacherId, count) => {
+                let appliedCount = 0;
+                let currentRow = startRow;
+                
+                for (let i = 0; i < count; i++) {
+                    // Get next row and select
+                    if (!(currentRow = currentRow.nextElementSibling)) break;
+                    const nextSelect = currentRow.querySelector('.game-teacher-select');
+                    if (!nextSelect) continue;
+                    
+                    // Update and highlight
+                    nextSelect.value = teacherId;
+                    nextSelect.dispatchEvent(new Event('change'));
+                    
+                    // Brief highlight
+                    highlightRow(currentRow);
+                    appliedCount++;
+                }
+                
+                // Show result message
+                if (appliedCount > 0) {
+                    showToast(`{% translate "Nauczyciel został przypisany do" %} ${appliedCount} {% translate "kolejnych gier." %}`);
+                }
+            };
+            
+            // Highlight a row briefly
+            const highlightRow = (row) => {
+                row.style.transition = 'background-color 0.5s';
+                row.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+                setTimeout(() => row.style.backgroundColor = '', 1000);
+            };
             
             // Highlight changed teacher selects and show save reminder if needed
-            const checkForChangedSelects = () => {
+            const highlightChangedFields = () => {
                 const hasChanges = [...document.querySelectorAll('.game-teacher-select')]
                     .filter(select => {
                         const changed = select.value !== select.dataset.originalValue;
@@ -351,48 +346,39 @@
                     }).length > 0;
                 
                 if (hasChanges) showSaveReminder();
-            }
+            };
             
             // Show a reminder to save changes
             const showSaveReminder = () => {
                 // Don't show multiple reminders or for non-admin users
                 if (document.getElementById('save-reminder') || !document.getElementById('save-to-db-btn')) return;
                 
-                // Create and insert reminder in one operation
-                document.getElementById('save-to-db-btn').closest('form')?.insertAdjacentHTML('afterend', `
-                    <div id="save-reminder" class="alert alert-warning mt-2 small">
-                        <i class="fas fa-exclamation-triangle me-1"></i> 
-                        {% translate "Masz niezapisane zmiany. Kliknij 'Zapisz nauczycieli do bazy danych' aby zapisać." %}
-                        <button type="button" class="btn btn-sm btn-warning ms-2" 
-                            onclick="document.getElementById('save-to-db-btn').scrollIntoView({behavior:'smooth',block:'center'})">
-                            <i class="fas fa-arrow-up"></i> {% translate "Przewiń do przycisku zapisu" %}
-                        </button>
-                    </div>
-                `);
+                const saveForm = document.getElementById('save-to-db-btn').closest('form');
+                const reminder = document.createElement('div');
+                reminder.id = 'save-reminder';
+                reminder.className = 'alert alert-warning mt-2 small';
+                reminder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-1"></i> 
+                    {% translate "Masz niezapisane zmiany. Kliknij 'Zapisz nauczycieli do bazy danych' aby zapisać." %}
+                `;
                 
-                // Auto-hide after 10 seconds
-                setTimeout(() => document.getElementById('save-reminder')?.remove(), 10000);
-            }
+                saveForm.insertAdjacentElement('afterend', reminder);
+            };
             
-            // Prepare teacher assignment data for submission
-            const prepareTeacherAssignmentData = () => [...document.querySelectorAll('tbody tr[data-game-id]')]
-                .flatMap(row => {
-                    const gameId = row.getAttribute('data-game-id');
-                    const select = row.querySelector('.game-teacher-select');
-                    if (!gameId || !select) return [];
-                    
-                    // Include if it has a value or was changed from original
-                    const originalValue = select.dataset.originalValue || '';
-                    const currentValue = select.value || '';
-                    
-                    return (currentValue || (originalValue && currentValue !== originalValue)) 
-                        ? [{ game_id: gameId, teacher_id: currentValue }]
-                        : [];
-                });
+            // Prepare teacher assignment data for submission - get only changed data
+            const prepareTeacherAssignmentData = () => 
+                [...document.querySelectorAll('.game-teacher-select')]
+                    .filter(select => select.value !== select.dataset.originalValue || 
+                                     (select.value && select.dataset.originalValue === ''))
+                    .map(select => {
+                        const gameId = select.closest('tr').getAttribute('data-game-id');
+                        return { game_id: gameId, teacher_id: select.value };
+                    });
             
             // Set up form submission handling for admin users
-            document.getElementById('save-to-db-btn')?.closest('form')?.addEventListener('submit', e => {
-                try {
+            const saveForm = document.getElementById('save-to-db-btn')?.closest('form');
+            if (saveForm) {
+                saveForm.addEventListener('submit', e => {
                     const assignmentData = prepareTeacherAssignmentData();
                     const dataField = document.getElementById('assignment-data');
                     const saveBtn = e.submitter;
@@ -408,40 +394,19 @@
                     dataField.value = JSON.stringify(assignmentData);
                     saveBtn.disabled = true;
                     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% translate "Zapisywanie..." %}';
-                    
-                    // Safety timeout for long-running requests
-                    setTimeout(() => {
-                        if (saveBtn.disabled) saveBtn.innerHTML = 
-                            '<i class="fas fa-save"></i> {% translate "Zapisz nauczycieli do bazy danych" %}';
-                    }, 5000);
-                } catch (err) {
-                    e.preventDefault();
-                    console.error(err);
-                    alert('{% translate "Wystąpił błąd. Proszę odświeżyć stronę i spróbować ponownie." %}');
-                }
-            });
+                });
+            }
             
-            // Initialize teacher select events
+            // Initialize all components
             initTeacherSelects();
-            
-            // Initialize tooltips
-            initializeTooltips();
             
             // Highlight recently updated game if any
             {% if individual_updated_game_id %}
             const updatedGameRow = document.querySelector(`tr[data-game-id="{{ individual_updated_game_id }}"]`);
             if (updatedGameRow) {
-                // Scroll to the updated game
+                // Scroll to the updated game and highlight it
                 updatedGameRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Highlight the row briefly
-                updatedGameRow.style.transition = 'background-color 2s';
-                updatedGameRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';  // Light green
-                
-                // Reset after animation
-                setTimeout(() => {
-                    updatedGameRow.style.backgroundColor = '';
-                }, 3000);
+                highlightRow(updatedGameRow);
             }
             {% endif %}
         });

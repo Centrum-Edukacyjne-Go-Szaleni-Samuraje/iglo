@@ -8,7 +8,7 @@
 
 {% block content %}
     <style>
-        /* Styles for teacher assignment UI */
+        /* Minimal styles */
         .teacher-controls {
             display: flex;
             align-items: center;
@@ -17,21 +17,7 @@
             flex: 1;
         }
         .apply-next-container {
-            width: auto;
             margin-left: 0.5rem;
-        }
-        .next-games-count {
-            width: 3.5rem !important;
-            text-align: center;
-            padding-left: 0.25rem;
-            padding-right: 0.25rem;
-        }
-        .apply-to-next {
-            padding-left: 0.4rem;
-            padding-right: 0.4rem;
-        }
-        .highlight-updated {
-            transition: background-color 1s;
         }
     </style>
     <div class="row">
@@ -194,19 +180,15 @@
                                         </select>
                                     </div>
                                     <div class="apply-next-container">
-                                        <div class="input-group input-group-sm">
-                                            <input type="number" class="form-control next-games-count" 
-                                                min="1" max="50" value="5" 
-                                                title="{% translate 'Liczba kolejnych gier do przypisania' %}"
-                                                aria-label="{% translate 'Liczba kolejnych gier' %}">
-                                            <button class="btn btn-outline-secondary apply-to-next" 
-                                                type="button" 
-                                                data-bs-toggle="tooltip" 
-                                                data-bs-placement="top"
-                                                title="{% translate 'Zastosuj tego nauczyciela do kolejnych gier' %}">
-                                                <i class="fas fa-arrow-down"></i>
-                                            </button>
-                                        </div>
+                                        <input type="number" class="form-control form-control-sm next-games-count" 
+                                            min="1" max="50" value="5" style="width:3rem; display:inline-block;"
+                                            title="{% translate 'Liczba kolejnych gier do przypisania' %}"
+                                            data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <button class="btn btn-sm btn-outline-secondary apply-to-next" type="button"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="{% translate 'Zastosuj tego nauczyciela do kolejnych gier' %}">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 {% else %}
@@ -240,78 +222,31 @@
             document.querySelectorAll('[data-bs-toggle="tooltip"]')
                 .forEach(el => new bootstrap.Tooltip(el));
             
-            // Set up teacher assignment form
-            const teacherForm = document.getElementById('teacher-assignment-form');
-            if (teacherForm) {
-                const tbody = teacherForm.querySelector('tbody');
-                
-                // Handle form submission
-                teacherForm.addEventListener('submit', e => {
-                    const saveBtn = document.getElementById('save-to-db-btn');
-                    
-                    // Enable the save button
-                    saveBtn.disabled = true;
-                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% translate "Zapisywanie..." %}';
-                });
-                
-                // Handle clicks on "Apply to Next" buttons
-                tbody.addEventListener('click', e => {
-                    const btn = e.target.closest('.apply-to-next');
-                    if (!btn) return;
-                    
-                    const row = btn.closest('tr');
+            // Minimal script for "Apply to Next" functionality
+            document.addEventListener('click', function(e) {
+                // Handle Apply to Next buttons
+                if (e.target.closest('.apply-to-next')) {
+                    const row = e.target.closest('tr');
                     const select = row.querySelector('select[name="teacher_ids[]"]');
-                    if (!select) return;
-                    
-                    // Get parameters
-                    const teacherId = select.value;
                     const count = parseInt(row.querySelector('.next-games-count')?.value, 10) || 5;
+                    const teacherId = select?.value;
                     
-                    // Apply to next N games
+                    // Apply to next rows
                     let currentRow = row;
-                    let appliedCount = 0;
-                    
-                    // Apply to each subsequent row
                     for (let i = 0; i < count; i++) {
-                        if (!(currentRow = currentRow.nextElementSibling)) break;
+                        currentRow = currentRow.nextElementSibling;
+                        if (!currentRow) break;
+                        
                         const nextSelect = currentRow.querySelector('select[name="teacher_ids[]"]');
-                        if (!nextSelect) continue;
-                        
-                        // Update select
-                        nextSelect.value = teacherId;
-                        
-                        // Highlight the row
-                        currentRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
-                        setTimeout(() => {
-                            currentRow.style.backgroundColor = '';
-                        }, 1000);
-                        
-                        appliedCount++;
+                        if (nextSelect) nextSelect.value = teacherId;
                     }
-                    
-                    // Show alert with number of updates
-                    if (appliedCount > 0) {
-                        const alertMsg = document.createElement('div');
-                        alertMsg.className = 'alert alert-success small mt-2';
-                        alertMsg.innerHTML = `<i class="fas fa-check-circle me-1"></i> {% translate "Nauczyciel został przypisany do" %} ${appliedCount} {% translate "kolejnych gier." %}`;
-                        
-                        const container = document.querySelector('.mb-3');
-                        container.appendChild(alertMsg);
-                        setTimeout(() => alertMsg.remove(), 3000);
-                    }
-                });
-            }
+                }
+            });
             
-            // Highlight recently updated game if any
             {% if individual_updated_game_id %}
-            const updatedGameRow = document.querySelector(`tr[data-game-id="{{ individual_updated_game_id }}"]`);
-            if (updatedGameRow) {
-                updatedGameRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                updatedGameRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
-                setTimeout(() => {
-                    updatedGameRow.style.backgroundColor = '';
-                }, 2000);
-            }
+            // Scroll to highlighted game
+            const row = document.querySelector(`tr[data-game-id="{{ individual_updated_game_id }}"]`);
+            if (row) row.scrollIntoView();
             {% endif %}
         });
     </script>

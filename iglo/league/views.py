@@ -378,69 +378,41 @@ class GroupAllGamesView(GroupObjectMixin, DetailView):
             return self.get(request, *args, **kwargs)
         
         try:
-            # Get all unique teacher IDs for bulk lookup
-            unique_teacher_ids = set(filter(None, teacher_ids))
-            teachers = Teacher.objects.filter(id__in=unique_teacher_ids)
-            teachers_dict = {str(t.id): t for t in teachers}
-            
-            # Process assignments and prepare bulk update
-            games_to_update = []
-            updated_game_id = None
-            
-            # Use a transaction to ensure all updates succeed or fail together
+            # Use a transaction for safety
             with transaction.atomic():
-                # Get all games in a single query
-                games = Game.objects.filter(id__in=game_ids, group=self.object).select_related('assigned_teacher')
-                games_dict = {str(game.id): game for game in games}
+                # Load all teachers for lookup
+                all_teachers = {str(t.id): t for t in Teacher.objects.all()}
                 
                 # Process each game-teacher pair
+                updates = []
                 for i, game_id in enumerate(game_ids):
                     if i >= len(teacher_ids):
                         break
                         
                     teacher_id = teacher_ids[i]
-                    
+                    if not game_id:
+                        continue
+                        
                     try:
-                        # Skip if game not found
-                        if not game:
-                            continue
-                            
-                        # Get current teacher assignment
-                        current_teacher = game.assigned_teacher
-                        current_id = str(current_teacher.id) if current_teacher else ""
+                        # Get the game
+                        game = Game.objects.get(id=game_id, group=self.object)
                         
-                        # Skip if no change
-                        if current_id == teacher_id:
-                            continue
-                        
-                        # Update the assignment
-                        if teacher_id:
-                            teacher = teachers_dict.get(teacher_id)
-                            if not teacher:
-                                continue
-                            game.assigned_teacher = teacher
-                        else:
-                            game.assigned_teacher = None
-                        
-                        games_to_update.append(game)
-                        updated_game_id = game_id
-                    
-                    except Exception:
-                        # Skip problematic entries
+                        # Set the teacher (or None)
+                        teacher = all_teachers.get(teacher_id) if teacher_id else None
+                        game.assigned_teacher = teacher
+                        updates.append(game)
+                    except (Game.DoesNotExist, KeyError):
+                        # Skip if game not found or teacher not found
                         continue
                 
                 # Bulk update all games at once
-                if games_to_update:
-                    Game.objects.bulk_update(games_to_update, ['assigned_teacher'])
-                    num_updates = len(games_to_update)
+                if updates:
+                    Game.objects.bulk_update(updates, ['assigned_teacher'])
+                    num_updates = len(updates)
                     
-                    # Check if this is an individual update
-                    if request.POST.get('individual_update') == 'true' and updated_game_id:
-                        request.session['individual_update_success'] = True
-                        request.session['individual_updated_game_id'] = updated_game_id
-                    else:
-                        request.session['teacher_assignment_success'] = True
-                        request.session['teacher_assignment_count'] = num_updates
+                    # Just set success message
+                    request.session['teacher_assignment_success'] = True
+                    request.session['teacher_assignment_count'] = num_updates
         except Exception as e:
             # Handle other unexpected errors
             import logging

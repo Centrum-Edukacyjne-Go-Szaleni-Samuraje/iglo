@@ -389,11 +389,9 @@ class GroupAllGamesView(GroupObjectMixin, DetailView):
             
             # Use a transaction to ensure all updates succeed or fail together
             with transaction.atomic():
-                # Create a dictionary of existing assignments for comparison
-                existing_assignments = {}
+                # Get all games in a single query
                 games = Game.objects.filter(id__in=game_ids, group=self.object).select_related('assigned_teacher')
-                for game in games:
-                    existing_assignments[str(game.id)] = game.assigned_teacher.id if game.assigned_teacher else None
+                games_dict = {str(game.id): game for game in games}
                 
                 # Process each game-teacher pair
                 for i, game_id in enumerate(game_ids):
@@ -403,30 +401,32 @@ class GroupAllGamesView(GroupObjectMixin, DetailView):
                     teacher_id = teacher_ids[i]
                     
                     try:
-                        # Find the game
-                        game = games.get(id=game_id)
+                        # Skip if game not found
+                        if not game:
+                            continue
+                            
+                        # Get current teacher assignment
+                        current_teacher = game.assigned_teacher
+                        current_id = str(current_teacher.id) if current_teacher else ""
                         
-                        # Skip if assignment hasn't changed
-                        current_teacher_id = existing_assignments.get(str(game_id))
-                        if (current_teacher_id is None and not teacher_id) or (current_teacher_id and str(current_teacher_id) == teacher_id):
+                        # Skip if no change
+                        if current_id == teacher_id:
                             continue
                         
+                        # Update the assignment
                         if teacher_id:
-                            # Get the teacher from our dictionary
                             teacher = teachers_dict.get(teacher_id)
-                            if teacher:
-                                # Update game with teacher
-                                game.assigned_teacher = teacher
-                                games_to_update.append(game)
-                                updated_game_id = game_id
+                            if not teacher:
+                                continue
+                            game.assigned_teacher = teacher
                         else:
-                            # Remove teacher assignment if teacher_id is empty
                             game.assigned_teacher = None
-                            games_to_update.append(game)
-                            updated_game_id = game_id
-                            
-                    except Game.DoesNotExist:
-                        # Skip games that don't exist
+                        
+                        games_to_update.append(game)
+                        updated_game_id = game_id
+                    
+                    except Exception:
+                        # Skip problematic entries
                         continue
                 
                 # Bulk update all games at once

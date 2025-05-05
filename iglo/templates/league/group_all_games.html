@@ -184,8 +184,7 @@
                                 <div class="teacher-controls">
                                     <div class="teacher-select-container">
                                         <input type="hidden" name="game_ids[]" value="{{ game.id }}">
-                                        <select class="form-select form-select-sm game-teacher-select" name="teacher_ids[]" 
-                                                data-original-value="{% if game.assigned_teacher %}{{ game.assigned_teacher.id }}{% endif %}">
+                                        <select class="form-select form-select-sm" name="teacher_ids[]">
                                             <option value="">{% translate "Wybierz nauczyciela" %}</option>
                                             {% for teacher in available_teachers %}
                                                 <option value="{{ teacher.id }}" {% if game.assigned_teacher and game.assigned_teacher.id == teacher.id %}selected{% endif %}>
@@ -237,59 +236,31 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips - one simple line
-            const initializeTooltips = () => document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            // Initialize tooltips
+            document.querySelectorAll('[data-bs-toggle="tooltip"]')
                 .forEach(el => new bootstrap.Tooltip(el));
-                
-            // Utility function to show a toast notification
-            const showToast = (message, type = 'success') => {
-                const toast = document.createElement('div');
-                toast.className = 'position-fixed bottom-0 end-0 p-3';
-                toast.style.zIndex = '1050';
-                toast.innerHTML = `
-                    <div class="toast show" role="alert">
-                        <div class="toast-header bg-${type} text-white">
-                            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                            <strong class="me-auto">{% translate "Sukces" %}</strong>
-                            <button type="button" class="btn-close btn-close-white" aria-label="Close" 
-                                onclick="this.closest('.position-fixed').remove()"></button>
-                        </div>
-                        <div class="toast-body">${message}</div>
-                    </div>
-                `;
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
-            };
             
-            // Initialize tooltips on page load
-            initializeTooltips();
-            
-            // Initialize teacher select dropdowns and "Apply to Next" buttons with event delegation
-            const initTeacherSelects = () => {
-                const tbody = document.querySelector('tbody');
+            // Set up teacher assignment form
+            const teacherForm = document.getElementById('teacher-assignment-form');
+            if (teacherForm) {
+                const tbody = teacherForm.querySelector('tbody');
                 
-                // Store original values on all selects for change detection
-                document.querySelectorAll('.game-teacher-select').forEach(select => {
-                    select.dataset.originalValue = select.value || '';
+                // Handle form submission
+                teacherForm.addEventListener('submit', e => {
+                    const saveBtn = document.getElementById('save-to-db-btn');
+                    
+                    // Enable the save button
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% translate "Zapisywanie..." %}';
                 });
                 
-                // Use event delegation for teacher selects
-                tbody.addEventListener('change', e => {
-                    const select = e.target;
-                    if (select.classList.contains('game-teacher-select')) {
-                        const changed = select.value !== select.dataset.originalValue;
-                        select.classList.toggle('border-warning', changed);
-                        if (changed) showSaveReminder();
-                    }
-                });
-                
-                // Use event delegation for apply buttons
+                // Handle clicks on "Apply to Next" buttons
                 tbody.addEventListener('click', e => {
                     const btn = e.target.closest('.apply-to-next');
                     if (!btn) return;
                     
                     const row = btn.closest('tr');
-                    const select = row.querySelector('.game-teacher-select');
+                    const select = row.querySelector('select[name="teacher_ids[]"]');
                     if (!select) return;
                     
                     // Get parameters
@@ -297,108 +268,49 @@
                     const count = parseInt(row.querySelector('.next-games-count')?.value, 10) || 5;
                     
                     // Apply to next N games
-                    applyTeacherToNextGames(row, teacherId, count);
-                });
-                
-                // Check for any fields already changed
-                highlightChangedFields();
-            };
-            
-            // Apply teacher to the next N games
-            const applyTeacherToNextGames = (startRow, teacherId, count) => {
-                let appliedCount = 0;
-                let currentRow = startRow;
-                
-                for (let i = 0; i < count; i++) {
-                    // Get next row and select
-                    if (!(currentRow = currentRow.nextElementSibling)) break;
-                    const nextSelect = currentRow.querySelector('.game-teacher-select');
-                    if (!nextSelect) continue;
+                    let currentRow = row;
+                    let appliedCount = 0;
                     
-                    // Update and highlight
-                    nextSelect.value = teacherId;
-                    nextSelect.dispatchEvent(new Event('change'));
-                    
-                    // Brief highlight
-                    highlightRow(currentRow);
-                    appliedCount++;
-                }
-                
-                // Show result message
-                if (appliedCount > 0) {
-                    showToast(`{% translate "Nauczyciel został przypisany do" %} ${appliedCount} {% translate "kolejnych gier." %}`);
-                }
-            };
-            
-            // Highlight a row briefly
-            const highlightRow = (row) => {
-                row.style.transition = 'background-color 0.5s';
-                row.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
-                setTimeout(() => row.style.backgroundColor = '', 1000);
-            };
-            
-            // Highlight changed teacher selects and show save reminder if needed
-            const highlightChangedFields = () => {
-                const hasChanges = [...document.querySelectorAll('.game-teacher-select')]
-                    .filter(select => {
-                        const changed = select.value !== select.dataset.originalValue;
-                        if (changed) select.classList.add('border-warning');
-                        return changed;
-                    }).length > 0;
-                
-                if (hasChanges) showSaveReminder();
-            };
-            
-            // Show a reminder to save changes
-            const showSaveReminder = () => {
-                // Don't show multiple reminders or for non-admin users
-                if (document.getElementById('save-reminder') || !document.getElementById('save-to-db-btn')) return;
-                
-                const saveBtn = document.getElementById('save-to-db-btn');
-                const reminder = document.createElement('div');
-                reminder.id = 'save-reminder';
-                reminder.className = 'alert alert-warning mt-2 small';
-                reminder.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-1"></i> 
-                    {% translate "Masz niezapisane zmiany. Kliknij 'Zapisz nauczycieli do bazy danych' aby zapisać." %}
-                `;
-                
-                saveBtn.parentNode.insertAdjacentElement('beforeend', reminder);
-            };
-            
-            // Set up form submission handling for admin users
-            const teacherForm = document.getElementById('teacher-assignment-form');
-            if (teacherForm) {
-                teacherForm.addEventListener('submit', e => {
-                    const saveBtn = document.getElementById('save-to-db-btn');
-                    
-                    // Check if any teacher selections have changed from their original values
-                    const hasChanges = [...document.querySelectorAll('.game-teacher-select')]
-                        .some(select => select.value !== select.dataset.originalValue);
-                    
-                    // Stop if no data has changed
-                    if (!hasChanges) {
-                        e.preventDefault();
-                        alert('{% translate "Brak przypisań nauczycieli do zapisania." %}');
-                        return;
+                    // Apply to each subsequent row
+                    for (let i = 0; i < count; i++) {
+                        if (!(currentRow = currentRow.nextElementSibling)) break;
+                        const nextSelect = currentRow.querySelector('select[name="teacher_ids[]"]');
+                        if (!nextSelect) continue;
+                        
+                        // Update select
+                        nextSelect.value = teacherId;
+                        
+                        // Highlight the row
+                        currentRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+                        setTimeout(() => {
+                            currentRow.style.backgroundColor = '';
+                        }, 1000);
+                        
+                        appliedCount++;
                     }
                     
-                    // Show loading state
-                    saveBtn.disabled = true;
-                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% translate "Zapisywanie..." %}';
+                    // Show alert with number of updates
+                    if (appliedCount > 0) {
+                        const alertMsg = document.createElement('div');
+                        alertMsg.className = 'alert alert-success small mt-2';
+                        alertMsg.innerHTML = `<i class="fas fa-check-circle me-1"></i> {% translate "Nauczyciel został przypisany do" %} ${appliedCount} {% translate "kolejnych gier." %}`;
+                        
+                        const container = document.querySelector('.mb-3');
+                        container.appendChild(alertMsg);
+                        setTimeout(() => alertMsg.remove(), 3000);
+                    }
                 });
             }
-            
-            // Initialize all components
-            initTeacherSelects();
             
             // Highlight recently updated game if any
             {% if individual_updated_game_id %}
             const updatedGameRow = document.querySelector(`tr[data-game-id="{{ individual_updated_game_id }}"]`);
             if (updatedGameRow) {
-                // Scroll to the updated game and highlight it
                 updatedGameRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                highlightRow(updatedGameRow);
+                updatedGameRow.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+                setTimeout(() => {
+                    updatedGameRow.style.backgroundColor = '';
+                }, 2000);
             }
             {% endif %}
         });

@@ -44,7 +44,7 @@ SECRET_KEY = env("SECRET_KEY", default="secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", as_bool=True, default=True)
 
-ALLOWED_HOSTS = [env("DOMAIN", default="*"), "iglo.go.art.pl"]
+ALLOWED_HOSTS = [env("DOMAIN", default="*")]
 
 DOMAIN = env("DOMAIN", default="127.0.0.1:8000")
 
@@ -107,7 +107,7 @@ WSGI_APPLICATION = "iglo.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 IGLO_DB_PORT = env("IGLO_DB_PORT", default="5432")
-IGLO_DB_URL = f"postgres://postgres:password@localhost:{IGLO_DB_PORT}/postgres"
+IGLO_DB_URL = f"postgres://postgres:postgres@localhost:{IGLO_DB_PORT}/postgres"
 DATABASES = {
     "default": dj_database_url.config(default=IGLO_DB_URL),
 }

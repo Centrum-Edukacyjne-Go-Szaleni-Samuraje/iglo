@@ -12,3 +12,7 @@ CLAUDE.md
 
 # Ignore database dumps
 iglo_dumps/
+
+# Ignore local data volumes
+data/
+deploy/data/

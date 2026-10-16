@@ -39,13 +39,16 @@ services:
       - "${DATA_PATH}/media:/data/media"
       - "${DATA_PATH}/fixtures:/data/fixtures"
   db:
-    image: postgres:14.0-alpine
+    image: postgres:17-alpine
+    restart: unless-stopped
+    ports:
+      - "${IGLO_DB_PORT:-5432}:5432"
     environment:
-      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - "${DATA_PATH}/postgres:/var/lib/postgresql/data/pgdata"
-      - "${DATA_PATH}/pg_backups:/backups"
+      - "${DATA_PATH:-./data}/postgres:/var/lib/postgresql/data/pgdata"
+      - "${DATA_PATH:-./data}/pg_backups:/backups"
   worker:
     build:
       context: ..

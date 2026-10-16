@@ -139,8 +139,6 @@ TIME_ZONE = "Europe/Warsaw"
 
 USE_I18N = True
 
-USE_L10N = False
-
 USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)

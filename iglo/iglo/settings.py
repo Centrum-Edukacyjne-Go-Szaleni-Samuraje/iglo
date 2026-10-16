@@ -44,7 +44,7 @@ SECRET_KEY = env("SECRET_KEY", default="secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", as_bool=True, default=True)
 
-ALLOWED_HOSTS = [env("DOMAIN", default="*")]
+ALLOWED_HOSTS = [env("DOMAIN", default="*"), "iglo.go.art.pl"]
 
 DOMAIN = env("DOMAIN", default="127.0.0.1:8000")
 
@@ -138,8 +138,6 @@ LANGUAGE_CODE = "pl"
 TIME_ZONE = "Europe/Warsaw"
 
 USE_I18N = True
-
-USE_L10N = False
 
 USE_TZ = False
 

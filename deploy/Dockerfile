@@ -11,7 +11,7 @@ WORKDIR /app
 RUN poetry config virtualenvs.create false
 RUN poetry config installer.parallel false
 
-RUN poetry install --no-cache
+RUN poetry install --no-cache --no-root
 
 ADD . /app/
 

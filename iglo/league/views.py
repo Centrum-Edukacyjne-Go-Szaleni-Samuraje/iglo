@@ -215,6 +215,20 @@ class GroupDetailView(UserRoleRequiredForModify, GroupObjectMixin, DetailView):
     model = Group
     required_roles = [UserRole.REFEREE]
     
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        return get_object_or_404(
+            queryset.select_related("season", "teacher").prefetch_related(
+                "members__player",
+            ).annotate(
+                all_games_finished=~Exists(Game.objects.filter(group=OuterRef("id"), win_type__isnull=True)),
+                rounds_number=Count("rounds", distinct=True),
+            ),
+            season__number=self.kwargs["season_number"],
+            name__iexact=self.kwargs["group_name"],
+        )
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         

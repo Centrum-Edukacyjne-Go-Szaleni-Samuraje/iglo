@@ -433,7 +433,9 @@ class Group(models.Model):
         player_position = {member.player.nick: idx for idx, member in enumerate(members, start=1)}
         table = []
         for position, member in enumerate(members, start=1):
-            games = Game.objects.get_for_member(member)
+            games = getattr(member, "_group_games", None)
+            if games is None:
+                games = Game.objects.get_for_member(member)
             records = []
             for game in games:
                 opponent = game.get_opponent(member)
@@ -441,9 +443,9 @@ class Group(models.Model):
                     opponent_position = player_position[opponent.player.nick]
                     if not game.is_played:
                         result_symbol = ResultSymbol.not_played
-                    elif game.winner == member:
+                    elif game.winner_id == member.id:
                         result_symbol = ResultSymbol.win
-                    elif game.winner == opponent:
+                    elif game.winner_id == opponent.id:
                         result_symbol = ResultSymbol.lose
                     else:
                         result_symbol = ResultSymbol.no_result
@@ -473,11 +475,120 @@ class Group(models.Model):
 
     @cached_property
     def members_qualification(self) -> list["Member"]:
-        members = list(self.members.select_related("player")
-                       .prefetch_related("won_games__black", "won_games__white", "games_as_black", "games_as_white")
-                       .all())
+        if "members" in getattr(self, "_prefetched_objects_cache", {}):
+            members = list(self.members.all())
+        else:
+            members = list(self.members.select_related("player").all())
 
-        # Note different sorting based on group type.
+        if not members:
+            return []
+
+        # Ensure all members have group cached to avoid extra queries on member.group
+        for member in members:
+            member.group = self
+
+        # Fetch all games for this group in a single query with needed relations
+        all_games = list(
+            self.games
+            .select_related(
+                "white__player",
+                "black__player",
+                "winner__player",
+                "group__season",
+                "round",
+            )
+            .order_by("round__number", "id")
+        )
+
+        # Index games by member
+        games_by_member = defaultdict(list)
+        won_games_by_member = defaultdict(list)
+        games_as_white_by_member = defaultdict(list)
+        games_as_black_by_member = defaultdict(list)
+
+        for game in all_games:
+            if game.white_id:
+                games_by_member[game.white_id].append(game)
+                games_as_white_by_member[game.white_id].append(game)
+            if game.black_id and game.black_id != game.white_id:
+                games_by_member[game.black_id].append(game)
+                games_as_black_by_member[game.black_id].append(game)
+            if game.is_bye and game.winner_id and game.winner_id != game.white_id and game.winner_id != game.black_id:
+                games_by_member[game.winner_id].append(game)
+            if game.winner_id:
+                won_games_by_member[game.winner_id].append(game)
+
+        # 1. Compute points, score, and walkovers for each member in memory
+        points_by_member_id = {}
+        score_by_member_id = {}
+
+        for member in members:
+            m_won_games = won_games_by_member[member.id]
+            m_all_games = games_by_member[member.id]
+
+            # Points: won games excluding BYE
+            points = sum(1 for g in m_won_games if g.win_type != WinType.BYE)
+            points_by_member_id[member.id] = points
+            member.__dict__["points"] = points
+
+            # Score: initial_score + 0.5 for mutual not played + 1.0 for each win
+            score = float(member.initial_score)
+            for g in m_won_games:
+                if g.win_type == WinType.NOT_PLAYED and not g.winner_id:
+                    score += 0.5
+                else:
+                    score += 1.0
+            score_by_member_id[member.id] = score
+            member.__dict__["score"] = score
+
+            # Walkovers
+            mutual_unplayed = 0
+            lost_unplayed = 0
+            for g in m_all_games:
+                if g.win_type == WinType.NOT_PLAYED:
+                    if not g.winner_id:
+                        mutual_unplayed += 1
+                    elif g.winner_id != member.id:
+                        lost_unplayed += 1
+
+            member.__dict__["mutual_unplayed_games"] = mutual_unplayed
+            member.__dict__["lost_unplayed_games"] = lost_unplayed
+            member.__dict__["total_walkovers"] = mutual_unplayed + lost_unplayed
+            member._group_games = m_all_games
+
+        # 2. Compute SODOS and SOS for each member in memory
+        sos_by_member_id = {}
+        for member in members:
+            sodos = 0
+            for g in won_games_by_member[member.id]:
+                if not g.is_bye and g.winner_id:
+                    loser_id = g.white_id if g.winner_id == g.black_id else g.black_id
+                    if loser_id and loser_id in points_by_member_id:
+                        sodos += points_by_member_id[loser_id]
+            member.__dict__["sodos"] = sodos
+
+            sos = 0.0
+            for g in games_as_white_by_member[member.id]:
+                if not g.is_bye and g.black_id and g.black_id in score_by_member_id:
+                    sos += score_by_member_id[g.black_id]
+            for g in games_as_black_by_member[member.id]:
+                if not g.is_bye and g.white_id and g.white_id in score_by_member_id:
+                    sos += score_by_member_id[g.white_id]
+            sos_by_member_id[member.id] = sos
+            member.__dict__["sos"] = sos
+
+        # 3. Compute SOSOS for each member in memory
+        for member in members:
+            sosos = 0.0
+            for g in games_as_white_by_member[member.id]:
+                if not g.is_bye and g.black_id and g.black_id in sos_by_member_id:
+                    sosos += sos_by_member_id[g.black_id]
+            for g in games_as_black_by_member[member.id]:
+                if not g.is_bye and g.white_id and g.white_id in sos_by_member_id:
+                    sosos += sos_by_member_id[g.white_id]
+            member.__dict__["sosos"] = sosos
+
+        # Sort based on group type
         if self.type == GroupType.ROUND_ROBIN:
             members.sort(key=lambda member: (
                 member.final_order if member.final_order is not None else float('inf'),
@@ -851,6 +962,8 @@ class Member(models.Model):
     @cached_property
     def mutual_unplayed_games(self) -> int:
         """Count the number of games that were not played and had no winner (both sides didn't show up)."""
+        if hasattr(self, "_group_games"):
+            return sum(1 for g in self._group_games if g.win_type == WinType.NOT_PLAYED and not g.winner_id)
         return Game.objects.filter(
             Q(black=self) | Q(white=self),
             win_type=WinType.NOT_PLAYED,
@@ -860,6 +973,8 @@ class Member(models.Model):
     @cached_property
     def lost_unplayed_games(self) -> int:
         """Count the number of games that were not played and counted as losses."""
+        if hasattr(self, "_group_games"):
+            return sum(1 for g in self._group_games if g.win_type == WinType.NOT_PLAYED and g.winner_id and g.winner_id != self.id)
         return Game.objects.filter(
             Q(black=self) | Q(white=self),
             win_type=WinType.NOT_PLAYED,

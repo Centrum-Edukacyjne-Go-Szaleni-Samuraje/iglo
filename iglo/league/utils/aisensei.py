@@ -27,7 +27,9 @@ def upload_sgf(config: AISenseiConfig, sgf_data: str, tags: list[str]) -> str:
     )
 
     if response_token.status_code != 200:
-        raise AISenseiException("authentication error")
+        raise AISenseiException(
+            f"authentication error (HTTP {response_token.status_code}): {response_token.text}"
+        )
 
     response_upload = requests.post(
         url=config.service_url,
@@ -39,6 +41,8 @@ def upload_sgf(config: AISenseiConfig, sgf_data: str, tags: list[str]) -> str:
         },
     )
     if response_upload.status_code != 200:
-        raise AISenseiException("upload error")
+        raise AISenseiException(
+            f"upload error (HTTP {response_upload.status_code}): {response_upload.text}"
+        )
 
     return response_upload.json()["url"]

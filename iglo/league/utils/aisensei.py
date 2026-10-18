@@ -36,7 +36,7 @@ def upload_sgf(config: AISenseiConfig, sgf_data: str, tags: list[str]) -> str:
         json={
             "token": response_token.json()["idToken"],
             "game": sgf_data,
-            "options": {"quality": "pro"},
+            "options": {"quality": "free"},
             "tags": tags
         },
     )
@@ -45,4 +45,8 @@ def upload_sgf(config: AISenseiConfig, sgf_data: str, tags: list[str]) -> str:
             f"upload error (HTTP {response_upload.status_code}): {response_upload.text}"
         )
 
-    return response_upload.json()["url"]
+    upload_data = response_upload.json()
+    if "error" in upload_data:
+        raise AISenseiException(f"upload error: {upload_data['error']}")
+
+    return upload_data["url"]

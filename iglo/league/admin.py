@@ -78,7 +78,7 @@ class GroupModelAdmin(admin.ModelAdmin):
 
 
 class GameAIAnalyseUploadAdmin(admin.ModelAdmin):
-    list_display = ["created", "game", "status"]
+    list_display = ["created", "game", "status", "error"]
     raw_id_fields = ["game"]
 
     def has_delete_permission(self, request, obj=None):

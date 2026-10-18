@@ -117,9 +117,12 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url "accounts:logout" %}">
-                                    <i class="fas fa-sign-out-alt"></i> {% translate "Wyloguj" %}
-                                </a>
+                                <form method="post" action="{% url "accounts:logout" %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt"></i> {% translate "Wyloguj" %}
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </li>

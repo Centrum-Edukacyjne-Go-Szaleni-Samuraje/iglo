@@ -123,6 +123,7 @@ def game_ai_analyse_upload_task(game_id: int) -> None:
             return
         elif upload.status == GameAIAnalyseUploadStatus.IN_PROGRESS:
             logger.info("AI analyse already in progress for game %d", game_id)
+            return
     try:
         result = upload_sgf(
             config=AISenseiConfig(

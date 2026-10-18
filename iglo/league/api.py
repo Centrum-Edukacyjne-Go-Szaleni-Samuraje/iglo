@@ -1,11 +1,15 @@
+from django.http import Http404
 from rest_framework import serializers
+from rest_framework.decorators import action
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_extensions.routers import ExtendedDefaultRouter
 
-from league.models import Season, Group, Member, Round, Game
+from league.models import Season, SeasonState, Group, Member, Round, Game
+from league.services.season_report import SeasonReportService
 import league.igor
 
 
@@ -79,6 +83,37 @@ class SeasonViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, Gene
     queryset = Season.objects.all()
     serializer_class = SeasonSerializer
     lookup_field = "number"
+
+    def get_season_object(self, lookup_value: str) -> Season:
+        if lookup_value == "latest":
+            season = (
+                Season.objects.exclude(state=SeasonState.DRAFT)
+                .order_by("-number")
+                .first()
+            )
+            if not season:
+                try:
+                    season = Season.objects.get_latest()
+                except Season.DoesNotExist:
+                    raise Http404("No seasons found")
+            return season
+
+        season = Season.objects.filter(number=lookup_value).first()
+        if not season and lookup_value.isdigit():
+            season = Season.objects.filter(pk=lookup_value).first()
+        if not season:
+            raise Http404(f"Season '{lookup_value}' not found")
+        return season
+
+    @action(detail=True, methods=["get"], url_path="report")
+    def report(self, request, number=None):
+        season = self.get_season_object(number)
+        return Response(SeasonReportService.generate_report(season))
+
+    @action(detail=False, methods=["get"], url_path="latest/report")
+    def latest_report(self, request):
+        season = self.get_season_object("latest")
+        return Response(SeasonReportService.generate_report(season))
 
 
 class GroupViewSet(ListModelMixin, RetrieveModelMixin, NestedViewSetMixin, GenericViewSet):

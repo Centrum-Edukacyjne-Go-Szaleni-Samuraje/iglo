@@ -1,3 +1,4 @@
+import time
 import requests
 from typing import Optional, Dict, Any, Tuple
 
@@ -6,11 +7,25 @@ class OGSException(Exception):
     pass
 
 
-def fetch_sgf(sgf_url: str) -> str:
-    response = requests.get(url=sgf_url)
-    if response.status_code != 200:
-        raise OGSException("can not fetch SGF file")
-    return response.content.decode()
+def fetch_sgf(sgf_url: str, retries: int = 2, delay: float = 1.0) -> str:
+    headers = {"User-Agent": "IGLO-League/1.0 (https://iglo.szalenisamuraje.org)"}
+    last_status = None
+    for attempt in range(retries + 1):
+        try:
+            response = requests.get(url=sgf_url, headers=headers, timeout=10)
+            last_status = response.status_code
+            if response.status_code == 200:
+                return response.content.decode()
+            if response.status_code == 429 and attempt < retries:
+                time.sleep(delay * (attempt + 1) * 2)
+                continue
+        except requests.RequestException:
+            if attempt < retries:
+                time.sleep(delay)
+                continue
+            raise OGSException("can not fetch SGF file")
+    status_suffix = f" (HTTP {last_status})" if last_status else ""
+    raise OGSException(f"can not fetch SGF file{status_suffix}")
 
 
 def get_player_data(username: str) -> Dict[str, Any]:

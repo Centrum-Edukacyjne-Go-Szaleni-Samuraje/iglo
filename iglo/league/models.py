@@ -1097,7 +1097,7 @@ class GameManager(models.Manager):
             .filter(sgf_updated__isnull=False)
         )
         if current_season:
-            queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
+            queryset = queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
         return queryset
 
     def get_latest_reviews(self, current_season=False) -> QuerySet:
@@ -1110,7 +1110,7 @@ class GameManager(models.Manager):
             .filter(review_updated__isnull=False)
         )
         if current_season:
-            queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
+            queryset = queryset.filter(group__season__state=SeasonState.IN_PROGRESS)
         return queryset
 
     def get_upcoming_games(self) -> QuerySet:
@@ -1118,7 +1118,7 @@ class GameManager(models.Manager):
         one_hour_ago = now - datetime.timedelta(hours=1)
         return (
             self.prefetch_related("group", "black__player", "white__player", "group__season")
-            .filter(win_type=WinType.NOT_PLAYED, date__gt=one_hour_ago)
+            .filter(win_type__isnull=True, date__gt=one_hour_ago)
             .order_by("date")
         )
 

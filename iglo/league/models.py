@@ -178,10 +178,13 @@ class Season(models.Model):
         self.validate_state(state=SeasonState.IN_PROGRESS)
         if Game.objects.filter(group__season=self, win_type__isnull=True).exists():
             Game.objects.filter(group__season=self, win_type__isnull=True).update(win_type=WinType.NOT_PLAYED)
+        members_to_update = []
         for group in self.groups.all():
             for position, member in enumerate(group.members_qualification, start=1):
                 member.final_order = position
-                member.save()
+                members_to_update.append(member)
+        if members_to_update:
+            Member.objects.bulk_update(members_to_update, ["final_order"])
         self.state = SeasonState.FINISHED
         self.save()
 
@@ -1306,6 +1309,8 @@ class GameAIAnalyseUpload(models.Model):
 
 @receiver(signal=pre_save, sender=Game)
 def update_game_timestamps(sender, instance: Game, raw, using, update_fields, **kwargs):
+    if not instance.pk or raw:
+        return
     try:
         db_game: Game = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:

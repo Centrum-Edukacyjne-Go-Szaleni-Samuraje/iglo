@@ -68,10 +68,10 @@ def recalculate_igor():
     ar_data = accurating.data_from_dicts(matches)
     model = accurating.fit(ar_data, ar_config)
 
-    to_update = Player.objects.filter(nick__in=model.rating.keys())
+    to_update = Player.objects.filter(nick__in=model.rating.keys()).prefetch_related("memberships__group__season")
     for player in to_update:
         if player.nick in model.rating:
-            memberships = player.memberships.select_related("group__season")
+            memberships = player.memberships.all()
             participated_seasons = {m.group.season.number - 1 for m in memberships} # index seasons from 0
 
             def get_rating(kv):

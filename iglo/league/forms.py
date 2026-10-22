@@ -114,13 +114,16 @@ class GameResultUpdateRefereeForm(GameResultUpdateForm):
         fields = GameResultUpdateForm.Meta.fields + [
             "review_video_link",
             "ai_analyse_link",
+            "kifubara_link",
         ]
         labels = GameResultUpdateForm.Meta.labels | {
             "review_video_link": "Komentarz na YouTube",
             "ai_analyse_link": "Analiza AI Sensei",
+            "kifubara_link": "Analiza Kifubara",
         }
-        help_texts = GameResultUpdateForm.Meta.labels | {
+        help_texts = GameResultUpdateForm.Meta.help_texts | {
             "ai_analyse_link": texts.AI_ANALYSE_LINK_HELP_TEXT,
+            "kifubara_link": "Link do recenzji partii w Kifubara",
         }
 
 
@@ -128,6 +131,7 @@ class GameResultUpdateTeacherForm(GameResultUpdateRefereeForm):
     enabled_fields = [
         "review_video_link",
         "ai_analyse_link",
+        "kifubara_link",
     ]
 
     def __init__(self, *args, **kwargs):

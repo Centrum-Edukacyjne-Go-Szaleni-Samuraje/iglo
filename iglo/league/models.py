@@ -1176,6 +1176,7 @@ class Game(models.Model):
 
     review_video_link = models.URLField(null=True, blank=True)
     ai_analyse_link = models.URLField(null=True, blank=True)
+    kifubara_link = models.URLField(null=True, blank=True)
     upcoming_reminder_sent = models.DateTimeField(null=True)
     delayed_reminder_sent = models.DateTimeField(null=True)
     
@@ -1307,6 +1308,16 @@ class GameAIAnalyseUpload(models.Model):
     result = models.URLField(null=True)
 
 
+class GameKifubaraUpload(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="kifubara_uploads")
+    sgf_hash = models.CharField(max_length=32, null=True)
+    status = models.CharField(max_length=16, choices=GameAIAnalyseUploadStatus.choices)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    error = models.TextField()
+    result = models.URLField(null=True)
+
+
 @receiver(signal=pre_save, sender=Game)
 def update_game_timestamps(sender, instance: Game, raw, using, update_fields, **kwargs):
     if not instance.pk or raw:
@@ -1324,9 +1335,15 @@ def update_game_timestamps(sender, instance: Game, raw, using, update_fields, **
 
 @receiver(signal=post_save, sender=Game)
 def game_updated(instance, raw, **kwargs):
-    from league.tasks import game_ai_analyse_upload_task, game_sgf_fetch_task
+    from league.tasks import (
+        game_ai_analyse_upload_task,
+        game_kifubara_upload_task,
+        game_sgf_fetch_task,
+    )
 
     if instance.sgf and not instance.ai_analyse_link:
         game_ai_analyse_upload_task.delay(game_id=instance.id)
+    if instance.sgf and not instance.kifubara_link:
+        game_kifubara_upload_task.delay(game_id=instance.id)
     if instance.link and not instance.sgf:
         game_sgf_fetch_task.delay(game_id=instance.id)

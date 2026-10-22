@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n static %}
 
 {% if game.link %}
     <a href="{{ game.link }}" target="_blank" class="btn btn-primary">
@@ -11,8 +11,13 @@
     </a>
 {% endif %}
 {% if game.ai_analyse_link %}
-    <a href="{{ game.ai_analyse_link }}" class="btn btn-primary" target="_blank">
-        <i class="fas fa-robot"></i> <span class="d-none d-md-inline">{% translate "Analiza AI" %}</span>
+    <a href="{{ game.ai_analyse_link }}" class="btn btn-primary" target="_blank" title="AI Sensei">
+        <i class="fas fa-robot"></i> <span class="d-none d-md-inline">{% translate "AI Sensei" %}</span>
+    </a>
+{% endif %}
+{% if game.kifubara_link %}
+    <a href="{{ game.kifubara_link }}" class="btn btn-primary" target="_blank" title="Kifubara">
+        <img src="{% static 'imgs/capybara.png' %}" alt="Kifubara" style="width: 16px; height: 16px; vertical-align: -2px;" /> <span class="d-none d-md-inline">{% translate "Kifubara" %}</span>
     </a>
 {% endif %}
 {% if game.sgf_link %}

@@ -5,9 +5,15 @@ from django.core import mail
 from django.test import TestCase, override_settings
 
 from league.models import GameAIAnalyseUploadStatus, SeasonState
-from league.tasks import game_ai_analyse_upload_task, send_delayed_games_reminder, send_upcoming_games_reminder
+from league.tasks import (
+    game_ai_analyse_upload_task,
+    game_kifubara_upload_task,
+    send_delayed_games_reminder,
+    send_upcoming_games_reminder,
+)
 from league.tests.factories import GameFactory, SeasonFactory
 from league.utils.aisensei import AISenseiException
+from league.utils.kifubara import KifubaraException
 
 
 @override_settings(ENABLE_AI_ANALYSE_UPLOAD=True)
@@ -41,6 +47,59 @@ class GameAIAnalyseUploadTaskTestCase(TestCase):
         self.assertEqual(upload.status, GameAIAnalyseUploadStatus.FAILED)
         self.assertIsNone(upload.result)
         self.assertEqual(upload.error, "error message")
+
+
+@override_settings(KIFUBARA={"SERVICE_URL": "https://kifubara.app/api/integrations/analyze", "KEY": "test-key"})
+class GameKifubaraUploadTaskTestCase(TestCase):
+
+    def test_task_succeed(self):
+        game = GameFactory(sgf__data="(;GM[1])", group__name="A", group__season__number=46)
+        round_obj = game.round
+        round_obj.number = 2
+        round_obj.save()
+
+        with mock.patch("league.tasks.upload_game_to_kifubara") as upload_mock:
+            upload_mock.return_value = "https://kifubara.app/share/abc12345"
+            game_kifubara_upload_task(game_id=game.id)
+
+        upload_mock.assert_called_once()
+        call_kwargs = upload_mock.call_args.kwargs
+        self.assertEqual(call_kwargs["sgf_data"], "(;GM[1])")
+        self.assertEqual(call_kwargs["season"], "46")
+        self.assertEqual(call_kwargs["group"], "A")
+        self.assertEqual(call_kwargs["round"], "2")
+        self.assertIn("iglo-s46-gA-", call_kwargs["match_id"])
+        self.assertTrue(call_kwargs["external_url"].endswith(game.get_absolute_url()))
+
+        game.refresh_from_db()
+        self.assertEqual(game.kifubara_link, "https://kifubara.app/share/abc12345")
+        upload = game.kifubara_uploads.get()
+        self.assertEqual(upload.status, GameAIAnalyseUploadStatus.DONE)
+        self.assertEqual(upload.result, "https://kifubara.app/share/abc12345")
+
+    def test_task_failed(self):
+        game = GameFactory(sgf__data="(;GM[1])", group__name="A")
+
+        with mock.patch("league.tasks.upload_game_to_kifubara") as upload_mock:
+            upload_mock.side_effect = KifubaraException("kifubara error message")
+            game_kifubara_upload_task(game_id=game.id)
+
+        game.refresh_from_db()
+        self.assertIsNone(game.kifubara_link)
+        upload = game.kifubara_uploads.get()
+        self.assertEqual(upload.status, GameAIAnalyseUploadStatus.FAILED)
+        self.assertIsNone(upload.result)
+        self.assertEqual(upload.error, "kifubara error message")
+
+    @override_settings(KIFUBARA={"SERVICE_URL": "https://kifubara.app/api/integrations/analyze", "KEY": None})
+    def test_task_skipped_when_no_key(self):
+        game = GameFactory(sgf__data="(;GM[1])", group__name="A")
+
+        with mock.patch("league.tasks.upload_game_to_kifubara") as upload_mock:
+            game_kifubara_upload_task(game_id=game.id)
+
+        upload_mock.assert_not_called()
+        self.assertEqual(game.kifubara_uploads.count(), 0)
 
 
 @override_settings(ENABLE_DELAYED_GAMES_REMINDER=True)

@@ -76,6 +76,7 @@ class GameSerializer(ModelSerializer):
             "updated",
             "review_video_link",
             "ai_analyse_link",
+            "kifubara_link",
         ]
 
 

@@ -12,8 +12,20 @@ from django.db import models
 from requests.exceptions import HTTPError
 
 from league import texts
-from league.models import Game, GameAIAnalyseUpload, GameAIAnalyseUploadStatus, Player, WinType
+from league.models import (
+    Game,
+    GameAIAnalyseUpload,
+    GameAIAnalyseUploadStatus,
+    GameKifubaraUpload,
+    Player,
+    WinType,
+)
 from league.utils.aisensei import upload_sgf, AISenseiConfig, AISenseiException
+from league.utils.kifubara import (
+    upload_game_to_kifubara,
+    KifubaraConfig,
+    KifubaraException,
+)
 from league.utils.egd import get_gor_by_pin, EGDException
 from league.utils.ogs import fetch_sgf, OGSException, get_player_data
 from utils.emails import send_email
@@ -146,6 +158,103 @@ def game_ai_analyse_upload_task(game_id: int) -> None:
         upload.status = GameAIAnalyseUploadStatus.FAILED
         upload.save()
         logger.info("AI analyse upload failed for game %d - %s", game_id, str(err))
+
+
+@shared_task(time_limit=60)
+def game_kifubara_upload_task(game_id: int) -> None:
+    kifubara_key = settings.KIFUBARA.get("KEY")
+    if not kifubara_key:
+        logger.info("Kifubara upload skipped for game %d - no API key configured", game_id)
+        return
+
+    logger.info("Kifubara upload started for game %d", game_id)
+    game = Game.objects.get(id=game_id)
+    if not game.sgf:
+        logger.info("Kifubara upload skipped for game %d - no SGF data", game_id)
+        return
+    if game.kifubara_link:
+        logger.info("Kifubara upload skipped for game %d - Kifubara link already defined", game_id)
+        return
+
+    with game.sgf.open("r") as file:
+        sgf_data = file.read()
+
+    sgf_hash = hashlib.md5(sgf_data.encode()).hexdigest()
+    upload, created = GameKifubaraUpload.objects.get_or_create(
+        game=game,
+        sgf_hash=sgf_hash,
+        defaults={
+            "status": GameAIAnalyseUploadStatus.IN_PROGRESS,
+        },
+    )
+
+    if not created:
+        if upload.status == GameAIAnalyseUploadStatus.DONE:
+            logger.info("Kifubara already uploaded for game %d", game_id)
+            game.kifubara_link = upload.result
+            game.save()
+            return
+        elif upload.status == GameAIAnalyseUploadStatus.IN_PROGRESS:
+            # If created less than 5 minutes ago, assume another worker is still running it
+            five_mins_ago = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=5)
+            if upload.created and upload.created > five_mins_ago:
+                logger.info("Kifubara upload already in progress for game %d", game_id)
+                return
+            logger.info("Stale in_progress Kifubara upload for game %d, retrying", game_id)
+
+    # Build rich metadata for Kifubara UI
+    season_number = str(game.group.season.number)
+    group_name = str(game.group.name)
+    round_number = str(game.round) if game.round else None
+
+    black_nick = game.black.player.nick if game.black and game.black.player else "black"
+    white_nick = game.white.player.nick if game.white and game.white.player else "white"
+    black_name = (
+        game.black.player.name or game.black.player.nick
+        if game.black and game.black.player
+        else None
+    )
+    white_name = (
+        game.white.player.name or game.white.player.nick
+        if game.white and game.white.player
+        else None
+    )
+
+    match_id = f"iglo-s{season_number}-g{group_name}-{black_nick}-{white_nick}-{game.id}"
+
+    base_url = getattr(settings, "BASE_URL", "https://iglo.go.art.pl").rstrip("/")
+    external_url = f"{base_url}{game.get_absolute_url()}"
+
+    config = KifubaraConfig(
+        service_url=settings.KIFUBARA["SERVICE_URL"],
+        key=kifubara_key,
+    )
+
+    try:
+        share_url = upload_game_to_kifubara(
+            config=config,
+            sgf_data=sgf_data,
+            match_id=match_id,
+            season=season_number,
+            group=group_name,
+            round=round_number,
+            black=black_name,
+            white=white_name,
+            external_url=external_url,
+        )
+        upload.result = share_url
+        upload.status = GameAIAnalyseUploadStatus.DONE
+        upload.error = ""
+        upload.save()
+
+        game.kifubara_link = share_url
+        game.save()
+        logger.info("Kifubara upload successful for game %d: %s", game_id, share_url)
+    except KifubaraException as err:
+        upload.error = str(err)
+        upload.status = GameAIAnalyseUploadStatus.FAILED
+        upload.save()
+        logger.info("Kifubara upload failed for game %d - %s", game_id, str(err))
 
 
 @shared_task(time_limit=10)

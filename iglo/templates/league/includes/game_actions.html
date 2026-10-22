@@ -11,8 +11,13 @@
     </a>
 {% endif %}
 {% if game.ai_analyse_link %}
-    <a href="{{ game.ai_analyse_link }}" class="btn btn-primary" target="_blank">
-        <i class="fas fa-robot"></i> <span class="d-none d-md-inline">{% translate "Analiza AI" %}</span>
+    <a href="{{ game.ai_analyse_link }}" class="btn btn-primary" target="_blank" title="AI Sensei">
+        <i class="fas fa-robot"></i> <span class="d-none d-md-inline">{% translate "AI Sensei" %}</span>
+    </a>
+{% endif %}
+{% if game.kifubara_link %}
+    <a href="{{ game.kifubara_link }}" class="btn btn-primary" target="_blank" title="Kifubara">
+        <i class="fas fa-brain"></i> <span class="d-none d-md-inline">{% translate "Kifubara" %}</span>
     </a>
 {% endif %}
 {% if game.sgf_link %}

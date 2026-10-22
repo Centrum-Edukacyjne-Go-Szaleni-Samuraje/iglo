@@ -246,6 +246,12 @@ AI_SENSEI = {
     "PASSWORD": env("AI_SENSEI_PASSWORD", required=False),
 }
 
+KIFUBARA = {
+    "SERVICE_URL": env("KIFUBARA_URL", default="https://kifubara.app/api/integrations/analyze"),
+    "KEY": env("KIFUBARA_PASS", default=env("KIFUBARA_KEY", default=None)),
+}
+BASE_URL = env("BASE_URL", default="https://iglo.go.art.pl")
+
 OGS_GAME_LINK_REGEX = r"https:\/\/online-go\.com\/game\/(\d+)"
 OGS_SGF_LINK_FORMAT = "https://online-go.com/api/v1/games/{id}/sgf"
 

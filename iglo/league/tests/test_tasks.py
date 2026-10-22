@@ -53,7 +53,10 @@ class GameAIAnalyseUploadTaskTestCase(TestCase):
 class GameKifubaraUploadTaskTestCase(TestCase):
 
     def test_task_succeed(self):
-        game = GameFactory(sgf__data="(;GM[1])", group__name="A", group__season__number=46, round__number=2)
+        game = GameFactory(sgf__data="(;GM[1])", group__name="A", group__season__number=46)
+        round_obj = game.round
+        round_obj.number = 2
+        round_obj.save()
 
         with mock.patch("league.tasks.upload_game_to_kifubara") as upload_mock:
             upload_mock.return_value = "https://kifubara.app/share/abc12345"

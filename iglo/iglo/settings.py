@@ -248,7 +248,7 @@ AI_SENSEI = {
 
 KIFUBARA = {
     "SERVICE_URL": env("KIFUBARA_URL", default="https://kifubara.app/api/integrations/analyze"),
-    "KEY": env("KIFUBARA_PASS", default=env("KIFUBARA_KEY", default=None)),
+    "KEY": env("KIFUBARA_PASS", required=False),
 }
 BASE_URL = env("BASE_URL", default="https://iglo.go.art.pl")
 

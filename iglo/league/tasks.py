@@ -205,17 +205,17 @@ def game_kifubara_upload_task(game_id: int) -> None:
     # Build rich metadata for Kifubara UI
     season_number = str(game.group.season.number)
     group_name = str(game.group.name)
-    round_number = str(game.round) if game.round else None
+    round_number = str(game.round.number) if game.round else None
 
     black_nick = game.black.player.nick if game.black and game.black.player else "black"
     white_nick = game.white.player.nick if game.white and game.white.player else "white"
     black_name = (
-        game.black.player.name or game.black.player.nick
+        f"{game.black.player.first_name} {game.black.player.last_name}".strip() or game.black.player.nick
         if game.black and game.black.player
         else None
     )
     white_name = (
-        game.white.player.name or game.white.player.nick
+        f"{game.white.player.first_name} {game.white.player.last_name}".strip() or game.white.player.nick
         if game.white and game.white.player
         else None
     )
